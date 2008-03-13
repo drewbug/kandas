@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE kpartgui SYSTEM "kpartgui.dtd">
+<gui name="kandas" version="1">
+    <MenuBar>
+        <Menu name="actions">
+            <Text>Actions</Text>
+            <Action name="kandas_start"/>
+            <Action name="kandas_stop"/>
+        </Menu>
+    </MenuBar>
+    <ToolBar name="driverToolBar">
+        <Text>Driver functions</Text>
+        <Action name="kandas_start"/>
+        <Action name="kandas_stop"/>
+    </ToolBar>
+
+    <State name="connected">
+        <disable>
+            <Action name="kandas_start"/>
+            <Action name="kandas_stop"/>
+        </disable>
+    </State>
+
+    <State name="disconnected">
+        <enable>
+            <Action name="kandas_stop"/>
+        </enable>
+        <disable>
+            <Action name="kandas_start"/>
+        </disable>
+    </State>
+
+    <State name="nodriver">
+        <enable>
+            <Action name="kandas_start"/>
+        </enable>
+        <disable>
+            <Action name="kandas_stop"/>
+        </disable>
+    </State>
+
+</gui>

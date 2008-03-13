@@ -1,0 +1,23 @@
+#summary Overview over contents and schedules of future releases.
+#labels Phase-Requirements
+
+This is the release schedule and feature plan for future releases. The contents of this page may change radically. More detailed schedules will be available once releases are approaching.
+
+== Version 0.1 ==
+
+ * Milestones:
+  * KaNDASd is able to read from the NDAS driver's information system.
+  * KaNDASd can use the ndasadmin program to connect and disconnect devices and slots.
+  * KaNDAS and CaNDAS are available for general consumption and provide access to all features provided by KaNDASd.
+ * Release Schedule: TBA
+
+== Version 0.2 ==
+
+ * Milestones:
+  * KaNDASd provides an interface to register and unregister NDAS devices.
+  * KaNDAS and CaNDAS are able to use this interface.
+
+== Version 0.3 ==
+
+ * Milestones:
+  * Provide more interfaces to integrate with the user's workflow.

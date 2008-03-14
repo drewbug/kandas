@@ -27,8 +27,17 @@
 
 namespace Kandas
 {
+    namespace AutoRefreshIntervals
+    {
+        const int HighImportanceMonitor = 1;
+        const int LowImportanceMonitor = 5;
+    };
+
     namespace Daemon
     {
+
+        const char VersionRaw[] = "0.1pre1";
+        const QString Version(VersionRaw);
 
         typedef void (*EngineJob)(int slot);
         struct EngineTask

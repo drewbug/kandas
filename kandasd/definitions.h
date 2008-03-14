@@ -24,20 +24,11 @@
 namespace Kandas
 {
 
-    const char InterfaceVersionRaw[] = "0.1pre1";
-    const QString InterfaceVersion(InterfaceVersionRaw);
-
     enum ClientType
     {
         HighImportanceMonitor,
         LowImportanceMonitor,
         DirectModifier
-    };
-
-    namespace AutoRefreshIntervals
-    {
-        const int HighImportanceMonitor = 1;
-        const int LowImportanceMonitor = 5;
     };
 
     enum SlotState

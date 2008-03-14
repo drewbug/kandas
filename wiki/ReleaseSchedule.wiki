@@ -1,4 +1,4 @@
-#labels Phase-Requirements
+#labels Category-Project
 This is the release schedule and feature plan for future releases. The contents of this page may change radically. More detailed schedules will be available once releases are approaching.
 
 == Version 0.1 ==

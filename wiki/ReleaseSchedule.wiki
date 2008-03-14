@@ -1,5 +1,5 @@
+#summary Release schedule and feature plan for future releases.
 #labels Category-Project
-#Summary Release schedule and feature plan for future releases.
 
 The contents of this page may change radically. More detailed schedules will be available once releases are approaching.
 

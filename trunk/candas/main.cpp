@@ -35,6 +35,8 @@ int main(int argc, char **argv)
     KCmdLineArgs::init(argc, argv, &about, KCmdLineArgs::CmdLineArgNone);
 
     KCmdLineOptions options;
+    options.add("r");
+    options.add("readonly", ki18n("Connect devices and slots without write access"));
     options.add("!+state <devices or slots>", ki18n("Show the state of the given devices or slots"));
     options.add("!+up <devices or slots>", ki18n("Connect the given devices or slots"));
     options.add("!+down <devices or slots>", ki18n("Disconnect the given devices or slots"));
@@ -45,10 +47,13 @@ int main(int argc, char **argv)
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     //read command line options
     QList<QString> upTargets, downTargets, stateTargets; QList<QString> *currentList = 0;
+    bool readOnly = false;
     for (int i = 0; i < args->count(); ++i)
     {
         QString arg = args->arg(i);
-        if (arg == "up")
+        if (arg == "--readonly" || arg == "-r")
+            readOnly = true;
+        else if (arg == "up")
             currentList = &upTargets;
         else if (arg == "down")
             currentList = &downTargets;
@@ -64,6 +69,6 @@ int main(int argc, char **argv)
     }
     args->clear();
 
-    Kandas::Console::Engine engine(upTargets, downTargets, stateTargets);
+    Kandas::Console::Engine engine(upTargets, downTargets, stateTargets, readOnly);
     return app.exec();
 }

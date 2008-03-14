@@ -18,8 +18,8 @@ Check the engine version of the running KaNDASd instance as the interface may di
 
 {{{
   //Methods:
-    void registerClient(int type);
-    void unregisterClient(int type);
+    void registerClient();
+    void unregisterClient();
     void refreshData();
   //Enumerations:
     enum ClientType
@@ -30,9 +30,7 @@ Check the engine version of the running KaNDASd instance as the interface may di
     };
 }}}
 
-When clients are registered on the server using the *registerClient* function, KaNDASd will eventually start to automatically refresh its data structures in intervals of some seconds. Whether the auto-refresh is enabled, and how big the interval is, depends on the type of the connected clients: For high importance monitors, the NDAS driver interfaces are checked for update every second; the interval raises to five seconds for low importance monitors. If you've registered your client as direct modifier, the data will be updated once the *registerClient* function is called, and no auto-update will be scheduled as you're expected to complete your task rapidly.
-
-If you need a data update but cannot wait for the next auto-update, call the *refreshData* function manually. For average use cases, a manual refresh should be unnecessary. When shutting down your client, always unregister it as KaNDASd will stop to schedule automatic refreshes once all clients are disconnected.
+When clients are registered on the server using the *registerClient* function, KaNDASd will eventually start to automatically refresh its data structures in intervals of three seconds. If you need a data update but cannot wait for the next auto-update, call the *refreshData* function manually. For average use cases, a manual refresh should be unnecessary. When shutting down your client, always unregister it as KaNDASd will stop to schedule automatic refreshes once all clients are disconnected.
 
 == Initiation of the client's data structures ==
 

@@ -27,12 +27,6 @@
 
 namespace Kandas
 {
-    namespace AutoRefreshIntervals
-    {
-        const int HighImportanceMonitor = 1;
-        const int LowImportanceMonitor = 5;
-    };
-
     namespace Daemon
     {
 
@@ -44,6 +38,7 @@ namespace Kandas
         {
             EngineJob job;
             int slot;
+            EngineTask(EngineJob myJob, int mySlot) : job(myJob), slot(mySlot) {}
         };
 
         class Engine : public QObject
@@ -58,8 +53,8 @@ namespace Kandas
                 static Engine *self();
                 bool clean();
             public Q_SLOTS:
-                void registerClient(int type);
-                void unregisterClient(int type);
+                void registerClient();
+                void unregisterClient();
                 void startDriver();
                 void stopDriver();
                 void connectSlot(int slot, bool readOnly);
@@ -89,9 +84,7 @@ namespace Kandas
                 static void initClientJob(int);
                 static void connectReadJob(int slot);
                 static void connectWriteJob(int slot);
-                static void waitForConnectedJob(int slot);
                 static void disconnectJob(int slot);
-                static void waitForDisconnectedJob(int slot);
             private Q_SLOTS:
                 void executeTask();
                 void scheduleTask(EngineJob job, int slot = 0);
@@ -102,14 +95,12 @@ namespace Kandas
                 Kandas::EnvironmentState m_envState;
                 QList<QString> *m_devices;
                 QHash<int, SlotInfo> *m_slots;
-                QHash<Kandas::ClientType, int> *m_clientCount;
+                int m_clientCount;
 
                 QList<EngineTask> m_taskQueue;
                 QTimer m_taskTimer, m_autoRefreshTimer;
                 static const int TaskInterval = 100; //interval between task invocations in milliseconds
         };
-
-        const QString runtimeInfoDir("/home/smajewsky/src/NDAS/use");
 
     }
 }

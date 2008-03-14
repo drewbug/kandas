@@ -22,11 +22,12 @@
 #include <iostream>
 #include <KLocalizedString>
 
-Kandas::Console::Engine::Engine(const QList<QString> &upTargets, const QList<QString> &downTargets, const QList<QString> &stateTargets)
+Kandas::Console::Engine::Engine(const QList<QString> &upTargets, const QList<QString> &downTargets, const QList<QString> &stateTargets, bool readOnly)
     : QObject()
     , m_upTargets(upTargets)
     , m_downTargets(downTargets)
     , m_stateTargets(stateTargets)
+    , m_readOnly(readOnly)
     , m_interface(new OrgKdeKandasInterface("org.kde.kandas", "/", QDBusConnection::systemBus(), this))
 {
     //connect interface signals
@@ -35,13 +36,13 @@ Kandas::Console::Engine::Engine(const QList<QString> &upTargets, const QList<QSt
     connect(m_interface, SIGNAL(initSlotInfo(int, const QString&, int)), SLOT(initSlot(int, const QString&, int)));
     connect(m_interface, SIGNAL(initInfoComplete()), SLOT(executeJobs()));
     //initiation sequence
-    m_interface->registerClient(Kandas::DirectModifier);
+    m_interface->registerClient();
     m_interface->initClient();
 }
 
 Kandas::Console::Engine::~Engine()
 {
-    m_interface->unregisterClient(Kandas::DirectModifier);
+    m_interface->unregisterClient();
     delete m_interface;
 }
 
@@ -168,18 +169,30 @@ void Kandas::Console::Engine::stateSlot(int slot)
     }
 }
 
-void Kandas::Console::Engine::upDevice(const QString &/*device*/)
+void Kandas::Console::Engine::upDevice(const QString &device)
 {
+    return; //function deactivated - awaiting redesign
+    QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
+    while (iterSlots.hasNext())
+        if (iterSlots.next().value().device == device)
+            upSlot(iterSlots.key());
 }
 
-void Kandas::Console::Engine::upSlot(int /*slot*/)
+void Kandas::Console::Engine::upSlot(int slot)
 {
+    return; //function deactivated - awaiting redesign
 }
 
-void Kandas::Console::Engine::downDevice(const QString &/*device*/)
+void Kandas::Console::Engine::downDevice(const QString &device)
 {
+    return; //function deactivated - awaiting redesign
+    QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
+    while (iterSlots.hasNext())
+        if (iterSlots.next().value().device == device)
+            downSlot(iterSlots.key());
 }
 
 void Kandas::Console::Engine::downSlot(int /*slot*/)
 {
+    return; //function deactivated - awaiting redesign
 }

@@ -192,7 +192,7 @@ void Kandas::Daemon::Engine::initClient()
 
 QString Kandas::Daemon::Engine::engineVersion()
 {
-    return Kandas::InterfaceVersion;
+    return Kandas::Daemon::Version;
 }
 
 //task engine

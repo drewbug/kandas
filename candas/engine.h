@@ -34,7 +34,7 @@ namespace Kandas
         {
             Q_OBJECT
             public:
-                Engine(const QList<QString> &upTargets, const QList<QString> &downTargets, const QList<QString> &stateTargets);
+                Engine(const QList<QString> &upTargets, const QList<QString> &downTargets, const QList<QString> &stateTargets, bool readOnly = false);
                 ~Engine();
             private slots:
                 void initEnvironment(int state);
@@ -50,6 +50,8 @@ namespace Kandas
                 void downSlot(int slot);
 
                 QList<QString> m_upTargets, m_downTargets, m_stateTargets; //stores the targets until they get resolved into jobs in Candas::Engine::executeJobs
+                bool m_readOnly;
+                QHash<int, Kandas::SlotState> m_awaitedStateChanges; //key = slot
                 OrgKdeKandasInterface *m_interface;
 
                 Kandas::EnvironmentState m_environment;

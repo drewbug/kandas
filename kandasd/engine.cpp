@@ -25,6 +25,7 @@
 #include <KProcess>
 
 //TODO: What is the difference between a slot and a device?
+//TODO: Move storage variables of Engine to EnginePrivate class.
 
 //singleton functions
 
@@ -34,11 +35,11 @@ Kandas::Daemon::Engine::Engine()
     , m_envState(Kandas::UnknownEnvironment)
     , m_devices(new QList<QString>())
     , m_slots(new QHash<int, Kandas::SlotInfo>())
-    , m_clientCount(new QHash<Kandas::ClientType, int>)
+    , m_clientCount(0)
 {
     //task timer
     connect(&m_taskTimer, SIGNAL(timeout()), this, SLOT(executeTask()));
-    connect(&m_taskTimer, SIGNAL(timeout()), this, SLOT(refreshData()));
+    connect(&m_autoRefreshTimer, SIGNAL(timeout()), this, SLOT(refreshData()));
     //D-Bus
     new KandasAdaptor(this);
     QDBusConnection bus = QDBusConnection::systemBus();
@@ -75,65 +76,21 @@ bool Kandas::Daemon::Engine::clean()
 
 //slots
 
-void Kandas::Daemon::Engine::registerClient(int intType)
+void Kandas::Daemon::Engine::registerClient()
 {
-    Kandas::ClientType type;
-    switch (intType)
-    {
-        case Kandas::HighImportanceMonitor:
-            type = Kandas::HighImportanceMonitor;
-            break;
-        case Kandas::LowImportanceMonitor:
-            type = Kandas::LowImportanceMonitor;
-            break;
-        case Kandas::DirectModifier:
-            type = Kandas::DirectModifier;
-            break;
-        default:
-            return;
-    }
-    QHash<Kandas::ClientType, int> *clientCount = self()->m_clientCount;
-    (*clientCount)[type] = clientCount->value(type, 0) + 1;
-    //determine new value for auto-refresh timing
-    if (clientCount->value(Kandas::HighImportanceMonitor, 0) > 0)
-        self()->m_autoRefreshTimer.start(Kandas::AutoRefreshIntervals::HighImportanceMonitor);
-    else if (clientCount->value(Kandas::LowImportanceMonitor, 0) > 0)
-        self()->m_autoRefreshTimer.start(Kandas::AutoRefreshIntervals::LowImportanceMonitor);
-    else
-    {
-        self()->m_autoRefreshTimer.stop();
-        //update once if a direct modifier has been registered
-        if (type == Kandas::DirectModifier)
-            self()->refreshData();
-    }
+    self()->m_clientCount++;
+    self()->refreshData(); //make sure the client has up-to-date data after its initiation sequence
+    self()->m_autoRefreshTimer.start(3);
 }
 
-void Kandas::Daemon::Engine::unregisterClient(int intType)
+void Kandas::Daemon::Engine::unregisterClient()
 {
-    Kandas::ClientType type;
-    switch (intType)
+    self()->m_clientCount--;
+    if (self()->m_clientCount <= 0)
     {
-        case Kandas::HighImportanceMonitor:
-            type = Kandas::HighImportanceMonitor;
-            break;
-        case Kandas::LowImportanceMonitor:
-            type = Kandas::LowImportanceMonitor;
-            break;
-        case Kandas::DirectModifier:
-            type = Kandas::DirectModifier;
-            break;
-        default:
-            return;
-    }
-    QHash<Kandas::ClientType, int> *clientCount = self()->m_clientCount;
-    (*clientCount)[type] = qMax(0, clientCount->value(type, 0) - 1);
-    //determine new value for auto-refresh timing
-    if (clientCount->value(Kandas::HighImportanceMonitor, 0) > 0)
-        self()->m_autoRefreshTimer.start(Kandas::AutoRefreshIntervals::HighImportanceMonitor);
-    else if (clientCount->value(Kandas::LowImportanceMonitor, 0) > 0)
-        self()->m_autoRefreshTimer.start(Kandas::AutoRefreshIntervals::LowImportanceMonitor);
-    else
+        self()->m_clientCount = 0;
         self()->m_autoRefreshTimer.stop();
+    }
 }
 
 void Kandas::Daemon::Engine::startDriver()
@@ -209,20 +166,14 @@ void Kandas::Daemon::Engine::scheduleTask(Kandas::Daemon::EngineJob job, int slo
 {
     if (m_taskQueue.count() == 0 && !m_taskTimer.isActive())
         m_taskTimer.start(Kandas::Daemon::Engine::TaskInterval);
-    Kandas::Daemon::EngineTask newTask;
-    newTask.job = job;
-    newTask.slot = slot;
-    m_taskQueue << newTask;
+    m_taskQueue << Kandas::Daemon::EngineTask(job, slot);
 }
 
 void Kandas::Daemon::Engine::scheduleBlockingTask(Kandas::Daemon::EngineJob job, int slot)
 {
     if (m_taskQueue.count() == 0 && !m_taskTimer.isActive())
         m_taskTimer.start(Kandas::Daemon::Engine::TaskInterval);
-    Kandas::Daemon::EngineTask newTask;
-    newTask.job = job;
-    newTask.slot = slot;
-    m_taskQueue.prepend(newTask);
+    m_taskQueue.prepend(Kandas::Daemon::EngineTask(job, slot));
 }
 
 //queueable jobs
@@ -231,10 +182,12 @@ void Kandas::Daemon::Engine::refreshEnvironmentJob(int)
 {
     Kandas::EnvironmentState newState = Kandas::UnknownEnvironment;
     //check availability of NDAS driver
-    QDir dir(Kandas::Daemon::runtimeInfoDir);
+    //TODO: Replace with a `lsmod | grep ndas | wc -l` == 1 check.
+    const QString runtimeInfoDir("/proc/ndas");
+    QDir dir(runtimeInfoDir);
     if (!dir.exists())
         newState = Kandas::NoDriverFound;
-    //check availability of ndasadmin
+    //check availability of ndasadmin if necessary
     if (newState == Kandas::UnknownEnvironment)
     {
         KProcess process;
@@ -270,7 +223,8 @@ void Kandas::Daemon::Engine::refreshDevicesJob(int)
     //clear devices list
     self()->m_devices->clear();
     //open devices list
-    QFile file(QString("%1/devs").arg(Kandas::Daemon::runtimeInfoDir));
+    const QString devicesList("/proc/ndas/devs");
+    QFile file(devicesList);
     if (file.exists() && file.open(QIODevice::ReadOnly) && file.isReadable())
     {
         char buffer[1024];
@@ -313,7 +267,8 @@ void Kandas::Daemon::Engine::refreshSlotsJob(int)
     char buffer[1024];
     foreach (QString device, *(self()->m_devices))
     {
-        QFile file(QString("%2/devices/%1/slots").arg(device).arg(Kandas::Daemon::runtimeInfoDir));
+        const QString devicesSlotFile("/proc/ndas/devices/%1/slots");
+        QFile file(devicesSlotFile.arg(device));
         Kandas::SlotInfo slotInfo(device);
         if (file.exists() && file.open(QIODevice::ReadOnly) && file.isReadable())
         {
@@ -334,7 +289,8 @@ void Kandas::Daemon::Engine::refreshSlotsJob(int)
         int slot = iterSlots.key();
         Kandas::SlotInfo &info = iterSlots.value();
         //read slot info file
-        QFile file(QString("%2/slots/%1/info").arg(slot).arg(Kandas::Daemon::runtimeInfoDir));
+        const QString slotInfoFile("/proc/ndas/slots/%1/info");
+        QFile file(slotInfoFile.arg(slot));
         if (!file.exists() || !file.open(QIODevice::ReadOnly) || !file.isReadable())
             continue;
         file.readLine(buffer, sizeof(buffer)); //skip first line (human-readable captions)
@@ -358,7 +314,6 @@ void Kandas::Daemon::Engine::refreshSlotsJob(int)
         int slot = iterOld.key();
         if (self()->m_slots->contains(slot))
         {
-            //TODO: More fine-grained: If device has changed, emit slotRemoved and slotAdded. If state has changed to 0, emit slotRemoved. If state has not changed, do not emit anything.
             const Kandas::SlotInfo info = (*(self()->m_slots))[slot], oldInfo = iterOld.value();
             if (info.device != oldInfo.device)
             {
@@ -466,29 +421,42 @@ void Kandas::Daemon::Engine::initClientJob(int)
     emit self()->initInfoComplete();
 }
 
-void Kandas::Daemon::Engine::connectReadJob(int /*slot*/)
+const QString intToStringConvertor("%1"); //needed by connectReadJob and connectWriteJob
+
+void Kandas::Daemon::Engine::connectReadJob(int slot)
 {
-    //TODO: Kandas::Daemon::Engine::connectReadJob
+    //check environment and slot state
+    if (self()->m_envState != Kandas::SaneEnvironment)
+        return;
+    if ((*(self()->m_slots))[slot].state != Kandas::Disconnected)
+        return;
+    //call ndasadmin
+    QStringList args; args << "enable" << "-s" << intToStringConvertor.arg(slot) << "-o" << "r";
+    KProcess::startDetached("ndasadmin", args);
 }
 
-void Kandas::Daemon::Engine::connectWriteJob(int /*slot*/)
+void Kandas::Daemon::Engine::connectWriteJob(int slot)
 {
-    //TODO: Kandas::Daemon::Engine::connectWriteJob
+    //check environment and slot state
+    if (self()->m_envState != Kandas::SaneEnvironment)
+        return;
+    if ((*(self()->m_slots))[slot].state != Kandas::Disconnected)
+        return;
+    //call ndasadmin
+    QStringList args; args << "enable" << "-s" << intToStringConvertor.arg(slot) << "-o" << "w";
+    KProcess::startDetached("ndasadmin", args);
 }
 
-void Kandas::Daemon::Engine::waitForConnectedJob(int /*slot*/)
+void Kandas::Daemon::Engine::disconnectJob(int slot)
 {
-    //TODO: Kandas::Daemon::Engine::waitForConnectedJob
-}
-
-void Kandas::Daemon::Engine::disconnectJob(int /*slot*/)
-{
-    //TODO: Kandas::Daemon::Engine::disconnectJob
-}
-
-void Kandas::Daemon::Engine::waitForDisconnectedJob(int /*slot*/)
-{
-    //TODO: Kandas::Daemon::Engine::waitForDisconnectedJob
+    //check environment and slot state
+    if (self()->m_envState != Kandas::SaneEnvironment)
+        return;
+    if ((*(self()->m_slots))[slot].state != Kandas::Connected)
+        return;
+    //call ndasadmin
+    QStringList args; args << "disable" << "-s" << intToStringConvertor.arg(slot);
+    KProcess::startDetached("ndasadmin", args);
 }
 
 #include "engine.moc"

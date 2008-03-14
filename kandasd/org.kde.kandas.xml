@@ -38,10 +38,8 @@
       <arg name="state" type="i" direction="out"/>
     </signal>
     <method name="registerClient">
-      <arg name="type" type="i" direction="in"/>
     </method>
     <method name="unregisterClient">
-      <arg name="type" type="i" direction="in"/>
     </method>
     <method name="startDriver">
     </method>

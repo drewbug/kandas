@@ -24,13 +24,6 @@
 namespace Kandas
 {
 
-    enum ClientType
-    {
-        HighImportanceMonitor,
-        LowImportanceMonitor,
-        DirectModifier
-    };
-
     enum SlotState
     {
         Undetermined = 0,

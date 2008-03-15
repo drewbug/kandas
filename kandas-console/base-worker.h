@@ -16,31 +16,48 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KANDAS_CONSOLE_INFOWORKER_H
-#define KANDAS_CONSOLE_INFOWORKER_H
+#ifndef KANDAS_CONSOLE_BASEWORKER_H
+#define KANDAS_CONSOLE_BASEWORKER_H
 
-#include "base-worker.h"
+#include <QHash>
+#include <QList>
+#include <QObject>
+#include <kandasd/definitions.h>
+
+class OrgKdeKandasInterface;
 
 namespace Kandas
 {
     namespace Console
     {
 
-        class InfoWorker : public BaseWorker
+        class BaseWorkerPrivate;
+
+        class BaseWorker : public QObject
         {
+            Q_OBJECT
             public:
-                InfoWorker(bool listDevices, bool listSlots);
+                BaseWorker();
+                virtual ~BaseWorker();
 
-                virtual void execute();
+                bool clean() const;
+                virtual void execute() = 0;
+            protected:
+                OrgKdeKandasInterface *interface() const;
+
+                Kandas::EnvironmentState environment() const;
+                QList<QString> devicesList() const;
+                QHash<int, Kandas::SlotInfo> slotsList() const;
+            private slots:
+                void initEnvironment(int state);
+                void initDevice(const QString &device);
+                void initSlot(int slot, const QString &device, int state);
+                void executeJobs();
             private:
-                void listDevices();
-                void listSlots();
-
-                bool m_listDevices;
-                bool m_listSlots;
+                BaseWorkerPrivate *p;
         };
 
     }
 }
 
-#endif // KANDAS_CONSOLE_INFOWORKER_H
+#endif // KANDAS_CONSOLE_BASEWORKER_H

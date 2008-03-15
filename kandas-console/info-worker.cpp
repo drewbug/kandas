@@ -20,127 +20,31 @@
 #include "interface.h"
 
 #include <iostream>
-#include <QApplication>
 #include <QHash>
 #include <QList>
 #include <KLocalizedString>
-#include <kandasd/definitions.h>
-
-//TODO: Abstract the whole initiation thing into a Kandas::Console::Worker class.
-//TODO: Find out whether there is a KaNDASd instance running. If no, immediately exit.
-
-namespace Kandas
-{
-    namespace Console
-    {
-
-        class InfoWorkerPrivate
-        {
-            public:
-                InfoWorkerPrivate(bool listDevices, bool listSlots, InfoWorker *parent);
-                ~InfoWorkerPrivate();
-
-                bool m_listDevices, m_listSlots, m_clean;
-                OrgKdeKandasInterface *m_interface;
-
-                Kandas::EnvironmentState m_environment;
-                QList<QString> m_devices;
-                QHash<int, Kandas::SlotInfo> m_slots;
-        };
-
-    }
-}
-
-Kandas::Console::InfoWorkerPrivate::InfoWorkerPrivate(bool listDevices, bool listSlots, InfoWorker *parent)
-    : m_listDevices(listDevices)
-    , m_listSlots(listSlots)
-    , m_clean(true)
-    , m_interface(new OrgKdeKandasInterface("org.kde.kandas", "/", QDBusConnection::systemBus(), parent))
-    , m_environment(Kandas::UnknownEnvironment)
-{
-    if (m_interface->engineVersion().value() == "") //no KaNDASd instance running
-    {
-        std::cerr << i18n("ERROR: KaNDASd is not running.").toUtf8().data() << std::endl;
-        m_clean = false;
-    }
-}
-
-Kandas::Console::InfoWorkerPrivate::~InfoWorkerPrivate()
-{
-    delete m_interface;
-}
 
 Kandas::Console::InfoWorker::InfoWorker(bool listDevices, bool listSlots)
-    : p(new InfoWorkerPrivate(listDevices, listSlots, this))
+    : BaseWorker()
+    , m_listDevices(listDevices)
+    , m_listSlots(listSlots)
 {
-    //connect interface signals
-    connect(p->m_interface, SIGNAL(initEnvironmentInfo(int)), SLOT(initEnvironment(int)));
-    connect(p->m_interface, SIGNAL(initDeviceInfo(const QString&)), SLOT(initDevice(const QString&)));
-    connect(p->m_interface, SIGNAL(initSlotInfo(int, const QString&, int)), SLOT(initSlot(int, const QString&, int)));
-    connect(p->m_interface, SIGNAL(initInfoComplete()), SLOT(executeJobs()));
-    //initiation sequence
-    p->m_interface->registerClient();
-    p->m_interface->initClient();
 }
 
-Kandas::Console::InfoWorker::~InfoWorker()
+void Kandas::Console::InfoWorker::execute()
 {
-    p->m_interface->unregisterClient();
-    delete p;
-}
-
-bool Kandas::Console::InfoWorker::clean() const
-{
-    return p->m_clean;
-}
-
-void Kandas::Console::InfoWorker::initEnvironment(int state)
-{
-    switch (state)
-    {
-        case Kandas::SaneEnvironment: p->m_environment = Kandas::SaneEnvironment; break;
-        case Kandas::NoDriverFound: p->m_environment = Kandas::NoDriverFound; break;
-        case Kandas::NoAdminFound: p->m_environment = Kandas::NoAdminFound; break;
-        default: p->m_environment = Kandas::UnknownEnvironment; break;
-    }
-}
-
-void Kandas::Console::InfoWorker::initDevice(const QString &device)
-{
-    p->m_devices << device;
-}
-
-void Kandas::Console::InfoWorker::initSlot(int slot, const QString &device, int state)
-{
-    Kandas::SlotState slotState = Kandas::Undetermined;
-    switch (state)
-    {
-        case Kandas::Connected: slotState = Kandas::Connected; break;
-        case Kandas::Connecting: slotState = Kandas::Connecting; break;
-        case Kandas::Disconnected: slotState = Kandas::Disconnected; break;
-        case Kandas::Disconnecting: slotState = Kandas::Disconnecting; break;
-        default: break; //leaves slotState = Kandas::Undetermined
-    }
-    p->m_slots[slot] = Kandas::SlotInfo(device, slotState);
-}
-
-void Kandas::Console::InfoWorker::executeJobs()
-{
-    if (p->m_listDevices)
+    if (m_listDevices && devicesList().count() != 0)
         listDevices();
-    if (p->m_listSlots)
+    if (m_listSlots && slotsList().count() != 0)
     {
-        if (p->m_listDevices)
-            std::cout << std::endl << std::endl; //some space between both lists
+        if (m_listDevices)
+            std::cout << std::endl; //some space between both lists
         listSlots();
     }
-    qApp->quit();
 }
 
 void Kandas::Console::InfoWorker::listDevices()
 {
-    if (p->m_devices.count() == 0)
-        return;
     static const QString deviceHeader = i18n("Device");
     static const QString slotsHeader = i18n("Associated slots");
     static const int columnPadding = 3;
@@ -149,12 +53,12 @@ void Kandas::Console::InfoWorker::listDevices()
     //gather information
     int maxDeviceNameLength = deviceHeader.length();
     QHash<QString, QList<int> > deviceSlots;
-    foreach (QString device, p->m_devices)
+    foreach (QString device, devicesList())
     {
         deviceSlots[device] = QList<int>();
         maxDeviceNameLength = qMax(maxDeviceNameLength, device.length());
     }
-    QHashIterator<int, Kandas::SlotInfo> iterSlots(p->m_slots);
+    QHashIterator<int, Kandas::SlotInfo> iterSlots(slotsList());
     while (iterSlots.hasNext())
     {
         QString device = iterSlots.next().value().device;
@@ -182,8 +86,6 @@ void Kandas::Console::InfoWorker::listDevices()
 
 void Kandas::Console::InfoWorker::listSlots()
 {
-    if (p->m_slots.count() == 0)
-        return;
     static const QString slotHeader = i18n("Slot");
     static const QString deviceHeader = i18n("At device");
     static const QString stateHeader = i18n("Current state");
@@ -194,7 +96,7 @@ void Kandas::Console::InfoWorker::listSlots()
     //gather information
     int maxSlotNumberLength = slotHeader.length();
     int maxDeviceNameLength = deviceHeader.length();
-    QHashIterator<int, Kandas::SlotInfo> iterSlots(p->m_slots);
+    QHashIterator<int, Kandas::SlotInfo> iterSlots(slotsList());
     while (iterSlots.hasNext())
     {
         iterSlots.next();
@@ -239,5 +141,3 @@ void Kandas::Console::InfoWorker::listSlots()
         }
     }
 }
-
-#include "info-worker.moc"

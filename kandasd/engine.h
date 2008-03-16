@@ -44,7 +44,7 @@ namespace Kandas
         class Engine : public QObject
         {
             Q_OBJECT
-            Q_CLASSINFO("D-Bus interface", "org.kde.kandas")
+            Q_CLASSINFO("D-Bus interface", "org.kandas")
             private:
                 Engine();
                 Engine(const Engine &);

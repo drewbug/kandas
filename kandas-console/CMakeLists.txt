@@ -10,7 +10,7 @@ include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
 SET(kandas_base_SRCS
     base-worker.cpp
 )
-qt4_add_dbus_interface(kandas_base_SRCS ${KDE4_INCLUDE_DIR}/kandasd/org.kde.kandas.xml interface)
+qt4_add_dbus_interface(kandas_base_SRCS ${KDE4_INCLUDE_DIR}/kandasd/org.kandas.xml interface)
 
 set(kandas_info_SRCS
     ${kandas_base_SRCS}

@@ -43,7 +43,7 @@ Kandas::Daemon::Engine::Engine()
     //D-Bus
     new KandasAdaptor(this);
     QDBusConnection bus = QDBusConnection::systemBus();
-    if (!bus.registerService("org.kde.kandas"))
+    if (!bus.registerService("org.kandas"))
     {
         kError() << "Could not register service. D-Bus returned:" << bus.lastError().message();
         m_clean = false;

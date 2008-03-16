@@ -24,7 +24,7 @@
 #include <QObject>
 #include <kandasd/definitions.h>
 
-class OrgKdeKandasInterface;
+class OrgKandasInterface;
 
 namespace Kandas
 {
@@ -43,7 +43,7 @@ namespace Kandas
                 bool clean() const;
                 virtual void execute() = 0;
             protected:
-                OrgKdeKandasInterface *interface() const;
+                OrgKandasInterface *interface() const;
 
                 Kandas::EnvironmentState environment() const;
                 QList<QString> devicesList() const;

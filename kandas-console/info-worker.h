@@ -29,13 +29,15 @@ namespace Kandas
         class InfoWorker : public BaseWorker
         {
             public:
-                InfoWorker(bool listDevices, bool listSlots);
+                InfoWorker(bool listEnv, bool listDevices, bool listSlots);
 
                 virtual void execute();
             private:
+                void listEnvironment();
                 void listDevices();
                 void listSlots();
 
+                bool m_listEnv;
                 bool m_listDevices;
                 bool m_listSlots;
         };

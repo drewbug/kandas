@@ -39,7 +39,7 @@ namespace Kandas
                 ~BaseWorkerPrivate();
 
                 bool m_clean;
-                OrgKdeKandasInterface *m_interface;
+                OrgKandasInterface *m_interface;
 
                 Kandas::EnvironmentState m_environment;
                 QList<QString> m_devices;
@@ -51,7 +51,7 @@ namespace Kandas
 
 Kandas::Console::BaseWorkerPrivate::BaseWorkerPrivate(BaseWorker *parent)
     : m_clean(true)
-    , m_interface(new OrgKdeKandasInterface("org.kde.kandas", "/", QDBusConnection::systemBus(), parent))
+    , m_interface(new OrgKandasInterface("org.kandas", "/", QDBusConnection::systemBus(), parent))
     , m_environment(Kandas::UnknownEnvironment)
 {
     if (m_interface->engineVersion().value() == "") //no KaNDASd instance running
@@ -90,7 +90,7 @@ bool Kandas::Console::BaseWorker::clean() const
     return p->m_clean;
 }
 
-OrgKdeKandasInterface *Kandas::Console::BaseWorker::interface() const
+OrgKandasInterface *Kandas::Console::BaseWorker::interface() const
 {
     return p->m_interface;
 }

@@ -50,8 +50,8 @@ int main(int argc, char **argv)
     args->clear();
 
     if (!listDevices && !listSlots)
-        //nothing to do
-        return 0;
+        //when called without arguments, display both lists
+        listDevices = listSlots = true;
 
     Kandas::Console::InfoWorker worker(listDevices, listSlots);
     if (worker.clean())

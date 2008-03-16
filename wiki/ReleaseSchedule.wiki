@@ -15,7 +15,7 @@ The contents of this page may change radically. More detailed schedules will be 
 
  * Milestones:
   * KaNDASd provides an interface to register and unregister NDAS devices.
-  * KaNDAS and CaNDAS are able to use this interface.
+  * KaNDAS and KaNDASconsole are able to use this interface.
 
 == Version 0.3 ==
 

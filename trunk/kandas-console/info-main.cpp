@@ -35,6 +35,8 @@ int main(int argc, char **argv)
     KCmdLineArgs::init(argc, argv, &about, KCmdLineArgs::CmdLineArgNone);
 
     KCmdLineOptions options;
+    options.add("e");
+    options.add("environment", ki18n("Show environment state"));
     options.add("d");
     options.add("devices", ki18n("List all available devices"));
     options.add("s");
@@ -45,15 +47,16 @@ int main(int argc, char **argv)
 
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     //read command line options
+    bool listEnv = args->isSet("environment");
     bool listDevices = args->isSet("devices");
     bool listSlots = args->isSet("slots");
     args->clear();
 
-    if (!listDevices && !listSlots)
+    if (!listEnv && !listDevices && !listSlots)
         //when called without arguments, display both lists
-        listDevices = listSlots = true;
+        listEnv = listDevices = listSlots = true;
 
-    Kandas::Console::InfoWorker worker(listDevices, listSlots);
+    Kandas::Console::InfoWorker worker(listEnv, listDevices, listSlots);
     if (worker.clean())
         return app.exec();
     else

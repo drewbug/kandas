@@ -24,8 +24,9 @@
 #include <QList>
 #include <KLocalizedString>
 
-Kandas::Console::InfoWorker::InfoWorker(bool listDevices, bool listSlots)
+Kandas::Console::InfoWorker::InfoWorker(bool listEnv, bool listDevices, bool listSlots)
     : BaseWorker()
+    , m_listEnv(listEnv)
     , m_listDevices(listDevices)
     , m_listSlots(listSlots)
 {
@@ -33,13 +34,39 @@ Kandas::Console::InfoWorker::InfoWorker(bool listDevices, bool listSlots)
 
 void Kandas::Console::InfoWorker::execute()
 {
+    if (m_listEnv)
+        listEnvironment();
     if (m_listDevices && devicesList().count() != 0)
+    {
+        if (m_listEnv)
+            std::cout << std::endl; //some space between both lists
         listDevices();
+    }
     if (m_listSlots && slotsList().count() != 0)
     {
-        if (m_listDevices)
+        if (m_listDevices || m_listEnv)
             std::cout << std::endl; //some space between both lists
         listSlots();
+    }
+}
+
+void Kandas::Console::InfoWorker::listEnvironment()
+{
+    std::cout << i18n("System state:").toUtf8().data() << ' ';
+    switch (environment())
+    {
+        case Kandas::UnknownEnvironment:
+            std::cout << i18n("Could not be determined").toUtf8().data() << std::endl;
+            break;
+        case Kandas::SaneEnvironment:
+            std::cout << i18n("Alright").toUtf8().data() << std::endl;
+            break;
+        case Kandas::NoDriverFound:
+            std::cout << i18n("NDAS driver not installed or not running").toUtf8().data() << std::endl;
+            break;
+        case Kandas::NoAdminFound:
+            std::cout << i18n("NDAS administration tool not installed.").toUtf8().data() << std::endl;
+            break;
     }
 }
 

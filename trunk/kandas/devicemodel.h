@@ -16,33 +16,34 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KANDAS_CLIENT_DEVICE_H
-#define KANDAS_CLIENT_DEVICE_H
+#ifndef KANDAS_CLIENT_DEVICEMODEL_H
+#define KANDAS_CLIENT_DEVICEMODEL_H
 
-#include <QGroupBox>
+#include <QAbstractListModel>
 
 namespace Kandas
 {
     namespace Client
     {
+        class Manager;
 
-        class DevicePrivate;
-
-        class Device : public QGroupBox
+        class DeviceModel : public QAbstractListModel
         {
             Q_OBJECT
             public:
-                Device(const QString &name, QWidget *parent = 0);
-                ~Device();
+                DeviceModel(Manager *parent = 0);
+                ~DeviceModel();
+
+                QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+                QVariant headerData(int index, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+                int rowCount(const QModelIndex &parent = QModelIndex()) const;
             public slots:
-                void addSlot(int slot, int state);
-                bool changeSlot(int slot, int state);
-                bool removeSlot(int slot);
+                void lateInit();
             private:
-                DevicePrivate *p;
+                Manager *p;
         };
 
     }
 }
 
-#endif // KANDAS_CLIENT_DEVICE_H
+#endif // KANDAS_CLIENT_DEVICEMODEL_H

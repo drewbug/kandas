@@ -16,36 +16,35 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KANDAS_CLIENT_SLOTMANAGER_H
-#define KANDAS_CLIENT_SLOTMANAGER_H
+#ifndef KANDAS_CLIENT_SLOTMODEL_H
+#define KANDAS_CLIENT_SLOTMODEL_H
 
-#include <QWidget>
+#include <QAbstractListModel>
 
 namespace Kandas
 {
     namespace Client
     {
+        class Manager;
 
-        class SlotManagerPrivate;
-
-        class SlotManager : public QWidget
+        class SlotModel : public QAbstractListModel
         {
             Q_OBJECT
             public:
-                SlotManager(int slot, int state, QWidget *parent = 0);
-                ~SlotManager();
+                SlotModel(Manager *parent = 0);
+                ~SlotModel();
+
+                QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+                QVariant headerData(int index, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+                int rowCount(const QModelIndex &parent = QModelIndex()) const;
             public slots:
-                void update(int state);
-            signals:
-                void connectRequested(int slot);
-                void disconnectRequested(int slot);
-            private slots:
-                void connectionChangeRequested();
+                void changeDevice(int index);
             private:
-                SlotManagerPrivate *p;
+                Manager *p;
+                int m_currentDevice;
         };
 
     }
 }
 
-#endif // KANDAS_CLIENT_SLOTMANAGER_H
+#endif // KANDAS_CLIENT_SLOTMODEL_H

@@ -19,22 +19,23 @@
 #ifndef KANDAS_CLIENT_VIEW_H
 #define KANDAS_CLIENT_VIEW_H
 
+class QModelIndex;
 #include <QWidget>
 
 namespace Kandas
 {
     namespace Client
     {
-        class Device;
         class ViewPrivate;
 
         class View : public QWidget
         {
+            Q_OBJECT
             public:
                 View(QWidget *parent = 0);
                 ~View();
-            public slots:
-                Device *addDevice(const QString &name);
+            signals:
+                void selectedDeviceChanged(const QModelIndex &selected);
             private:
                 ViewPrivate *p;
         };

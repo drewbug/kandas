@@ -21,13 +21,6 @@ Check the engine version of the running KaNDASd instance as the interface may di
     void registerClient();
     void unregisterClient();
     void refreshData();
-  //Enumerations:
-    enum ClientType
-    {
-      HighImportanceMonitor = 0,
-      LowImportanceMonitor = 1,
-      DirectModifier = 2
-    };
 }}}
 
 When clients are registered on the server using the *registerClient* function, KaNDASd will eventually start to automatically refresh its data structures in intervals of three seconds. If you need a data update but cannot wait for the next auto-update, call the *refreshData* function manually. For average use cases, a manual refresh should be unnecessary. When shutting down your client, always unregister it as KaNDASd will stop to schedule automatic refreshes once all clients are disconnected.

@@ -39,6 +39,11 @@ namespace Kandas
                 int rowCount(const QModelIndex &parent = QModelIndex()) const;
             public slots:
                 void lateInit();
+
+                void deviceAboutToBeAdded(int deviceIndex);
+                void deviceAboutToBeRemoved(int deviceIndex);
+                void deviceAdded();
+                void deviceRemoved();
             private:
                 Manager *p;
         };

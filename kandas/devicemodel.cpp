@@ -20,44 +20,61 @@
 #include "manager.h"
 
 #include <KIcon>
+#include <KIconLoader>
 #include <KLocalizedString>
+
+#include <KDebug>
 
 Kandas::Client::DeviceModel::DeviceModel(Kandas::Client::Manager *parent)
     : p(parent)
 {
+    kDebug() << "Hallo";
 }
 
 Kandas::Client::DeviceModel::~DeviceModel()
 {
+    kDebug() << "Hallo";
 }
 
 void Kandas::Client::DeviceModel::lateInit()
 {
+    kDebug() << "Hallo";
     disconnect(&p->m_interface, SIGNAL(initInfoComplete()), this, SLOT(lateInit()));
     reset();
 }
 
 QVariant Kandas::Client::DeviceModel::data(const QModelIndex &index, int role) const
 {
+    kDebug() << "Hallo";
+    //exceptional error view
+    if (p->error())
+    {
+        return (index.row() == 0 && index.column() == 0) ? p->errorContent(role) : QVariant();
+    }
+    //normal device view
     int row = index.row();
     if (row < 0 || row >= p->m_devices.count())
         return QVariant();
+    //information about connection status
     int connectedCount = 0;
     int slotCount = 0;
+    foreach (Kandas::Client::SlotInfo info, p->m_devices.at(row).slotList)
+    {
+        ++slotCount;
+        if (info.state == Kandas::Connected)
+            ++connectedCount;
+    }
+    //data
     switch (role)
     {
         case Qt::DisplayRole:
             return p->m_devices.at(row).device;
         case Qt::DecorationRole:
-            return KIcon("drive-harddisk");
+            if (connectedCount == 0)
+                return KIcon("drive-harddisk", KIconLoader::global());
+            else
+                return KIcon("drive-harddisk", KIconLoader::global(), QStringList() << "emblem-mounted");
         case Kandas::Client::ConnectionStatusRole:
-            //information about connection status
-            foreach (Kandas::Client::SlotInfo info, p->m_devices.at(row).slotList)
-            {
-                ++slotCount;
-                if (info.state == Kandas::Connected)
-                    ++connectedCount;
-            }
             if (connectedCount == 0)
                 return i18n("Not connected");
             else if (connectedCount == slotCount)
@@ -71,12 +88,41 @@ QVariant Kandas::Client::DeviceModel::data(const QModelIndex &index, int role) c
 
 QVariant Kandas::Client::DeviceModel::headerData(int, Qt::Orientation, int) const
 {
+    kDebug() << "Hallo";
     return QVariant();
 }
 
 int Kandas::Client::DeviceModel::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : p->m_devices.count();
+    kDebug() << "Hallo";
+    if (parent.isValid())
+        return 0;
+    //error view -> exactly one entry with the error message; device view -> count of devices
+    return p->error() ? 1 : p->m_devices.count();
+}
+
+void Kandas::Client::DeviceModel::deviceAboutToBeAdded(int deviceIndex)
+{
+    kDebug() << "Hallo";
+    beginInsertRows(index(deviceIndex).parent(), deviceIndex, deviceIndex);
+}
+
+void Kandas::Client::DeviceModel::deviceAboutToBeRemoved(int deviceIndex)
+{
+    kDebug() << "Hallo";
+    beginRemoveRows(index(deviceIndex).parent(), deviceIndex, deviceIndex);
+}
+
+void Kandas::Client::DeviceModel::deviceAdded()
+{
+    kDebug() << "Hallo";
+    endInsertRows();
+}
+
+void Kandas::Client::DeviceModel::deviceRemoved()
+{
+    kDebug() << "Hallo";
+    endRemoveRows();
 }
 
 #include "devicemodel.moc"

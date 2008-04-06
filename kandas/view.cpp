@@ -23,11 +23,11 @@
 
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
-#include <QHBoxLayout>
 #include <QListView>
 #include <QPainter>
 #include <QTextDocument>
 #include <QUrl>
+#include <QVBoxLayout>
 
 namespace Kandas
 {
@@ -48,10 +48,10 @@ namespace Kandas
         class ViewPrivate
         {
             public:
-                QHBoxLayout m_layout;
+                QVBoxLayout m_layout;
                 QListView m_deviceList, m_slotList;
                 Manager m_manager;
-                ViewDelegate m_delegate;
+                ViewDelegate m_deviceDelegate, m_slotDelegate;
         };
 
     }
@@ -61,19 +61,45 @@ Kandas::Client::View::View(QWidget *parent)
     : QWidget(parent)
     , p(new Kandas::Client::ViewPrivate())
 {
-    p->m_deviceList.setItemDelegate(&p->m_delegate);
+    p->m_deviceList.setItemDelegate(&p->m_deviceDelegate);
     p->m_deviceList.setModel(p->m_manager.deviceModel());
-    p->m_slotList.setItemDelegate(&p->m_delegate);
+    p->m_slotList.setItemDelegate(&p->m_slotDelegate);
     p->m_slotList.setModel(p->m_manager.slotModel());
-    //connect(p->m_deviceList.selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SIGNAL(selectedDeviceChanged(const QModelIndex &)));
+
     p->m_layout.addWidget(&p->m_deviceList);
     p->m_layout.addWidget(&p->m_slotList);
     setLayout(&p->m_layout);
+
+    connect(p->m_deviceList.selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), &p->m_manager, SLOT(selectedDeviceChanged(const QModelIndex &)));
+    connect(p->m_manager.deviceModel(), SIGNAL(modelReset()), this, SLOT(resetDeviceSelection()));
 }
 
 Kandas::Client::View::~View()
 {
     delete p;
+}
+
+void Kandas::Client::View::resetDeviceSelection()
+{
+    QModelIndex selection = p->m_manager.deviceModel()->index(0, 0);
+    p->m_deviceList.selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
+    p->m_manager.selectedDeviceChanged(selection);
+}
+
+void Kandas::Client::View::connectDevice()
+{
+}
+
+void Kandas::Client::View::disconnectDevice()
+{
+}
+
+void Kandas::Client::View::connectSlot()
+{
+}
+
+void Kandas::Client::View::disconnectSlot()
+{
 }
 
 void Kandas::Client::ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const

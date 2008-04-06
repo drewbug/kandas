@@ -21,6 +21,7 @@
 
 #include <KAction>
 #include <KActionCollection>
+#include <KActionMenu>
 #include <KApplication>
 #include <KLocalizedString>
 #include <KStatusBar>
@@ -44,24 +45,31 @@ Kandas::Client::MainWindow::~MainWindow()
 
 void Kandas::Client::MainWindow::setupActions()
 {
-//     KAction *action = actionCollection()->addAction("kandas_start", Kandas::Client::Adaptor::self(), SLOT(ndasDriverStart()));
-//     action->setIcon(KIcon("system-suspend-hibernate"));
-//     action->setText(i18n("Start driver"));
-//     action = actionCollection()->addAction("kandas_stop", Kandas::Client::Adaptor::self(), SLOT(ndasDriverStop()));
-//     action->setIcon(KIcon("system-shutdown"));
-//     action->setText(i18n("Stop driver"));
-//     action = actionCollection()->addAction("kandas_connect_read", Kandas::Client::Adaptor::self(), SLOT(ndasConnectRead()));
-//     action->setIcon(KIcon("media-playback-start"));
-//     action->setText(i18n("Connect (read)"));
-//     action = actionCollection()->addAction("kandas_connect_write", Kandas::Client::Adaptor::self(), SLOT(ndasConnectWrite()));
-//     action->setIcon(KIcon("media-record"));
-//     action->setText(i18n("Connect (write)"));
-//     action = actionCollection()->addAction("kandas_disconnect", Kandas::Client::Adaptor::self(), SLOT(ndasDisconnect()));
-//     action->setIcon(KIcon("media-playback-stop"));
-//     action->setText(i18n("Disconnect"));
-//     action = actionCollection()->addAction("kandas_refresh", Kandas::Client::Adaptor::self(), SLOT(ndasRefresh()));
-//     action->setIcon(KIcon("system-switch-user"));
-//     action->setText(i18n("Refresh view"));
+    //TODO: States of actions according to selection states.
+    //connect device
+    KActionMenu *actConnDev = new KActionMenu(KIcon("media-playback-start"), i18n("Connect device"), actionCollection());
+    actConnDev->setDelayed(false);
+    actConnDev->setStickyMenu(true);
+    KAction *actConnDevRead = new KAction(KIcon("media-playback-start"), i18n("Read access"), actConnDev);
+    actConnDev->addAction(actConnDevRead);
+    KAction *actConnDevWrite = new KAction(KIcon("media-record"), i18n("Write access"), actConnDev);
+    actConnDev->addAction(actConnDevWrite);
+    actionCollection()->addAction("kandas_device_connect", actConnDev);
+    //disconnect device
+    KAction *actDiscDev = new KAction(KIcon("media-eject"), i18n("Disconnect device"), actionCollection());
+    actionCollection()->addAction("kandas_device_disconnect", actDiscDev);
+    //connect slot
+    KActionMenu *actConnSlot = new KActionMenu(KIcon("media-playback-start"), i18n("Connect slot"), actionCollection());
+    actConnSlot->setDelayed(false);
+    actConnSlot->setStickyMenu(true);
+    KAction *actConnSlotRead = new KAction(KIcon("media-playback-start"), i18n("Read access"), actConnSlot);
+    actConnSlot->addAction(actConnSlotRead);
+    KAction *actConnSlotWrite = new KAction(KIcon("media-record"), i18n("Write access"), actConnSlot);
+    actConnSlot->addAction(actConnSlotWrite);
+    actionCollection()->addAction("kandas_slot_connect", actConnSlot);
+    //disconnect slot
+    KAction *actDiscSlot = new KAction(KIcon("media-eject"), i18n("Disconnect slot"), actionCollection());
+    actionCollection()->addAction("kandas_slot_disconnect", actDiscSlot);
 }
 
 #include "window.moc"

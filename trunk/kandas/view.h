@@ -34,8 +34,15 @@ namespace Kandas
             public:
                 View(QWidget *parent = 0);
                 ~View();
+            public slots:
+                void resetDeviceSelection();
+
+                void connectDevice();
+                void disconnectDevice();
+                void connectSlot();
+                void disconnectSlot();
             signals:
-                void selectedDeviceChanged(const QModelIndex &selected);
+                void stateChanged(const QString &);
             private:
                 ViewPrivate *p;
         };

@@ -8,35 +8,17 @@
             <Action name="kandas_stop"/>
         </Menu>
     </MenuBar>
-    <ToolBar name="driverToolBar">
+<!--    <ToolBar name="driverToolBar">
         <Text>Driver functions</Text>
         <Action name="kandas_start"/>
         <Action name="kandas_stop"/>
+    </ToolBar>-->
+    <ToolBar name="connectionTools">
+        <Text>Connection management</Text>
+        <Action name="kandas_device_connect"/>
+        <Action name="kandas_device_disconnect"/>
+        <Separator/>
+        <Action name="kandas_slot_connect"/>
+        <Action name="kandas_slot_disconnect"/>
     </ToolBar>
-
-    <State name="connected">
-        <disable>
-            <Action name="kandas_start"/>
-            <Action name="kandas_stop"/>
-        </disable>
-    </State>
-
-    <State name="disconnected">
-        <enable>
-            <Action name="kandas_stop"/>
-        </enable>
-        <disable>
-            <Action name="kandas_start"/>
-        </disable>
-    </State>
-
-    <State name="nodriver">
-        <enable>
-            <Action name="kandas_start"/>
-        </enable>
-        <disable>
-            <Action name="kandas_stop"/>
-        </disable>
-    </State>
-
 </gui>

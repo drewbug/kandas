@@ -20,31 +20,26 @@
 #include "manager.h"
 
 #include <KIcon>
+#include <KIconLoader>
 #include <KLocalizedString>
 
-//TODO: How does slot list behave if indexes in device list change (e.g. because of a device being added)?
+#include <KDebug>
 
 Kandas::Client::SlotModel::SlotModel(Kandas::Client::Manager *parent)
     : p(parent)
     , m_currentDevice(-1)
 {
+    kDebug() << "Hallo";
 }
 
 Kandas::Client::SlotModel::~SlotModel()
 {
-}
-
-void Kandas::Client::SlotModel::changeDevice(int index)
-{
-    if (m_currentDevice != index)
-    {
-        m_currentDevice = index;
-        reset();
-    }
+    kDebug() << "Hallo";
 }
 
 QVariant Kandas::Client::SlotModel::data(const QModelIndex &index, int role) const
 {
+    kDebug() << "Hallo";
     if (m_currentDevice < 0 || m_currentDevice >= p->m_devices.count())
         return QVariant();
     int row = index.row();
@@ -56,9 +51,26 @@ QVariant Kandas::Client::SlotModel::data(const QModelIndex &index, int role) con
         case Qt::DisplayRole:
             return i18n("Slot %1", info.slot);
         case Qt::DecorationRole:
-            return KIcon("unknown");
+            if (info.state == Kandas::Connected || info.state == Kandas::Disconnecting)
+                return KIcon("network-wired", KIconLoader::global(), QStringList() << "emblem-mounted");
+            else if (info.state == Kandas::Undetermined)
+                return KIcon("unknown");
+            else
+                return KIcon("network-wired", KIconLoader::global());
         case Kandas::Client::ConnectionStatusRole:
-            return QString("Hello world");
+            switch (info.state)
+            {
+                case Kandas::Undetermined:
+                    return i18n("State could not be determined. Check your installation.");
+                case Kandas::Connected:
+                    return i18n("Connected");
+                case Kandas::Disconnected:
+                    return i18n("Disconnected");
+                case Kandas::Connecting:
+                    return i18n("Connecting");
+                case Kandas::Disconnecting:
+                    return i18n("Disconnecting");
+            }
         default:
             return QVariant();
     }
@@ -66,12 +78,77 @@ QVariant Kandas::Client::SlotModel::data(const QModelIndex &index, int role) con
 
 QVariant Kandas::Client::SlotModel::headerData(int, Qt::Orientation, int) const
 {
+    kDebug() << "Hallo";
     return QVariant();
 }
 
 int Kandas::Client::SlotModel::rowCount(const QModelIndex &parent) const
 {
+    kDebug() << "Hallo";
     if (parent.isValid() || m_currentDevice < 0 || m_currentDevice >= p->m_devices.count())
         return 0;
     return p->m_devices.at(m_currentDevice).slotList.count();
 }
+
+void Kandas::Client::SlotModel::changeSelectedDevice(int index)
+{
+    kDebug() << "Hallo";
+    if (m_currentDevice != index)
+    {
+        m_currentDevice = index;
+        reset();
+    }
+}
+
+void Kandas::Client::SlotModel::deviceAdded(int deviceIndex)
+{
+    kDebug() << "Hallo";
+    if (m_currentDevice <= deviceIndex) //device added before selected one - increment index
+        ++m_currentDevice;
+}
+
+void Kandas::Client::SlotModel::deviceRemoved(int deviceIndex)
+{
+    kDebug() << "Hallo";
+    if (m_currentDevice == deviceIndex) //selected device removed
+        changeSelectedDevice(-1);
+    else if (m_currentDevice <= deviceIndex) //device removed before selected one - decrement index
+        --m_currentDevice;
+}
+
+void Kandas::Client::SlotModel::slotAboutToBeAdded(int deviceIndex, int slotIndex)
+{
+    kDebug() << "Hallo";
+    if (m_currentDevice == deviceIndex)
+        beginInsertRows(index(slotIndex).parent(), slotIndex, slotIndex);
+}
+
+void Kandas::Client::SlotModel::slotAdded(int deviceIndex)
+{
+    kDebug() << "Hallo";
+    if (m_currentDevice == deviceIndex)
+        endInsertRows();
+}
+
+void Kandas::Client::SlotModel::slotChanged(int deviceIndex, int slotIndex)
+{
+    kDebug() << "Hallo";
+    if (m_currentDevice == deviceIndex)
+        emit dataChanged(index(slotIndex), index(slotIndex));
+}
+
+void Kandas::Client::SlotModel::slotAboutToBeRemoved(int deviceIndex, int slotIndex)
+{
+    kDebug() << "Hallo";
+    if (m_currentDevice == deviceIndex)
+        beginRemoveRows(index(slotIndex).parent(), slotIndex, slotIndex);
+}
+
+void Kandas::Client::SlotModel::slotRemoved(int deviceIndex)
+{
+    kDebug() << "Hallo";
+    if (m_currentDevice == deviceIndex)
+        endRemoveRows();
+}
+
+#include "slotmodel.moc"

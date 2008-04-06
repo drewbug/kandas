@@ -23,6 +23,7 @@
 
 #include <QHash>
 #include <QList>
+class QModelIndex;
 #include <QObject>
 #include <kandasd/definitions.h>
 
@@ -45,7 +46,7 @@ namespace Kandas
         struct DeviceInfo
         {
             DeviceInfo(const QString &deviceName) : device(deviceName) {}
-            DeviceInfo(const DeviceInfo &other) : device(other.device) {}
+            DeviceInfo(const DeviceInfo &other) : device(other.device), slotList(other.slotList) {}
             QString device;
             QList<SlotInfo> slotList;
         };
@@ -63,18 +64,27 @@ namespace Kandas
                 Manager();
                 ~Manager();
 
+                bool error() const;
+                QVariant errorContent(int role) const; //returns QString() if no problem has been found
+
                 DeviceModel *deviceModel() const;
                 SlotModel *slotModel() const;
             public slots:
-                void initEnvironment(int state);
-                void initDevice(const QString &device);
-                void initSlot(int slot, const QString &device, int state);
+                void changeEnvironment(int state);
+                void changeDevice(const QString &device);
+                void changeSlot(int slot, const QString &device, int state);
+                void removeDevice(const QString &device);
+                void removeSlot(int slot, const QString &device);
                 void initComplete();
+
+                void selectedDeviceChanged(const QModelIndex &device);
+                void resetDeviceSelection();
             private:
                 DeviceModel *m_deviceModel;
                 SlotModel *m_slotModel;
 
                 OrgKandasInterface m_interface;
+
                 Kandas::EnvironmentState m_environment;
                 QList<DeviceInfo> m_devices;
         };

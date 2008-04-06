@@ -38,7 +38,15 @@ namespace Kandas
                 QVariant headerData(int index, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
                 int rowCount(const QModelIndex &parent = QModelIndex()) const;
             public slots:
-                void changeDevice(int index);
+                void changeSelectedDevice(int index);
+
+                void deviceAdded(int deviceIndex);
+                void deviceRemoved(int deviceIndex);
+                void slotAboutToBeAdded(int deviceIndex, int slotIndex);
+                void slotAdded(int deviceIndex);
+                void slotChanged(int deviceIndex, int slotIndex);
+                void slotAboutToBeRemoved(int deviceIndex, int slotIndex);
+                void slotRemoved(int deviceIndex);
             private:
                 Manager *p;
                 int m_currentDevice;

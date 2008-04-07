@@ -19,16 +19,17 @@
 #ifndef KANDAS_CLIENT_DEVICEMODEL_H
 #define KANDAS_CLIENT_DEVICEMODEL_H
 
+#include "manager.h"
 #include <QAbstractListModel>
 
 namespace Kandas
 {
     namespace Client
     {
-        class Manager;
 
         class DeviceModel : public QAbstractListModel
         {
+            friend void Kandas::Client::Manager::changeEnvironment(int state);
             Q_OBJECT
             public:
                 DeviceModel(Manager *parent = 0);

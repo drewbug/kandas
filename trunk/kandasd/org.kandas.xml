@@ -63,7 +63,10 @@
     </method>
     <method name="initClient">
     </method>
-    <method name="engineVersion">
+    <method name="daemonVersion">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="interfaceVersion">
       <arg type="s" direction="out"/>
     </method>
   </interface>

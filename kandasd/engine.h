@@ -57,8 +57,10 @@ namespace Kandas
             public Q_SLOTS:
                 void registerClient();
                 void unregisterClient();
+            /*
                 void startDriver();
                 void stopDriver();
+            */
                 void connectSlot(int slot, bool readOnly);
                 void disconnectSlot(int slot);
                 void connectDevice(const QString &device, bool readOnly);
@@ -79,9 +81,11 @@ namespace Kandas
                 void deviceRemoved(const QString &device);
                 void environmentChanged(int state);
             private:
-                static void startDriverJob(int); //parameter is discarded (needed only for compliance with EngineJob delegate)
+            /*
+                static void startDriverJob(int);
                 static void stopDriverJob(int);
-                static void refreshEnvironmentJob(int);
+            */
+                static void refreshEnvironmentJob(int); //parameter is discarded (needed only for compliance with EngineJob delegate)
                 static void refreshDevicesJob(int);
                 static void refreshSlotsJob(int);
                 static void initClientJob(int);

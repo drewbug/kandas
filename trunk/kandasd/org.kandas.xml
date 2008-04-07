@@ -41,10 +41,6 @@
     </method>
     <method name="unregisterClient">
     </method>
-    <method name="startDriver">
-    </method>
-    <method name="stopDriver">
-    </method>
     <method name="connectSlot">
       <arg name="slot" type="i" direction="in"/>
       <arg name="readOnly" type="b" direction="in"/>

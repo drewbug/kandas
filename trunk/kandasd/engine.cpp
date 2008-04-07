@@ -92,6 +92,7 @@ void Kandas::Daemon::Engine::unregisterClient()
     }
 }
 
+/*
 void Kandas::Daemon::Engine::startDriver()
 {
     scheduleTask(&Kandas::Daemon::Engine::startDriverJob);
@@ -101,6 +102,7 @@ void Kandas::Daemon::Engine::stopDriver()
 {
     scheduleTask(&Kandas::Daemon::Engine::stopDriverJob);
 }
+*/
 
 void Kandas::Daemon::Engine::connectSlot(int slot, bool readonly)
 {
@@ -348,6 +350,7 @@ void Kandas::Daemon::Engine::refreshSlotsJob(int)
     }
 }
 
+/*
 void Kandas::Daemon::Engine::startDriverJob(int)
 {
     //check state
@@ -407,6 +410,7 @@ void Kandas::Daemon::Engine::stopDriverJob(int)
     self()->scheduleTask(&Kandas::Daemon::Engine::refreshDevicesJob);
     self()->scheduleTask(&Kandas::Daemon::Engine::refreshSlotsJob);
 }
+*/
 
 void Kandas::Daemon::Engine::initClientJob(int)
 {

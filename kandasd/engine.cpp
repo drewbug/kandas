@@ -24,7 +24,7 @@
 #include <KDebug> //do not remove, is needed by kError and kWarning
 #include <KProcess>
 
-//TODO: What is the difference between a slot and a device?
+//TODO: What is the logical difference between a slot and a device?
 
 //singleton functions
 
@@ -79,7 +79,7 @@ void Kandas::Daemon::Engine::registerClient()
 {
     self()->m_clientCount++;
     self()->refreshData(); //make sure the client has up-to-date data after its initiation sequence
-    self()->m_autoRefreshTimer.start(3);
+    self()->m_autoRefreshTimer.start(2000);
 }
 
 void Kandas::Daemon::Engine::unregisterClient()
@@ -143,7 +143,7 @@ void Kandas::Daemon::Engine::refreshData()
 
 void Kandas::Daemon::Engine::initClient()
 {
-    scheduleBlockingTask(&Kandas::Daemon::Engine::initClientJob);
+    scheduleTask(&Kandas::Daemon::Engine::initClientJob);
 }
 
 QString Kandas::Daemon::Engine::daemonVersion()
@@ -187,7 +187,7 @@ void Kandas::Daemon::Engine::refreshEnvironmentJob(int)
     Kandas::EnvironmentState newState = Kandas::UnknownEnvironment;
     //check availability of NDAS driver
     //TODO: Replace with a `lsmod | grep ndas | wc -l` == 1 check.
-    const QString runtimeInfoDir("/home/smajewsky/ndas");
+    const QString runtimeInfoDir("/proc/ndas");
     QDir dir(runtimeInfoDir);
     if (!dir.exists())
         newState = Kandas::NoDriverFound;
@@ -227,7 +227,7 @@ void Kandas::Daemon::Engine::refreshDevicesJob(int)
     //clear devices list
     self()->m_devices->clear();
     //open devices list
-    const QString devicesList("/home/smajewsky/ndas/devs");
+    const QString devicesList("/proc/ndas/devs");
     QFile file(devicesList);
     if (file.exists() && file.open(QIODevice::ReadOnly) && file.isReadable())
     {
@@ -271,7 +271,7 @@ void Kandas::Daemon::Engine::refreshSlotsJob(int)
     char buffer[1024];
     foreach (QString device, *(self()->m_devices))
     {
-        const QString devicesSlotFile("/home/smajewsky/ndas/devices/%1/slots");
+        const QString devicesSlotFile("/proc/ndas/devices/%1/slots");
         QFile file(devicesSlotFile.arg(device));
         Kandas::SlotInfo slotInfo(device);
         if (file.exists() && file.open(QIODevice::ReadOnly) && file.isReadable())
@@ -293,7 +293,7 @@ void Kandas::Daemon::Engine::refreshSlotsJob(int)
         int slot = iterSlots.key();
         Kandas::SlotInfo &info = iterSlots.value();
         //read slot info file
-        const QString slotInfoFile("/home/smajewsky/ndas/slots/%1/info");
+        const QString slotInfoFile("/proc/ndas/slots/%1/info");
         QFile file(slotInfoFile.arg(slot));
         if (!file.exists() || !file.open(QIODevice::ReadOnly) || !file.isReadable())
             continue;

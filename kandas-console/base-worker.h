@@ -22,6 +22,7 @@
 #include <QHash>
 #include <QList>
 #include <QObject>
+#include <KLocalizedString>
 #include <kandasd/definitions.h>
 
 class OrgKandasInterface;
@@ -30,6 +31,10 @@ namespace Kandas
 {
     namespace Console
     {
+
+        const char Description[] = I18N_NOOP("Command line management for NDAS devices");
+        const char VersionRaw[] = "0.1";
+        const QString Version(VersionRaw);
 
         class BaseWorkerPrivate;
 
@@ -41,7 +46,7 @@ namespace Kandas
                 virtual ~BaseWorker();
 
                 bool clean() const;
-                virtual void execute() = 0;
+                virtual bool execute() = 0; //returns true if the 
             protected:
                 OrgKandasInterface *interface() const;
 

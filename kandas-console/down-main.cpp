@@ -16,41 +16,43 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#include "info-worker.h"
+#include "down-worker.h"
 
+#include <iostream>
 #include <KAboutData>
 #include <KApplication>
 #include <KCmdLineArgs>
+#include <KLocalizedString>
+
+#include <KDebug>
 
 int main(int argc, char **argv)
 {
-    KAboutData about("kandas-info", "kandas", ki18nc("The application's name", "KaNDAS-info"), Kandas::Console::VersionRaw, ki18n(Kandas::Console::Description), KAboutData::License_GPL, ki18n("(C) 2008 Stefan Majewsky"));
+    KAboutData about("kandas-down", "kandas", ki18nc("The application's name", "KaNDAS-down"), Kandas::Console::VersionRaw, ki18n(Kandas::Console::Description), KAboutData::License_GPL, ki18n("(C) 2008 Stefan Majewsky"));
     about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Original author and current maintainer"), "majewsky@gmx.net");
     KCmdLineArgs::init(argc, argv, &about, KCmdLineArgs::CmdLineArgNone);
 
     KCmdLineOptions options;
-    options.add("e");
-    options.add("environment", ki18n("Show environment state"));
     options.add("d");
-    options.add("devices", ki18n("List all available devices"));
-    options.add("s");
-    options.add("slots", ki18n("List all available slots"));
+    options.add("device", ki18n("Slot argument is a device name; connect all slots of this device"));
+    options.add("+slot", ki18n("The slot to connect to"));
     KCmdLineArgs::addCmdLineOptions(options);
 
     KApplication app(false);
 
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
+    if (args->count() < 1)
+    {
+        std::cerr << i18n("ERROR: KaNDAS-down called without slot ID or device name. Use the --help switch for details.").toUtf8().data() << std::endl;
+        return 1;
+    }
     //read command line options
-    bool listEnv = args->isSet("environment");
-    bool listDevices = args->isSet("devices");
-    bool listSlots = args->isSet("slots");
+    QVariant target(args->arg(0));
+    if (!args->isSet("device"))
+        target.convert(QVariant::Int);
     args->clear();
 
-    if (!listEnv && !listDevices && !listSlots)
-        //when called without arguments, display both lists
-        listEnv = listDevices = listSlots = true;
-
-    Kandas::Console::InfoWorker worker(listEnv, listDevices, listSlots);
+    Kandas::Console::DownWorker worker(target);
     if (worker.clean())
         return app.exec();
     else

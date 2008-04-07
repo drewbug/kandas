@@ -146,8 +146,8 @@ void Kandas::Console::BaseWorker::initSlot(int slot, const QString &device, int 
 
 void Kandas::Console::BaseWorker::executeJobs()
 {
-    execute();
-    qApp->quit();
+    if (execute())
+        qApp->quit();
 }
 
 #include "base-worker.moc"

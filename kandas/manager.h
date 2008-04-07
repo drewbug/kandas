@@ -84,6 +84,7 @@ namespace Kandas
                 SlotModel *m_slotModel;
 
                 OrgKandasInterface m_interface;
+                bool m_connectionClean;
 
                 Kandas::EnvironmentState m_environment;
                 QList<DeviceInfo> m_devices;

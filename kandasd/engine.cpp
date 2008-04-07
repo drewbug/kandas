@@ -25,7 +25,6 @@
 #include <KProcess>
 
 //TODO: What is the difference between a slot and a device?
-//TODO: Move storage variables of Engine to EnginePrivate class.
 
 //singleton functions
 
@@ -147,9 +146,14 @@ void Kandas::Daemon::Engine::initClient()
     scheduleBlockingTask(&Kandas::Daemon::Engine::initClientJob);
 }
 
-QString Kandas::Daemon::Engine::engineVersion()
+QString Kandas::Daemon::Engine::daemonVersion()
 {
-    return Kandas::Daemon::Version;
+    return Kandas::Daemon::DaemonVersion;
+}
+
+QString Kandas::Daemon::Engine::interfaceVersion()
+{
+    return Kandas::Daemon::InterfaceVersion;
 }
 
 //task engine

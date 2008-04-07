@@ -30,8 +30,10 @@ namespace Kandas
     namespace Daemon
     {
 
-        const char VersionRaw[] = "0.1pre1";
-        const QString Version(VersionRaw);
+        const char DaemonVersionRaw[] = "0.1devel";
+        const QString DaemonVersion(DaemonVersionRaw);
+        const char InterfaceVersionRaw[] = "0.1";
+        const QString InterfaceVersion(InterfaceVersionRaw);
 
         typedef void (*EngineJob)(int slot);
         struct EngineTask
@@ -63,7 +65,8 @@ namespace Kandas
                 void disconnectDevice(const QString &device);
                 void refreshData();
                 void initClient();
-                QString engineVersion();
+                QString daemonVersion();
+                QString interfaceVersion();
             Q_SIGNALS:
                 void initEnvironmentInfo(int state);
                 void initDeviceInfo(const QString &device);

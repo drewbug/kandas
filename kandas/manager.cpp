@@ -20,6 +20,7 @@
 #include "devicemodel.h"
 #include "slotmodel.h"
 
+#include <iostream>
 #include <KIcon>
 #include <KLocalizedString>
 
@@ -29,23 +30,38 @@ Kandas::Client::Manager::Manager()
     : m_deviceModel(new Kandas::Client::DeviceModel(this))
     , m_slotModel(new Kandas::Client::SlotModel(this))
     , m_interface("org.kandas", "/", QDBusConnection::systemBus(), this)
+    , m_connectionClean(true)
     , m_environment(Kandas::UnknownEnvironment)
 {
     kDebug() << "Hallo";
-    //TODO: Check version - "0.1" and "" should be allowed. "" should result in a "Check if KaNDASd is running." message (this needs a more fine-grained version information system in KaNDASd -> server version, interface version, driver version)
+    //check version
+    QString version = m_interface.interfaceVersion().value();
+    if (version == "") //no KaNDASd instance running
+    {
+        std::cerr << i18n("ERROR: KaNDASd is not running.").toUtf8().data() << std::endl;
+        m_connectionClean = false;
+    }
+    else if (version != "0.1")
+    {
+        std::cerr << i18n("ERROR: Unknown KaNDASd version \"%1\" detected.", version).toUtf8().data() << std::endl;
+        m_connectionClean = false;
+    }
     //connect interface
-    connect(&m_interface, SIGNAL(initEnvironmentInfo(int)), this, SLOT(changeEnvironment(int)));
-    connect(&m_interface, SIGNAL(initDeviceInfo(const QString &)), this, SLOT(changeDevice(const QString &)));
-    connect(&m_interface, SIGNAL(initSlotInfo(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
-    connect(&m_interface, SIGNAL(environmentChanged(int)), this, SLOT(changeEnvironment(int)));
-    connect(&m_interface, SIGNAL(slotChanged(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
-    connect(&m_interface, SIGNAL(deviceAdded(const QString &)), this, SLOT(changeDevice(const QString &)));
-    connect(&m_interface, SIGNAL(slotAdded(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
-    connect(&m_interface, SIGNAL(deviceRemoved(const QString &)), this, SLOT(removeDevice(const QString &)));
-    connect(&m_interface, SIGNAL(slotRemoved(int, const QString &)), this, SLOT(removeSlot(int, const QString &)));
-    m_interface.registerClient();
-    m_interface.initClient();
-    connect(m_deviceModel, SIGNAL(modelReset()), this, SLOT(resetDeviceSelection()));
+    if (m_connectionClean)
+    {
+        connect(&m_interface, SIGNAL(initEnvironmentInfo(int)), this, SLOT(changeEnvironment(int)));
+        connect(&m_interface, SIGNAL(initDeviceInfo(const QString &)), this, SLOT(changeDevice(const QString &)));
+        connect(&m_interface, SIGNAL(initSlotInfo(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
+        connect(&m_interface, SIGNAL(environmentChanged(int)), this, SLOT(changeEnvironment(int)));
+        connect(&m_interface, SIGNAL(slotChanged(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
+        connect(&m_interface, SIGNAL(deviceAdded(const QString &)), this, SLOT(changeDevice(const QString &)));
+        connect(&m_interface, SIGNAL(slotAdded(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
+        connect(&m_interface, SIGNAL(deviceRemoved(const QString &)), this, SLOT(removeDevice(const QString &)));
+        connect(&m_interface, SIGNAL(slotRemoved(int, const QString &)), this, SLOT(removeSlot(int, const QString &)));
+        m_interface.registerClient();
+        m_interface.initClient();
+        connect(m_deviceModel, SIGNAL(modelReset()), this, SLOT(resetDeviceSelection()));
+    }
 }
 
 Kandas::Client::Manager::~Manager()
@@ -58,13 +74,25 @@ Kandas::Client::Manager::~Manager()
 bool Kandas::Client::Manager::error() const
 {
     kDebug() << "Hallo";
-    return m_environment != Kandas::SaneEnvironment;
+    return !m_connectionClean || m_environment != Kandas::SaneEnvironment;
 }
 
 QVariant Kandas::Client::Manager::errorContent(int role) const
 {
     kDebug() << "Hallo";
-    if (m_environment != Kandas::SaneEnvironment)
+    if (!m_connectionClean)
+    {
+        switch (role)
+        {
+            case Qt::DisplayRole:
+                return i18n("Could not connect to KaNDASd service");
+            case Kandas::Client::ConnectionStatusRole:
+                return i18n("Please check your installation.");
+            case Qt::DecorationRole:
+                return KIcon("dialog-cancel");
+        }
+    }
+    else if (m_environment != Kandas::SaneEnvironment)
     {
         switch (role)
         {
@@ -102,12 +130,19 @@ Kandas::Client::SlotModel *Kandas::Client::Manager::slotModel() const
 void Kandas::Client::Manager::changeEnvironment(int state)
 {
     kDebug() << "Hallo";
+    Kandas::EnvironmentState newEnvironment;
     switch (state)
     {
-        case Kandas::SaneEnvironment: m_environment = Kandas::SaneEnvironment; break;
-        case Kandas::NoDriverFound: m_environment = Kandas::NoDriverFound; break;
-        case Kandas::NoAdminFound: m_environment = Kandas::NoAdminFound; break;
-        default: m_environment = Kandas::UnknownEnvironment; break;
+        case Kandas::SaneEnvironment: newEnvironment = Kandas::SaneEnvironment; break;
+        case Kandas::NoDriverFound: newEnvironment = Kandas::NoDriverFound; break;
+        case Kandas::NoAdminFound: newEnvironment = Kandas::NoAdminFound; break;
+        default: newEnvironment = Kandas::UnknownEnvironment; break;
+    }
+    if (m_environment != newEnvironment)
+    {
+        m_environment = newEnvironment;
+        m_deviceModel->reset();
+        m_slotModel->reset();
     }
 }
 

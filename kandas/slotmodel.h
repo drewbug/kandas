@@ -19,16 +19,17 @@
 #ifndef KANDAS_CLIENT_SLOTMODEL_H
 #define KANDAS_CLIENT_SLOTMODEL_H
 
+#include "manager.h"
 #include <QAbstractListModel>
 
 namespace Kandas
 {
     namespace Client
     {
-        class Manager;
 
         class SlotModel : public QAbstractListModel
         {
+            friend void Kandas::Client::Manager::changeEnvironment(int state);
             Q_OBJECT
             public:
                 SlotModel(Manager *parent = 0);

@@ -25,8 +25,6 @@
 #include <QList>
 #include <KLocalizedString>
 
-//TODO: Abstract the whole initiation thing into a Kandas::Console::Worker class.
-
 namespace Kandas
 {
     namespace Console
@@ -54,9 +52,15 @@ Kandas::Console::BaseWorkerPrivate::BaseWorkerPrivate(BaseWorker *parent)
     , m_interface(new OrgKandasInterface("org.kandas", "/", QDBusConnection::systemBus(), parent))
     , m_environment(Kandas::UnknownEnvironment)
 {
-    if (m_interface->engineVersion().value() == "") //no KaNDASd instance running
+    QString version = m_interface->interfaceVersion().value();
+    if (version == "") //no KaNDASd instance running
     {
         std::cerr << i18n("ERROR: KaNDASd is not running.").toUtf8().data() << std::endl;
+        m_clean = false;
+    }
+    else if (version != "0.1")
+    {
+        std::cerr << i18n("ERROR: Unknown KaNDASd version \"%1\" detected.", version).toUtf8().data() << std::endl;
         m_clean = false;
     }
 }

@@ -17,11 +17,8 @@
  ***************************************************************************/
 
 #include "info-worker.h"
-#include "interface.h"
 
 #include <iostream>
-#include <QHash>
-#include <QList>
 #include <KLocalizedString>
 
 Kandas::Console::InfoWorker::InfoWorker(bool listEnv, bool listDevices, bool listSlots)
@@ -32,7 +29,7 @@ Kandas::Console::InfoWorker::InfoWorker(bool listEnv, bool listDevices, bool lis
 {
 }
 
-void Kandas::Console::InfoWorker::execute()
+bool Kandas::Console::InfoWorker::execute()
 {
     if (m_listEnv)
         listEnvironment();
@@ -48,6 +45,8 @@ void Kandas::Console::InfoWorker::execute()
             std::cout << std::endl; //some space between both lists
         listSlots();
     }
+    //exit immediately
+    return true;
 }
 
 void Kandas::Console::InfoWorker::listEnvironment()

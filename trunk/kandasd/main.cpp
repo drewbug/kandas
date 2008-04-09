@@ -34,7 +34,10 @@ int main(int argc, char ** argv)
     KCmdLineArgs::init(argc, argv, &about, KCmdLineArgs::CmdLineArgNone);
 
     KCmdLineOptions options;
+    options.add("d");
     options.add("detach", ki18n("Start detached instance of KaNDASd (for usage on console)"));
+    options.add("s");
+    options.add("source <directory>", ki18n("NDAS source directory (use this with KaNDASsimul)"), "/proc/ndas");
     options.add("", ki18n("KaNDASd has to run with root privileges."));
     KCmdLineArgs::addCmdLineOptions(options);
 
@@ -46,9 +49,10 @@ int main(int argc, char ** argv)
         KProcess::startDetached(QCoreApplication::applicationFilePath());
         return 0;
     }
+    Kandas::Daemon::Engine::self(); //cause the Kandas::Engine singleton to be created while the CLI args are available
     args->clear();
 
-    if (Kandas::Daemon::Engine::self()->clean()) //causes the Kandas::Engine singleton to be created
+    if (Kandas::Daemon::Engine::self()->clean())
         return app.exec();
     else
         return 1;

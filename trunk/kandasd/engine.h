@@ -53,7 +53,7 @@ namespace Kandas
                 ~Engine();
             public:
                 static Engine *self();
-                bool clean();
+                bool clean() const;
             public Q_SLOTS:
                 void registerClient();
                 void unregisterClient();
@@ -98,6 +98,8 @@ namespace Kandas
                 void scheduleBlockingTask(EngineJob job, int slot = 0);
             private:
                 bool m_clean;
+
+                QString m_infoSourceDir;
 
                 Kandas::EnvironmentState m_envState;
                 QList<QString> *m_devices;

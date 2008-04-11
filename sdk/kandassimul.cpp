@@ -104,7 +104,7 @@ void Kandas::Simulator::write()
     {
         devList.write(QByteArray("#discard\n"));
         foreach (QString device, m_devices)
-            devList.write(device.toUtf8());
+            devList.write(QString("%1\n").arg(device).toUtf8());
     }
     devList.close();
     //for each device, write slot list
@@ -120,12 +120,12 @@ void Kandas::Simulator::write()
             {
                 iterSlots.next();
                 if (iterSlots.value().device == device)
-                    devList.write(QString("%1\n").arg(iterSlots.key()).toUtf8());
+                    slotList.write(QString("%1\n").arg(iterSlots.key()).toUtf8());
             }
         }
         slotList.close();
     }
-    //for each slot, write this little connection info
+    //for each slot, write some info
     iterSlots.toFront();
     while (iterSlots.hasNext())
     {
@@ -137,7 +137,7 @@ void Kandas::Simulator::write()
         if (slotInfo.open(QIODevice::WriteOnly | QIODevice::Truncate) && slotInfo.isWritable())
         {
             slotInfo.write(QByteArray("#discard\n"));
-            slotInfo.write((iterSlots.value().state == Kandas::Connected || iterSlots.value().state == Kandas::Disconnecting) ? "Enabled" : "Disabled");
+            slotInfo.write((iterSlots.value().state == Kandas::Connected || iterSlots.value().state == Kandas::Disconnecting) ? "Enabled\n" : "Disabled\n");
         }
         slotInfo.close();
     }
@@ -145,7 +145,7 @@ void Kandas::Simulator::write()
 
 void Kandas::Simulator::loop()
 {
-    std::cout << "Welcome to KaNDASsimul. If it was implemented you could type 'help' for help." << std::endl;
+    std::cout << "Welcome to KaNDASsimul. Type 'help' for help." << std::endl;
     forever
     {
         std::cout << "KaNDASsimul:" << m_baseDirectory.toUtf8().data() << "> ";
@@ -154,7 +154,7 @@ void Kandas::Simulator::loop()
         QString command = QString(buffer).simplified();
         QStringList args = command.split(' ');
         QString commandName = args.at(0);
-        if (commandName == "dev" || commandName == "mkdev")
+        if (commandName == "dev")
         {
             if (args.count() != 2)
             {
@@ -172,7 +172,7 @@ void Kandas::Simulator::loop()
             }
             removeDevice(args[1]);
         }
-        else if (commandName == "slot" || commandName == "mkslot")
+        else if (commandName == "slot")
         {
             if (args.count() != 4)
             {
@@ -194,17 +194,36 @@ void Kandas::Simulator::loop()
         {
             break;
         }
+        else if (commandName == "help")
+        {
+            std::cout << "\n"
+                "KaNDASsimul simulates an NDAS driver's procfs in the given directory.\n"
+                "Available commands on the KaNDASsimul prompt are:\n\n"
+                "dev [name]                       Adds a device with this name.\n"
+                "rmdev [name]                     Removes a device with this name.\n"
+                "slot [number] [device] [state]   Adds or changes this slot.\n"
+                "rmslot [number]                  Removes this slot.\n"
+                "quit | exit | help               Just too obvious.\n\n"
+                "Possible states for the 'slot' command are:\n\n"
+                "10                               Slot is disconnected.\n"
+                "11                               Slot is connected.\n"
+                "It is not possible to emulate unavailability and transition states.\n"
+            << std::endl;
+        }
         else
         {
-            std::cout << "ERROR: Unknown command name." << std::endl;
+            std::cout << "ERROR: Unknown command name. Type 'help' for help." << std::endl;
         }
     }
 }
 
 int main(int argc, char **argv)
 {
-    if (argc < 2)
-        return 0;
+    if (argc != 2)
+    {
+        std::cout << "Usage: kandassimul [directory]" << std::endl;
+        std::cout << "KaNDASsimul simulates an NDAS driver's procfs tree in the given directory." << std::endl;
+    }
     Kandas::Simulator sim(argv[1]);
     sim.loop();
     return 0;

@@ -46,7 +46,7 @@ int main(int argc, char ** argv)
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     if (args->isSet("detach"))
     {
-        KProcess::startDetached(QCoreApplication::applicationFilePath());
+        KProcess::startDetached(QCoreApplication::applicationFilePath(), QStringList() << "--source" << args->getOption("source"));
         return 0;
     }
     Kandas::Daemon::Engine::self(); //cause the Kandas::Engine singleton to be created while the CLI args are available

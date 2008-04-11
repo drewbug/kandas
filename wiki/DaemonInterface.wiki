@@ -9,10 +9,13 @@ KaNDASd defines some state enumerations which are transferred over D-Bus as inte
 
 {{{
   //Methods:
-    string engineVersion();
+    string daemonVersion();
+    string interfaceVersion();
 }}}
 
-Check the engine version of the running KaNDASd instance as the interface may differ for each versions. For stable versions and current development versions, such differences will be noted on this page. Example version strings are _0.1_ or _0.2beta7_. Development versions will contain _pre_, like in _0.2pre4_.
+Check the interface version of the running KaNDASd instance as the interface may differ between versions. For stable versions and current development versions, such differences will be noted on this page. Example version strings are _0.1_ or _0.2_.
+
+The daemon version is not of programmatic relevance. However, you can use it in your UI's about dialog, or whatever you deserve.
 
 == Registration of a new client ==
 

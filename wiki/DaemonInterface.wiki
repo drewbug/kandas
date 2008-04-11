@@ -1,9 +1,9 @@
 #summary Usage guide for the D-Bus interface provided by KaNDASd.
 #labels Product-KaNDASd,Category-DevDoc
 
-KaNDASd has two main intentions: It abstracts the interfaces of the Ximeta NDAS driver (i.e. the /proc/ndas tree and the ndasadmin program), and (as it runs as root) allows clients to perform operations without root privileges. To fulfil these purposes, KaNDASd offers a D-Bus interface at the system bus, accessible at `org.kde.kandas /`. This is the reference documentation for the methods and signals in this interface.
+KaNDASd has two main intentions: It abstracts the interfaces of the Ximeta NDAS driver (i.e. the /proc/ndas tree and the ndasadmin program), and (as it runs as root) allows clients to perform operations without root privileges. To fulfil these purposes, KaNDASd offers a D-Bus interface at the system bus, accessible at `org.kandas /`. This is the reference documentation for the methods and signals in this interface.
 
-KaNDASd defines some state enumerations which are transferred over D-Bus as integers. Include the header `<kandasd/definitions.h>` to get these. When talking of the data type _string_ in this documentation, the data type which is actually used in your client depends on the libraries you're using. When using Qt and its QtDBus, _string_
+KaNDASd defines some state enumerations which are transferred over D-Bus as integers. Include the header `<kandasd/definitions.h>` to get these. A standard XML interface definition is available in the same folder as `org.kandas.xml`. When talking of the data type _string_ in this documentation, the data type which is actually used in your client depends on the libraries you're using. When using Qt and its QtDBus, _string_ means QString, for instance.
 
 == Information about the daemon ==
 

@@ -6,10 +6,10 @@ The contents of this page may change radically. Schedules will become more detai
 == Version 0.1 ==
 
  * Milestones:
-  * KaNDASd is able to gather information from the NDAS driver's information system.
-  * KaNDASd can use the ndasadmin program to connect and disconnect devices and slots.
-  * KaNDAS and KaNDASconsole provide access to all features provided by KaNDASd.
- * Release Schedule: TBA
+  * KaNDASd is able to gather information from the NDAS driver's information system (done).
+  * KaNDASd can use the ndasadmin program to connect and disconnect devices and slots (done).
+  * KaNDAS and KaNDASconsole provide access to all features provided by KaNDASd (done).
+ * Release Schedule: ReleaseSchedule01
 
 == Version 0.2 ==
 

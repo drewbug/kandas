@@ -37,12 +37,15 @@ namespace Kandas
             public slots:
                 void resetDeviceSelection();
 
-                void connectDevice();
+                void connectDeviceRead();
+                void connectDeviceWrite();
+                void connectSlotRead();
+                void connectSlotWrite();
                 void disconnectDevice();
-                void connectSlot();
                 void disconnectSlot();
             signals:
                 void stateChanged(const QString &);
+                void initializationComplete();
             private:
                 ViewPrivate *p;
         };

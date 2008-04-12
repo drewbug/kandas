@@ -33,7 +33,6 @@ int main(int argc, char ** argv)
     KCmdLineArgs::init(argc, argv, &about);
 
     KApplication app;
-    Kandas::Client::MainWindow *window = new Kandas::Client::MainWindow;
-    window->show();
+    new Kandas::Client::MainWindow;
     return app.exec();
 }

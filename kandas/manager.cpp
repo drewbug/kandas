@@ -33,7 +33,7 @@ Kandas::Client::Manager::Manager()
     , m_connectionClean(true)
     , m_environment(Kandas::UnknownEnvironment)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     //check version
     QString version = m_interface.interfaceVersion().value();
     if (version == "") //no KaNDASd instance running
@@ -52,6 +52,7 @@ Kandas::Client::Manager::Manager()
         connect(&m_interface, SIGNAL(initEnvironmentInfo(int)), this, SLOT(changeEnvironment(int)));
         connect(&m_interface, SIGNAL(initDeviceInfo(const QString &)), this, SLOT(changeDevice(const QString &)));
         connect(&m_interface, SIGNAL(initSlotInfo(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
+        connect(&m_interface, SIGNAL(initInfoComplete()), this, SIGNAL(initializationComplete()));
         connect(&m_interface, SIGNAL(environmentChanged(int)), this, SLOT(changeEnvironment(int)));
         connect(&m_interface, SIGNAL(slotChanged(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
         connect(&m_interface, SIGNAL(deviceAdded(const QString &)), this, SLOT(changeDevice(const QString &)));
@@ -66,20 +67,20 @@ Kandas::Client::Manager::Manager()
 
 Kandas::Client::Manager::~Manager()
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     m_interface.unregisterClient();
     delete m_deviceModel;
 }
 
 bool Kandas::Client::Manager::error() const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     return !m_connectionClean || m_environment != Kandas::SaneEnvironment;
 }
 
 QVariant Kandas::Client::Manager::errorContent(int role) const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (!m_connectionClean)
     {
         switch (role)
@@ -117,19 +118,19 @@ QVariant Kandas::Client::Manager::errorContent(int role) const
 
 Kandas::Client::DeviceModel *Kandas::Client::Manager::deviceModel() const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     return m_deviceModel;
 }
 
 Kandas::Client::SlotModel *Kandas::Client::Manager::slotModel() const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     return m_slotModel;
 }
 
 void Kandas::Client::Manager::changeEnvironment(int state)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     Kandas::EnvironmentState newEnvironment;
     switch (state)
     {
@@ -148,7 +149,7 @@ void Kandas::Client::Manager::changeEnvironment(int state)
 
 void Kandas::Client::Manager::changeDevice(const QString &device)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     //insert device into list if not already added
     foreach (Kandas::Client::DeviceInfo info, m_devices)
     {
@@ -163,7 +164,7 @@ void Kandas::Client::Manager::changeDevice(const QString &device)
 
 void Kandas::Client::Manager::changeSlot(int slot, const QString &device, int state)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     //convert state
     Kandas::SlotState slotState = Kandas::Undetermined;
     switch (state)
@@ -209,7 +210,7 @@ void Kandas::Client::Manager::changeSlot(int slot, const QString &device, int st
 
 void Kandas::Client::Manager::removeDevice(const QString &device)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     for (int d = 0; d < m_devices.count(); ++d)
     {
         if (m_devices[d].device == device)
@@ -224,7 +225,7 @@ void Kandas::Client::Manager::removeDevice(const QString &device)
 
 void Kandas::Client::Manager::removeSlot(int slot, const QString &device)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     //search for device
     for (int d = 0; d < m_devices.count(); ++d)
     {
@@ -247,7 +248,7 @@ void Kandas::Client::Manager::removeSlot(int slot, const QString &device)
 
 void Kandas::Client::Manager::initComplete()
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     disconnect(&m_interface, SIGNAL(initEnvironmentInfo(int)), this, SLOT(changeEnvironment(int)));
     disconnect(&m_interface, SIGNAL(initDeviceInfo(const QString &)), this, SLOT(changeDevice(const QString &)));
     disconnect(&m_interface, SIGNAL(initSlotInfo(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
@@ -256,15 +257,39 @@ void Kandas::Client::Manager::initComplete()
 
 void Kandas::Client::Manager::selectedDeviceChanged(const QModelIndex &device)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (device.isValid())
         m_slotModel->changeSelectedDevice(device.row());
 }
 
 void Kandas::Client::Manager::resetDeviceSelection()
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     m_slotModel->changeSelectedDevice(-1);
+}
+
+void Kandas::Client::Manager::connectDevice(const QString &device, bool readOnly)
+{
+    kDebug() << "hello";
+    m_interface.connectDevice(device, readOnly);
+}
+
+void Kandas::Client::Manager::connectSlot(int slot, bool readOnly)
+{
+    kDebug() << "hello";
+    m_interface.connectSlot(slot, readOnly);
+}
+
+void Kandas::Client::Manager::disconnectDevice(const QString &device)
+{
+    kDebug() << "hello";
+    m_interface.disconnectDevice(device);
+}
+
+void Kandas::Client::Manager::disconnectSlot(int slot)
+{
+    kDebug() << "hello";
+    m_interface.disconnectSlot(slot);
 }
 
 #include "manager.moc"

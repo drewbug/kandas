@@ -29,17 +29,17 @@ Kandas::Client::SlotModel::SlotModel(Kandas::Client::Manager *parent)
     : p(parent)
     , m_currentDevice(-1)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
 }
 
 Kandas::Client::SlotModel::~SlotModel()
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
 }
 
 QVariant Kandas::Client::SlotModel::data(const QModelIndex &index, int role) const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice < 0 || m_currentDevice >= p->m_devices.count())
         return QVariant();
     int row = index.row();
@@ -71,6 +71,8 @@ QVariant Kandas::Client::SlotModel::data(const QModelIndex &index, int role) con
                 case Kandas::Disconnecting:
                     return i18n("Disconnecting");
             }
+        case Kandas::Client::ItemIdentifierRole:
+            return info.slot;
         default:
             return QVariant();
     }
@@ -78,13 +80,13 @@ QVariant Kandas::Client::SlotModel::data(const QModelIndex &index, int role) con
 
 QVariant Kandas::Client::SlotModel::headerData(int, Qt::Orientation, int) const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     return QVariant();
 }
 
 int Kandas::Client::SlotModel::rowCount(const QModelIndex &parent) const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (parent.isValid() || m_currentDevice < 0 || m_currentDevice >= p->m_devices.count())
         return 0;
     return p->m_devices.at(m_currentDevice).slotList.count();
@@ -92,7 +94,7 @@ int Kandas::Client::SlotModel::rowCount(const QModelIndex &parent) const
 
 void Kandas::Client::SlotModel::changeSelectedDevice(int index)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice != index)
     {
         m_currentDevice = index;
@@ -102,14 +104,14 @@ void Kandas::Client::SlotModel::changeSelectedDevice(int index)
 
 void Kandas::Client::SlotModel::deviceAdded(int deviceIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice <= deviceIndex) //device added before selected one - increment index
         ++m_currentDevice;
 }
 
 void Kandas::Client::SlotModel::deviceRemoved(int deviceIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice == deviceIndex) //selected device removed
         changeSelectedDevice(-1);
     else if (m_currentDevice <= deviceIndex) //device removed before selected one - decrement index
@@ -118,35 +120,35 @@ void Kandas::Client::SlotModel::deviceRemoved(int deviceIndex)
 
 void Kandas::Client::SlotModel::slotAboutToBeAdded(int deviceIndex, int slotIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice == deviceIndex)
         beginInsertRows(index(slotIndex).parent(), slotIndex, slotIndex);
 }
 
 void Kandas::Client::SlotModel::slotAdded(int deviceIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice == deviceIndex)
         endInsertRows();
 }
 
 void Kandas::Client::SlotModel::slotChanged(int deviceIndex, int slotIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice == deviceIndex)
         emit dataChanged(index(slotIndex), index(slotIndex));
 }
 
 void Kandas::Client::SlotModel::slotAboutToBeRemoved(int deviceIndex, int slotIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice == deviceIndex)
         beginRemoveRows(index(slotIndex).parent(), slotIndex, slotIndex);
 }
 
 void Kandas::Client::SlotModel::slotRemoved(int deviceIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (m_currentDevice == deviceIndex)
         endRemoveRows();
 }

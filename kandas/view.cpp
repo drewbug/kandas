@@ -63,8 +63,10 @@ Kandas::Client::View::View(QWidget *parent)
 {
     p->m_deviceList.setItemDelegate(&p->m_deviceDelegate);
     p->m_deviceList.setModel(p->m_manager.deviceModel());
+    p->m_deviceList.setSelectionMode(QAbstractItemView::SingleSelection);
     p->m_slotList.setItemDelegate(&p->m_slotDelegate);
     p->m_slotList.setModel(p->m_manager.slotModel());
+    p->m_slotList.setSelectionMode(QAbstractItemView::SingleSelection);
 
     p->m_layout.addWidget(&p->m_deviceList);
     p->m_layout.addWidget(&p->m_slotList);
@@ -72,6 +74,8 @@ Kandas::Client::View::View(QWidget *parent)
 
     connect(p->m_deviceList.selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), &p->m_manager, SLOT(selectedDeviceChanged(const QModelIndex &)));
     connect(p->m_manager.deviceModel(), SIGNAL(modelReset()), this, SLOT(resetDeviceSelection()));
+
+    connect(&p->m_manager, SIGNAL(initializationComplete()), this, SIGNAL(initializationComplete()));
 }
 
 Kandas::Client::View::~View()
@@ -86,20 +90,58 @@ void Kandas::Client::View::resetDeviceSelection()
     p->m_manager.selectedDeviceChanged(selection);
 }
 
-void Kandas::Client::View::connectDevice()
+void Kandas::Client::View::connectDeviceRead()
 {
+    if (!p->m_deviceList.selectionModel()->hasSelection())
+        return;
+    QModelIndex selected = p->m_deviceList.selectionModel()->currentIndex();
+    QString device = p->m_manager.deviceModel()->data(selected, Kandas::Client::ItemIdentifierRole).toString();
+    p->m_manager.connectDevice(device, true);
+}
+
+void Kandas::Client::View::connectDeviceWrite()
+{
+    if (!p->m_deviceList.selectionModel()->hasSelection())
+        return;
+    QModelIndex selected = p->m_deviceList.selectionModel()->currentIndex();
+    QString device = p->m_manager.deviceModel()->data(selected, Kandas::Client::ItemIdentifierRole).toString();
+    p->m_manager.connectDevice(device, false);
+}
+
+void Kandas::Client::View::connectSlotRead()
+{
+    if (!p->m_slotList.selectionModel()->hasSelection())
+        return;
+    QModelIndex selected = p->m_slotList.selectionModel()->currentIndex();
+    int slot = p->m_manager.slotModel()->data(selected, Kandas::Client::ItemIdentifierRole).toInt();
+    p->m_manager.connectSlot(slot, true);
+}
+
+void Kandas::Client::View::connectSlotWrite()
+{
+    if (!p->m_slotList.selectionModel()->hasSelection())
+        return;
+    QModelIndex selected = p->m_slotList.selectionModel()->currentIndex();
+    int slot = p->m_manager.slotModel()->data(selected, Kandas::Client::ItemIdentifierRole).toInt();
+    p->m_manager.connectSlot(slot, false);
 }
 
 void Kandas::Client::View::disconnectDevice()
 {
-}
-
-void Kandas::Client::View::connectSlot()
-{
+    if (!p->m_deviceList.selectionModel()->hasSelection())
+        return;
+    QModelIndex selected = p->m_deviceList.selectionModel()->currentIndex();
+    QString device = p->m_manager.deviceModel()->data(selected, Kandas::Client::ItemIdentifierRole).toString();
+    p->m_manager.disconnectDevice(device);
 }
 
 void Kandas::Client::View::disconnectSlot()
 {
+    if (!p->m_slotList.selectionModel()->hasSelection())
+        return;
+    QModelIndex selected = p->m_slotList.selectionModel()->currentIndex();
+    int slot = p->m_manager.slotModel()->data(selected, Kandas::Client::ItemIdentifierRole).toInt();
+    p->m_manager.disconnectSlot(slot);
 }
 
 void Kandas::Client::ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const

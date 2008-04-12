@@ -28,15 +28,15 @@
 
 Kandas::Client::MainWindow::MainWindow()
     : KXmlGuiWindow()
+    , m_view(new Kandas::Client::View(this))
 {
     setupActions();
     setupGUI();
     setWindowIcon(KIcon("folder-remote"));
-    slotStateChanged("nodriver");
     statusBar()->hide();
     //central widget
-    m_view = new Kandas::Client::View(this);
     setCentralWidget(m_view);
+    connect(m_view, SIGNAL(initializationComplete()), this, SLOT(show()));
 }
 
 Kandas::Client::MainWindow::~MainWindow()
@@ -70,6 +70,13 @@ void Kandas::Client::MainWindow::setupActions()
     //disconnect slot
     KAction *actDiscSlot = new KAction(KIcon("media-eject"), i18n("Disconnect slot"), actionCollection());
     actionCollection()->addAction("kandas_slot_disconnect", actDiscSlot);
+    //meta-object connections
+    connect(actConnDevRead, SIGNAL(triggered()), m_view, SLOT(connectDeviceRead()));
+    connect(actConnDevWrite, SIGNAL(triggered()), m_view, SLOT(connectDeviceWrite()));
+    connect(actDiscDev, SIGNAL(triggered()), m_view, SLOT(disconnectDevice()));
+    connect(actConnSlotRead, SIGNAL(triggered()), m_view, SLOT(connectSlotRead()));
+    connect(actConnSlotWrite, SIGNAL(triggered()), m_view, SLOT(connectSlotWrite()));
+    connect(actDiscSlot, SIGNAL(triggered()), m_view, SLOT(disconnectSlot()));
 }
 
 #include "window.moc"

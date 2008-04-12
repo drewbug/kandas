@@ -28,24 +28,24 @@
 Kandas::Client::DeviceModel::DeviceModel(Kandas::Client::Manager *parent)
     : p(parent)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
 }
 
 Kandas::Client::DeviceModel::~DeviceModel()
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
 }
 
 void Kandas::Client::DeviceModel::lateInit()
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     disconnect(&p->m_interface, SIGNAL(initInfoComplete()), this, SLOT(lateInit()));
     reset();
 }
 
 QVariant Kandas::Client::DeviceModel::data(const QModelIndex &index, int role) const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     //exceptional error view
     if (p->error())
     {
@@ -81,6 +81,8 @@ QVariant Kandas::Client::DeviceModel::data(const QModelIndex &index, int role) c
                 return i18np("%1 slot connected", "%1 slots connected", slotCount);
             else
                 return i18n("%1 of %2 slots connected", connectedCount, slotCount);
+        case Kandas::Client::ItemIdentifierRole:
+            return p->m_devices.at(row).device;
         default:
             return QVariant();
     }
@@ -88,13 +90,13 @@ QVariant Kandas::Client::DeviceModel::data(const QModelIndex &index, int role) c
 
 QVariant Kandas::Client::DeviceModel::headerData(int, Qt::Orientation, int) const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     return QVariant();
 }
 
 int Kandas::Client::DeviceModel::rowCount(const QModelIndex &parent) const
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     if (parent.isValid())
         return 0;
     //error view -> exactly one entry with the error message; device view -> count of devices
@@ -103,25 +105,25 @@ int Kandas::Client::DeviceModel::rowCount(const QModelIndex &parent) const
 
 void Kandas::Client::DeviceModel::deviceAboutToBeAdded(int deviceIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     beginInsertRows(index(deviceIndex).parent(), deviceIndex, deviceIndex);
 }
 
 void Kandas::Client::DeviceModel::deviceAboutToBeRemoved(int deviceIndex)
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     beginRemoveRows(index(deviceIndex).parent(), deviceIndex, deviceIndex);
 }
 
 void Kandas::Client::DeviceModel::deviceAdded()
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     endInsertRows();
 }
 
 void Kandas::Client::DeviceModel::deviceRemoved()
 {
-    kDebug() << "Hallo";
+    kDebug() << "hello";
     endRemoveRows();
 }
 

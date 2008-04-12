@@ -52,7 +52,8 @@ namespace Kandas
         };
 
         enum Role { //role extensions for QAbstractItemModel::data
-            ConnectionStatusRole = Qt::UserRole + 1
+            ConnectionStatusRole = Qt::UserRole + 1,
+            ItemIdentifierRole
         };
 
         class Manager : public QObject
@@ -70,15 +71,22 @@ namespace Kandas
                 DeviceModel *deviceModel() const;
                 SlotModel *slotModel() const;
             public slots:
+                void connectDevice(const QString &device, bool readOnly);
+                void connectSlot(int slot, bool readOnly);
+                void disconnectDevice(const QString &device);
+                void disconnectSlot(int slot);
+
+                void selectedDeviceChanged(const QModelIndex &device);
+                void resetDeviceSelection();
+            signals:
+                void initializationComplete();
+            private slots:
                 void changeEnvironment(int state);
                 void changeDevice(const QString &device);
                 void changeSlot(int slot, const QString &device, int state);
                 void removeDevice(const QString &device);
                 void removeSlot(int slot, const QString &device);
                 void initComplete();
-
-                void selectedDeviceChanged(const QModelIndex &device);
-                void resetDeviceSelection();
             private:
                 DeviceModel *m_deviceModel;
                 SlotModel *m_slotModel;

@@ -30,13 +30,17 @@ Kandas::Client::MainWindow::MainWindow()
     : KXmlGuiWindow()
     , m_view(new Kandas::Client::View(this))
 {
+    //early GUI initialisation
     setupActions();
-    setupGUI();
-    setWindowIcon(KIcon("folder-remote"));
-    statusBar()->hide();
+    statusBar()->insertPermanentItem(i18n("Connecting to KaNDASd..."), 1, 1);
+    statusBar()->setItemAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+    setAutoSaveSettings();
     //central widget
     setCentralWidget(m_view);
-    connect(m_view, SIGNAL(initializationComplete()), this, SLOT(show()));
+    connect(m_view, SIGNAL(initializationComplete(const QString &)), this, SLOT(initializationComplete(const QString &)));
+    //late GUI initialisation
+    setupGUI();
+    setWindowIcon(KIcon("folder-remote"));
 }
 
 Kandas::Client::MainWindow::~MainWindow()
@@ -77,6 +81,12 @@ void Kandas::Client::MainWindow::setupActions()
     connect(actConnSlotRead, SIGNAL(triggered()), m_view, SLOT(connectSlotRead()));
     connect(actConnSlotWrite, SIGNAL(triggered()), m_view, SLOT(connectSlotWrite()));
     connect(actDiscSlot, SIGNAL(triggered()), m_view, SLOT(disconnectSlot()));
+}
+
+void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVersion)
+{
+    statusBar()->changeItem(i18n("Connected to KaNDASd %1", daemonVersion), 1);
+    show();
 }
 
 #include "window.moc"

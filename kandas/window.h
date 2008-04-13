@@ -34,6 +34,8 @@ namespace Kandas
             public:
                 explicit MainWindow();
                 ~MainWindow();
+            public slots:
+                void initializationComplete(const QString &daemonVersion);
             private:
                 void setupActions();
                 View *m_view;

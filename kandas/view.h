@@ -44,8 +44,7 @@ namespace Kandas
                 void disconnectDevice();
                 void disconnectSlot();
             signals:
-                void stateChanged(const QString &);
-                void initializationComplete();
+                void initializationComplete(const QString &name);
             private:
                 ViewPrivate *p;
         };

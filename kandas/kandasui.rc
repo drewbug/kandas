@@ -24,4 +24,5 @@
         <Action name="kandas_slot_connect"/>
         <Action name="kandas_slot_disconnect"/>
     </ToolBar>
+    <StatusBar/>
 </gui>

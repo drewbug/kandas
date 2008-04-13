@@ -79,7 +79,7 @@ namespace Kandas
                 void selectedDeviceChanged(const QModelIndex &device);
                 void resetDeviceSelection();
             signals:
-                void initializationComplete();
+                void initializationComplete(const QString &daemonVersion);
             private slots:
                 void changeEnvironment(int state);
                 void changeDevice(const QString &device);

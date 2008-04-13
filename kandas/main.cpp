@@ -28,7 +28,7 @@ static const char version[] = "0.1";
 int main(int argc, char ** argv)
 {
     KAboutData about("kandas", 0, ki18nc("The application's name", "KaNDAS"), version, ki18n(description),
-        KAboutData::License_GPL, ki18n("(C) 2008 Stefan Majewsky"));
+        KAboutData::License_GPL, ki18n("(C) 2008 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
     about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Original author and current maintainer"), "majewsky@gmx.net");
     KCmdLineArgs::init(argc, argv, &about);
 

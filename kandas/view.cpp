@@ -75,7 +75,7 @@ Kandas::Client::View::View(QWidget *parent)
     connect(p->m_deviceList.selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), &p->m_manager, SLOT(selectedDeviceChanged(const QModelIndex &)));
     connect(p->m_manager.deviceModel(), SIGNAL(modelReset()), this, SLOT(resetDeviceSelection()));
 
-    connect(&p->m_manager, SIGNAL(initializationComplete()), this, SIGNAL(initializationComplete()));
+    connect(&p->m_manager, SIGNAL(initializationComplete(const QString &)), this, SIGNAL(initializationComplete(const QString &)));
 }
 
 Kandas::Client::View::~View()

@@ -52,7 +52,7 @@ Kandas::Client::Manager::Manager()
         connect(&m_interface, SIGNAL(initEnvironmentInfo(int)), this, SLOT(changeEnvironment(int)));
         connect(&m_interface, SIGNAL(initDeviceInfo(const QString &)), this, SLOT(changeDevice(const QString &)));
         connect(&m_interface, SIGNAL(initSlotInfo(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
-        connect(&m_interface, SIGNAL(initInfoComplete()), this, SIGNAL(initializationComplete()));
+        connect(&m_interface, SIGNAL(initInfoComplete()), this, SLOT(initComplete()));
         connect(&m_interface, SIGNAL(environmentChanged(int)), this, SLOT(changeEnvironment(int)));
         connect(&m_interface, SIGNAL(slotChanged(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
         connect(&m_interface, SIGNAL(deviceAdded(const QString &)), this, SLOT(changeDevice(const QString &)));
@@ -253,6 +253,7 @@ void Kandas::Client::Manager::initComplete()
     disconnect(&m_interface, SIGNAL(initDeviceInfo(const QString &)), this, SLOT(changeDevice(const QString &)));
     disconnect(&m_interface, SIGNAL(initSlotInfo(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
     disconnect(&m_interface, SIGNAL(initInfoComplete()), this, SLOT(initComplete()));
+    emit initializationComplete(m_interface.daemonVersion());
 }
 
 void Kandas::Client::Manager::selectedDeviceChanged(const QModelIndex &device)

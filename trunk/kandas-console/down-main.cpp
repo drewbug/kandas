@@ -28,7 +28,7 @@
 
 int main(int argc, char **argv)
 {
-    KAboutData about("kandas-down", "kandas", ki18nc("The application's name", "KaNDAS-down"), Kandas::Console::VersionRaw, ki18n(Kandas::Console::Description), KAboutData::License_GPL, ki18n("(C) 2008 Stefan Majewsky"));
+    KAboutData about("kandas-down", "kandas", ki18nc("The application's name", "KaNDAS-down"), Kandas::Console::VersionRaw, ki18n(Kandas::Console::Description), KAboutData::License_GPL, ki18n("(C) 2008 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
     about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Original author and current maintainer"), "majewsky@gmx.net");
     KCmdLineArgs::init(argc, argv, &about, KCmdLineArgs::CmdLineArgNone);
 

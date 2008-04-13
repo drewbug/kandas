@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "info-worker.h"
+#include "interface.h"
 
 #include <iostream>
 #include <KLocalizedString>
@@ -58,7 +59,7 @@ void Kandas::Console::InfoWorker::listEnvironment()
             std::cout << i18n("Could not be determined").toUtf8().data() << std::endl;
             break;
         case Kandas::SaneEnvironment:
-            std::cout << i18n("Alright").toUtf8().data() << std::endl;
+            std::cout << i18nc("System state is alright", "Alright").toUtf8().data() << std::endl;
             break;
         case Kandas::NoDriverFound:
             std::cout << i18n("NDAS driver not installed or not running").toUtf8().data() << std::endl;
@@ -67,6 +68,8 @@ void Kandas::Console::InfoWorker::listEnvironment()
             std::cout << i18n("NDAS administration tool not installed.").toUtf8().data() << std::endl;
             break;
     }
+    //show KaNDAS version
+    std::cout << i18n("NDAS management: KaNDASd %1", interface()->daemonVersion()).toUtf8().data() << std::endl;
 }
 
 void Kandas::Console::InfoWorker::listDevices()

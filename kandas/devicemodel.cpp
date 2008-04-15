@@ -23,29 +23,23 @@
 #include <KIconLoader>
 #include <KLocalizedString>
 
-#include <KDebug>
-
 Kandas::Client::DeviceModel::DeviceModel(Kandas::Client::Manager *parent)
     : p(parent)
 {
-    kDebug() << "hello";
 }
 
 Kandas::Client::DeviceModel::~DeviceModel()
 {
-    kDebug() << "hello";
 }
 
 void Kandas::Client::DeviceModel::lateInit()
 {
-    kDebug() << "hello";
     disconnect(&p->m_interface, SIGNAL(initInfoComplete()), this, SLOT(lateInit()));
     reset();
 }
 
 QVariant Kandas::Client::DeviceModel::data(const QModelIndex &index, int role) const
 {
-    kDebug() << "hello";
     //exceptional error view
     if (p->error())
     {
@@ -90,13 +84,11 @@ QVariant Kandas::Client::DeviceModel::data(const QModelIndex &index, int role) c
 
 QVariant Kandas::Client::DeviceModel::headerData(int, Qt::Orientation, int) const
 {
-    kDebug() << "hello";
     return QVariant();
 }
 
 int Kandas::Client::DeviceModel::rowCount(const QModelIndex &parent) const
 {
-    kDebug() << "hello";
     if (parent.isValid())
         return 0;
     //error view -> exactly one entry with the error message; device view -> count of devices
@@ -105,25 +97,21 @@ int Kandas::Client::DeviceModel::rowCount(const QModelIndex &parent) const
 
 void Kandas::Client::DeviceModel::deviceAboutToBeAdded(int deviceIndex)
 {
-    kDebug() << "hello";
     beginInsertRows(index(deviceIndex).parent(), deviceIndex, deviceIndex);
 }
 
 void Kandas::Client::DeviceModel::deviceAboutToBeRemoved(int deviceIndex)
 {
-    kDebug() << "hello";
     beginRemoveRows(index(deviceIndex).parent(), deviceIndex, deviceIndex);
 }
 
 void Kandas::Client::DeviceModel::deviceAdded()
 {
-    kDebug() << "hello";
     endInsertRows();
 }
 
 void Kandas::Client::DeviceModel::deviceRemoved()
 {
-    kDebug() << "hello";
     endRemoveRows();
 }
 

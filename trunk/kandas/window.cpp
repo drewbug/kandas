@@ -85,7 +85,10 @@ void Kandas::Client::MainWindow::setupActions()
 
 void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVersion)
 {
-    statusBar()->changeItem(i18n("Connected to KaNDASd %1", daemonVersion), 1);
+    if (daemonVersion.isEmpty())
+        statusBar()->changeItem(i18n("No connection to KaNDASd"), 1);
+    else
+        statusBar()->changeItem(i18n("Connected to KaNDASd %1", daemonVersion), 1);
     show();
 }
 

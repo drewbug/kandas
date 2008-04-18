@@ -1,23 +1,16 @@
 #summary Release timeline for KaNDAS, KaNDASd, and KaNDASconsole 0.1.
-#labels Category-Project,Featured
+#labels Category-Project
 
 It is possible that more betas are released if necessary. Minor stable revisions will be added as necessary.
 
 == Upcoming pre-releases ==
-  * _April 18, 2008_: Tag KaNDAS components version 0.1 Beta 1
+  * _April 18, 2008_: Tag and release KaNDAS components version 0.1 Beta 1
     * KaNDAS, KaNDASd, and KaNDASconsole are branched. This branch is frozen for feature commits. In the tag, only urgent fixes may be commited.
-  * _April 21, 2008_: Release KaNDAS components version 0.1 Beta 1
     * Version 0.1 Beta 1 becomes available for general consumption.
-    * Tag is frozen for any commits. Branch is unfrozen for bug fix commits.
-  * _April 25, 2008_: Tag KaNDAS components version 0.1 Beta 2
+  * _April 25, 2008_: Tag and release KaNDAS components version 0.1 Beta 2
     * In the tag, only urgent fixes may be commited.
-  * _April 28, 2008_: Release KaNDAS components version 0.1 Beta 2
     * Version 0.1 Beta 2 becomes available for general consumption.
-    * Tag is frozen for any commits. Branch is unfrozen for bug fix commits.
 
 == Upcoming stable releases ==
-  * _May 2, 2008_: Tag KaNDAS components version 0.1
+  * _May 2, 2008_: Tag and release KaNDAS components version 0.1
     * In the tag, only urgent fixes may be commited.
-  * _May 5, 2008_: Release KaNDAS components version 0.1
-    * Version 0.1 alpha becomes available for general consumption.
-    * Tag is frozen for any commits. Branch is unfrozen for bug fix commits. 

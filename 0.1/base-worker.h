@@ -33,7 +33,7 @@ namespace Kandas
     {
 
         const char Description[] = I18N_NOOP("Command line management for NDAS devices");
-        const char VersionRaw[] = "trunk";
+        const char VersionRaw[] = "0.1svn";
         const QString Version(VersionRaw);
 
         class BaseWorkerPrivate;

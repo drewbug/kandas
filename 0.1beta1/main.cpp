@@ -16,38 +16,23 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KANDAS_DEFINITIONS_H
-#define KANDAS_DEFINITIONS_H
+#include "window.h"
 
-#include <QString>
+#include <KApplication>
+#include <KAboutData>
+#include <KCmdLineArgs>
 
-namespace Kandas
+static const char description[] = I18N_NOOP("KDE adapter for NDAS devices");
+static const char version[] = "0.1beta1";
+
+int main(int argc, char ** argv)
 {
+    KAboutData about("kandas", 0, ki18nc("The application's name", "KaNDAS"), version, ki18n(description),
+        KAboutData::License_GPL, ki18n("(C) 2008 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
+    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Original author and current maintainer"), "majewsky@gmx.net");
+    KCmdLineArgs::init(argc, argv, &about);
 
-    enum SlotState
-    {
-        Undetermined = 0,
-        Disconnected = 10,
-        Connected,
-        Disconnecting = 20,
-        Connecting
-    };
-
-    enum EnvironmentState
-    {
-        UnknownEnvironment = 0,
-        SaneEnvironment = 1,
-        NoDriverFound = 10, //kernel module is not loaded
-        NoAdminFound //the ndasadmin program could not be found in $PATH
-    };
-
-    struct SlotInfo
-    {
-        SlotState state;
-        QString device;
-        SlotInfo(const QString &slotDevice = QString(), SlotState slotState = Kandas::Undetermined) : state(slotState), device(slotDevice) {}
-    };
-
+    KApplication app;
+    new Kandas::Client::MainWindow;
+    return app.exec();
 }
-
-#endif // KANDAS_DEFINITIONS_H

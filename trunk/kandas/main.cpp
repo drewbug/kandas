@@ -23,7 +23,7 @@
 #include <KCmdLineArgs>
 
 static const char description[] = I18N_NOOP("KDE adapter for NDAS devices");
-static const char version[] = "0.1";
+static const char version[] = "trunk";
 
 int main(int argc, char ** argv)
 {

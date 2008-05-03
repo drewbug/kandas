@@ -39,7 +39,7 @@ namespace Kandas
                 bool m_clean;
                 OrgKandasInterface *m_interface;
 
-                Kandas::EnvironmentState m_environment;
+                Kandas::SystemState m_system;
                 QList<QString> m_devices;
                 QHash<int, Kandas::SlotInfo> m_slots;
         };
@@ -50,7 +50,7 @@ namespace Kandas
 Kandas::Console::BaseWorkerPrivate::BaseWorkerPrivate(BaseWorker *parent)
     : m_clean(true)
     , m_interface(new OrgKandasInterface("org.kandas", "/", QDBusConnection::systemBus(), parent))
-    , m_environment(Kandas::UnknownEnvironment)
+    , m_system(Kandas::SystemUnchecked)
 {
     QString version = m_interface->interfaceVersion().value();
     if (version == "") //no KaNDASd instance running
@@ -58,7 +58,7 @@ Kandas::Console::BaseWorkerPrivate::BaseWorkerPrivate(BaseWorker *parent)
         std::cerr << i18n("ERROR: KaNDASd is not running.").toUtf8().data() << std::endl;
         m_clean = false;
     }
-    else if (version != "0.1")
+    else if (version != "0.2")
     {
         std::cerr << i18n("ERROR: Unknown KaNDASd version \"%1\" detected.", version).toUtf8().data() << std::endl;
         m_clean = false;
@@ -74,13 +74,12 @@ Kandas::Console::BaseWorker::BaseWorker()
     : p(new BaseWorkerPrivate(this))
 {
     //connect interface signals
-    connect(p->m_interface, SIGNAL(initEnvironmentInfo(int)), SLOT(initEnvironment(int)));
-    connect(p->m_interface, SIGNAL(initDeviceInfo(const QString&)), SLOT(initDevice(const QString&)));
-    connect(p->m_interface, SIGNAL(initSlotInfo(int, const QString&, int)), SLOT(initSlot(int, const QString&, int)));
-    connect(p->m_interface, SIGNAL(initInfoComplete()), SLOT(executeJobs()));
+    connect(p->m_interface, SIGNAL(systemInfo(int)), SLOT(systemInfo(int)));
+    connect(p->m_interface, SIGNAL(deviceInfo(const QString&)), SLOT(deviceInfo(const QString&)));
+    connect(p->m_interface, SIGNAL(slotInfo(int, const QString&, int)), SLOT(slotInfo(int, const QString&, int)));
+    connect(p->m_interface, SIGNAL(initComplete()), SLOT(executeJobs()));
     //initiation sequence
     p->m_interface->registerClient();
-    p->m_interface->initClient();
 }
 
 Kandas::Console::BaseWorker::~BaseWorker()
@@ -99,9 +98,9 @@ OrgKandasInterface *Kandas::Console::BaseWorker::interface() const
     return p->m_interface;
 }
 
-Kandas::EnvironmentState Kandas::Console::BaseWorker::environment() const
+Kandas::SystemState Kandas::Console::BaseWorker::system() const
 {
-    return p->m_environment;
+    return p->m_system;
 }
 
 QList<QString> Kandas::Console::BaseWorker::devicesList() const
@@ -114,32 +113,32 @@ QHash<int, Kandas::SlotInfo> Kandas::Console::BaseWorker::slotsList() const
     return p->m_slots;
 }
 
-void Kandas::Console::BaseWorker::initEnvironment(int state)
+void Kandas::Console::BaseWorker::systemInfo(int state)
 {
     switch (state)
     {
-        case Kandas::SaneEnvironment: p->m_environment = Kandas::SaneEnvironment; break;
-        case Kandas::NoDriverFound: p->m_environment = Kandas::NoDriverFound; break;
-        case Kandas::NoAdminFound: p->m_environment = Kandas::NoAdminFound; break;
-        default: p->m_environment = Kandas::UnknownEnvironment; break;
+        case Kandas::SystemChecked: p->m_system = Kandas::SystemChecked; break;
+        case Kandas::NoDriverFound: p->m_system = Kandas::NoDriverFound; break;
+        case Kandas::NoAdminFound: p->m_system = Kandas::NoAdminFound; break;
+        default: p->m_system = Kandas::SystemUnchecked; break;
     }
 }
 
-void Kandas::Console::BaseWorker::initDevice(const QString &device)
+void Kandas::Console::BaseWorker::deviceInfo(const QString &device)
 {
     p->m_devices << device;
 }
 
-void Kandas::Console::BaseWorker::initSlot(int slot, const QString &device, int state)
+void Kandas::Console::BaseWorker::slotInfo(int slot, const QString &device, int state)
 {
-    Kandas::SlotState slotState = Kandas::Undetermined;
+    Kandas::SlotState slotState = Kandas::Unknown;
     switch (state)
     {
         case Kandas::Connected: slotState = Kandas::Connected; break;
         case Kandas::Connecting: slotState = Kandas::Connecting; break;
         case Kandas::Disconnected: slotState = Kandas::Disconnected; break;
         case Kandas::Disconnecting: slotState = Kandas::Disconnecting; break;
-        default: break; //leaves slotState = Kandas::Undetermined
+        default: break; //leaves slotState = Kandas::Unknown
     }
     p->m_slots[slot] = Kandas::SlotInfo(device, slotState);
 }

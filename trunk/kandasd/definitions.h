@@ -26,17 +26,17 @@ namespace Kandas
 
     enum SlotState
     {
-        Undetermined = 0,
-        Disconnected = 10,
+        Unknown = 0,
+        Disconnected = 1,
         Connected,
-        Disconnecting = 20,
+        Disconnecting = 10,
         Connecting
     };
 
-    enum EnvironmentState
+    enum SystemState
     {
-        UnknownEnvironment = 0,
-        SaneEnvironment = 1,
+        SystemUnchecked = 0,
+        SystemChecked = 1,
         NoDriverFound = 10, //kernel module is not loaded
         NoAdminFound //the ndasadmin program could not be found in $PATH
     };
@@ -45,7 +45,7 @@ namespace Kandas
     {
         SlotState state;
         QString device;
-        SlotInfo(const QString &slotDevice = QString(), SlotState slotState = Kandas::Undetermined) : state(slotState), device(slotDevice) {}
+        SlotInfo(const QString &slotDevice = QString(), SlotState slotState = Kandas::Unknown) : state(slotState), device(slotDevice) {}
     };
 
 }

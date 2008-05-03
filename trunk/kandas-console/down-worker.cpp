@@ -60,7 +60,7 @@ bool Kandas::Console::DownWorker::disconnectDevice(const QString &device)
     if (m_remainingSlots.count() != 0)
     {
         std::cout << i18np("Waiting for 1 slot to disconnect...", "Waiting for %1 slots to disconnect...", m_remainingSlots.count()).toUtf8().data() << std::endl;
-        connect(interface(), SIGNAL(slotChanged(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
+        connect(interface(), SIGNAL(slotInfo(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
         return false;
     }
     else
@@ -84,7 +84,7 @@ bool Kandas::Console::DownWorker::disconnectSlot(int slot)
     m_remainingSlots << slot;
     interface()->disconnectSlot(slot);
     std::cout << i18n("Waiting for slot to disconnect...").toUtf8().data() << std::endl;
-    connect(interface(), SIGNAL(slotChanged(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
+    connect(interface(), SIGNAL(slotInfo(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
     return false;
 }
 

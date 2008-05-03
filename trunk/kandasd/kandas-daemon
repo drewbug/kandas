@@ -60,7 +60,7 @@ if test "$KANDASD_STOP" == "1"; then
     pkill -f "kandasd --source"
 fi
 if test "$KANDASD_START" == "1"; then
-    `which kandasd` --detach || rc_failed
+    kandasd --detach || rc_failed
 fi
 rc_status -v
 rc_exit

@@ -48,10 +48,10 @@ int main(int argc, char ** argv)
         KProcess::startDetached(QCoreApplication::applicationFilePath(), QStringList() << "--source" << args->getOption("source"));
         return 0;
     }
-    Kandas::Daemon::Engine::self(); //cause the Kandas::Engine singleton to be created while the CLI args are available
+    Kandas::Daemon::Engine engine(args->getOption("source")); //cause the Kandas::Engine singleton to be created while the CLI args are available
     args->clear();
 
-    if (Kandas::Daemon::Engine::self()->clean())
+    if (engine.clean())
         return app.exec();
     else
         return 1;

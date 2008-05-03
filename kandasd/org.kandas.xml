@@ -1,46 +1,39 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="org.kandas">
-    <signal name="initEnvironmentInfo">
-        <arg name="state" type="i" direction="out"/>
+    <!-- daemon information -->
+    <method name="daemonVersion">
+      <arg type="s" direction="out"/>
+    </method>
+    <method name="interfaceVersion">
+      <arg type="s" direction="out"/>
+    </method>
+    <!-- client management -->
+    <method name="registerClient">
+    </method>
+    <signal name="initComplete">
     </signal>
-    <signal name="initDeviceInfo">
+    <method name="unregisterClient">
+    </method>
+    <!-- NDAS information -->
+    <signal name="systemInfo">
+      <arg name="state" type="i" direction="out"/>
+    </signal>
+    <signal name="deviceInfo">
       <arg name="device" type="s" direction="out"/>
     </signal>
-    <signal name="initSlotInfo">
+    <signal name="slotInfo">
       <arg name="slot" type="i" direction="out"/>
       <arg name="device" type="s" direction="out"/>
       <arg name="state" type="i" direction="out"/>
-    </signal>
-    <signal name="initInfoComplete">
-    </signal>
-    <signal name="slotAdded">
-      <arg name="slot" type="i" direction="out"/>
-      <arg name="device" type="s" direction="out"/>
-      <arg name="state" type="i" direction="out"/>
-    </signal>
-    <signal name="slotChanged">
-      <arg name="slot" type="i" direction="out"/>
-      <arg name="device" type="s" direction="out"/>
-      <arg name="state" type="i" direction="out"/>
-    </signal>
-    <signal name="slotRemoved">
-      <arg name="slot" type="i" direction="out"/>
-      <arg name="device" type="s" direction="out"/>
-    </signal>
-    <signal name="deviceAdded">
-      <arg name="device" type="s" direction="out"/>
     </signal>
     <signal name="deviceRemoved">
       <arg name="device" type="s" direction="out"/>
     </signal>
-    <signal name="environmentChanged">
-      <arg name="state" type="i" direction="out"/>
+    <signal name="slotRemoved">
+      <arg name="slot" type="i" direction="out"/>
     </signal>
-    <method name="registerClient">
-    </method>
-    <method name="unregisterClient">
-    </method>
+    <!-- NDAS management -->
     <method name="connectSlot">
       <arg name="slot" type="i" direction="in"/>
       <arg name="readOnly" type="b" direction="in"/>
@@ -54,16 +47,6 @@
     </method>
     <method name="disconnectDevice">
       <arg name="device" type="s" direction="in"/>
-    </method>
-    <method name="refreshData">
-    </method>
-    <method name="initClient">
-    </method>
-    <method name="daemonVersion">
-      <arg type="s" direction="out"/>
-    </method>
-    <method name="interfaceVersion">
-      <arg type="s" direction="out"/>
     </method>
   </interface>
 </node>

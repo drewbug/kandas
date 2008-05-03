@@ -32,83 +32,47 @@ namespace Kandas
 
         const char DaemonVersionRaw[] = "trunk";
         const QString DaemonVersion(DaemonVersionRaw);
-        const char InterfaceVersionRaw[] = "0.1";
+        const char InterfaceVersionRaw[] = "0.2";
         const QString InterfaceVersion(InterfaceVersionRaw);
-
-        typedef void (*EngineJob)(int slot);
-        struct EngineTask
-        {
-            EngineJob job;
-            int slot;
-            EngineTask(EngineJob myJob, int mySlot) : job(myJob), slot(mySlot) {}
-        };
+        const int RefreshInterval = 2000; //refresh every three seconds
 
         class Engine : public QObject
         {
             Q_OBJECT
             Q_CLASSINFO("D-Bus interface", "org.kandas")
-            private:
-                Engine();
-                Engine(const Engine &);
-                ~Engine();
             public:
-                static Engine *self();
+                Engine(const QString &infoSourceDir);
                 bool clean() const;
             public Q_SLOTS:
+                QString daemonVersion();
+                QString interfaceVersion();
+
                 void registerClient();
                 void unregisterClient();
-            /*
-                void startDriver();
-                void stopDriver();
-            */
+
                 void connectSlot(int slot, bool readOnly);
                 void disconnectSlot(int slot);
                 void connectDevice(const QString &device, bool readOnly);
                 void disconnectDevice(const QString &device);
-                void refreshData();
-                void initClient();
-                QString daemonVersion();
-                QString interfaceVersion();
             Q_SIGNALS:
-                void initEnvironmentInfo(int state);
-                void initDeviceInfo(const QString &device);
-                void initSlotInfo(int slot, const QString &device, int state);
-                void initInfoComplete();
-                void slotAdded(int slot, const QString &device, int state);
-                void slotChanged(int slot, const QString &device, int state);
-                void slotRemoved(int slot, const QString &device);
-                void deviceAdded(const QString &device);
+                void systemInfo(int state);
+                void deviceInfo(const QString &device);
                 void deviceRemoved(const QString &device);
-                void environmentChanged(int state);
-            private:
-            /*
-                static void startDriverJob(int);
-                static void stopDriverJob(int);
-            */
-                static void refreshEnvironmentJob(int); //parameter is discarded (needed only for compliance with EngineJob delegate)
-                static void refreshDevicesJob(int);
-                static void refreshSlotsJob(int);
-                static void initClientJob(int);
-                static void connectReadJob(int slot);
-                static void connectWriteJob(int slot);
-                static void disconnectJob(int slot);
+                void slotInfo(int slot, const QString &device, int state);
+                void slotRemoved(int slot);
+                void initComplete();
             private Q_SLOTS:
-                void executeTask();
-                void scheduleTask(EngineJob job, int slot = 0);
-                void scheduleBlockingTask(EngineJob job, int slot = 0);
+                void refreshData();
             private:
                 bool m_clean;
-
                 QString m_infoSourceDir;
 
-                Kandas::EnvironmentState m_envState;
-                QList<QString> *m_devices;
-                QHash<int, SlotInfo> *m_slots;
                 int m_clientCount;
+                QTimer m_autoRefreshTimer;
 
-                QList<EngineTask> m_taskQueue;
-                QTimer m_taskTimer, m_autoRefreshTimer;
-                static const int TaskInterval = 100; //interval between task invocations in milliseconds
+                Kandas::SystemState m_system;
+                QList<QString> m_devices;
+                QHash<int, Kandas::SlotInfo> m_slots;
         };
 
     }

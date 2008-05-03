@@ -53,12 +53,12 @@ bool Kandas::Console::InfoWorker::execute()
 void Kandas::Console::InfoWorker::listEnvironment()
 {
     std::cout << i18n("System state:").toUtf8().data() << ' ';
-    switch (environment())
+    switch (system())
     {
-        case Kandas::UnknownEnvironment:
+        case Kandas::SystemUnchecked:
             std::cout << i18n("Could not be determined").toUtf8().data() << std::endl;
             break;
-        case Kandas::SaneEnvironment:
+        case Kandas::SystemChecked:
             std::cout << i18nc("System state is alright", "Alright").toUtf8().data() << std::endl;
             break;
         case Kandas::NoDriverFound:
@@ -152,7 +152,7 @@ void Kandas::Console::InfoWorker::listSlots()
                   << QString(deviceNameColumnWidth - info.device.length(), paddingCharacter).toUtf8().data();
         switch (info.state)
         {
-            case Kandas::Undetermined:
+            case Kandas::Unknown:
                 std::cout << i18n("Undetermined").toUtf8().data() << std::endl;
                 break;
             case Kandas::Connected:

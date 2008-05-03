@@ -61,7 +61,7 @@ bool Kandas::Console::UpWorker::connectDevice(const QString &device)
     if (m_remainingSlots.count() != 0)
     {
         std::cout << i18np("Waiting for 1 slot to connect...", "Waiting for %1 slots to connect...", m_remainingSlots.count()).toUtf8().data() << std::endl;
-        connect(interface(), SIGNAL(slotChanged(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
+        connect(interface(), SIGNAL(slotInfo(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
         return false;
     }
     else
@@ -85,7 +85,7 @@ bool Kandas::Console::UpWorker::connectSlot(int slot)
     m_remainingSlots << slot;
     interface()->connectSlot(slot, m_readOnly);
     std::cout << i18n("Waiting for slot to connect...").toUtf8().data() << std::endl;
-    connect(interface(), SIGNAL(slotChanged(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
+    connect(interface(), SIGNAL(slotInfo(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
     return false;
 }
 

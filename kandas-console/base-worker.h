@@ -50,13 +50,13 @@ namespace Kandas
             protected:
                 OrgKandasInterface *interface() const;
 
-                Kandas::EnvironmentState environment() const;
+                Kandas::SystemState system() const;
                 QList<QString> devicesList() const;
                 QHash<int, Kandas::SlotInfo> slotsList() const;
             private slots:
-                void initEnvironment(int state);
-                void initDevice(const QString &device);
-                void initSlot(int slot, const QString &device, int state);
+                void systemInfo(int state);
+                void deviceInfo(const QString &device);
+                void slotInfo(int slot, const QString &device, int state);
                 void executeJobs();
             private:
                 BaseWorkerPrivate *p;

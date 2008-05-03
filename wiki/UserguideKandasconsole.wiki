@@ -1,5 +1,5 @@
 #summary Installation and usage guide for KaNDAS.
-#labels Product-KaNDASconsole,Category-UserDoc,Featured
+#labels Product-KaNDASconsole,Category-UserDoc
 
 KaNDASconsole is a suite of command line interfaces to the Linux NDAS driver which allows to connect and disconnect NDAS devices. Some devices have multiple slots to connect to, these can be managed with KaNDASconsole as well.
 

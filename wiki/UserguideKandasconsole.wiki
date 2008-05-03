@@ -1,4 +1,4 @@
-#summary Installation and usage guide for KaNDAS.
+#summary Installation and usage guide for KaNDASconsole.
 #labels Product-KaNDASconsole,Category-UserDoc
 
 KaNDASconsole is a suite of command line interfaces to the Linux NDAS driver which allows to connect and disconnect NDAS devices. Some devices have multiple slots to connect to, these can be managed with KaNDASconsole as well.
@@ -7,7 +7,7 @@ KaNDASconsole is a suite of command line interfaces to the Linux NDAS driver whi
 
 You need to have installed the packages _libqt4_ and _kdelibs4_ (or _libkde4_) and their development packages. Refer to your system's documentation for how to install these packages. The NDAS driver has to be installed, refer to [http://code.ximeta.com the Ximeta homepage] for details. KaNDASd does also have to be installed, refer to UserguideKandasd for details.
 
-Download a source package of KaNDASconsole from this server and unpack it; a directory _kandas-console-0.1_ or similar should appear. Open a terminal window and go to this directory, then execute the following commands:
+Download a source package of the KaNDAS suite from this server and unpack it; a directory _kandas-0.1.0_ or similar should appear. Open a terminal window and go to the _kandas-console_ subdirectory, then execute the following commands:
 {{{
 mkdir build
 cd build

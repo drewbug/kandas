@@ -1,5 +1,5 @@
 #summary Installation and usage guide for KaNDAS.
-#labels Product-KaNDASd,Category-UserDoc,Featured
+#labels Product-KaNDASd,Category-UserDoc
 
 KaNDASd is an information management server for the Linux NDAS driver which allows to gather information about, connect to, and disconnect from NDAS devices. Some devices have multiple slots to connect to, these are managed by KaNDASd as well.
 
@@ -8,13 +8,13 @@ KaNDASd is an information management server for the Linux NDAS driver which allo
 You need to have installed the packages _libqt4_ and _kdelibs4_ (or _libkde4_) and their development packages. Refer to your system's documentation for how to install these packages. The NDAS driver has to be installed, refer to [http://code.ximeta.com the Ximeta homepage] for details.
 
 Download a source package of KaNDASd from this server and unpack it; a directory _kandasd-0.1_ or similar should appear. Open a terminal window and go to this directory, then execute the following commands:
-<code>
+{{{
 mkdir build
 cd build
 cmake ..
 make
 sudo make install
-</code>
+}}}
 If any of the commands fails (i.e. an error message does appear), do not proceed before the error has been fixed.
 
 == Usage ==

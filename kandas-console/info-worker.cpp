@@ -69,7 +69,7 @@ void Kandas::Console::InfoWorker::listEnvironment()
             break;
     }
     //show KaNDAS version
-    std::cout << i18n("NDAS management: KaNDASd %1", interface()->daemonVersion()).toUtf8().data() << std::endl;
+    std::cout << i18n("NDAS management: KaNDASd %1, protocol version %2", interface()->daemonVersion(), interface()->interfaceVersion()).toUtf8().data() << std::endl;
 }
 
 void Kandas::Console::InfoWorker::listDevices()

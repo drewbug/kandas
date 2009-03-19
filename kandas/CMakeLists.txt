@@ -8,6 +8,7 @@ include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
 
 set(kandas_SRCS
     devicemodel.cpp
+    iconwidget.cpp
     main.cpp
     manager.cpp
     slotmodel.cpp

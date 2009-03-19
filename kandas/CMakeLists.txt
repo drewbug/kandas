@@ -14,7 +14,8 @@ set(kandas_SRCS
     view.cpp
     window.cpp
 )
-qt4_add_dbus_interface(kandas_SRCS ${KDE4_INCLUDE_DIR}/kandasd/org.kandas.xml interface)
+find_path(KANDASD_INTERFACE_PATH NAMES org.kandas.xml PATH_SUFFIXES kandasd)
+qt4_add_dbus_interface(kandas_SRCS ${KANDASD_INTERFACE_PATH}/org.kandas.xml interface)
 
 kde4_add_executable(kandas ${kandas_SRCS})
 target_link_libraries(kandas ${KDE4_KDEUI_LIBS})

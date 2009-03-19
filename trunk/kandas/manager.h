@@ -85,7 +85,7 @@ namespace Kandas
                 void changeDevice(const QString &device);
                 void changeSlot(int slot, const QString &device, int state);
                 void removeDevice(const QString &device);
-                void removeSlot(int slot, const QString &device);
+                void removeSlot(int slot);
                 void initComplete();
             private:
                 DeviceModel *m_deviceModel;

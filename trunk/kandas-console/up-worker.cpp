@@ -27,6 +27,7 @@ Kandas::Console::UpWorker::UpWorker(QVariant target, bool readOnly)
     , m_readOnly(readOnly)
     , m_target(target)
 {
+    setAutoTimeout(true);
 }
 
 bool Kandas::Console::UpWorker::execute()

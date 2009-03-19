@@ -46,18 +46,21 @@ namespace Kandas
                 virtual ~BaseWorker();
 
                 bool clean() const;
-                virtual bool execute() = 0; //returns true if the 
+                virtual bool execute() = 0; //returns true if the application can exit immediately
             protected:
                 OrgKandasInterface *interface() const;
 
                 Kandas::SystemState system() const;
                 QList<QString> devicesList() const;
                 QHash<int, Kandas::SlotInfo> slotsList() const;
+
+                void setAutoTimeout(bool enableAutoTimeout);
             private slots:
                 void systemInfo(int state);
                 void deviceInfo(const QString &device);
                 void slotInfo(int slot, const QString &device, int state);
                 void executeJobs();
+                void autoTimeout();
             private:
                 BaseWorkerPrivate *p;
         };

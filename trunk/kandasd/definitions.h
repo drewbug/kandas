@@ -26,11 +26,11 @@ namespace Kandas
 
     enum SlotState
     {
-        Unknown = 0,
-        Disconnected = 1,
-        Connected,
-        Disconnecting = 10,
-        Connecting
+        UnknownSlot = 0,
+        DisconnectedSlot = 1,
+        ConnectedSlot,
+        DisconnectingSlot = 10,
+        ConnectingSlot
     };
 
     enum SystemState
@@ -45,7 +45,7 @@ namespace Kandas
     {
         SlotState state;
         QString device;
-        SlotInfo(const QString &slotDevice = QString(), SlotState slotState = Kandas::Unknown) : state(slotState), device(slotDevice) {}
+        SlotInfo(const QString &slotDevice = QString(), SlotState slotState = Kandas::UnknownSlot) : state(slotState), device(slotDevice) {}
     };
 
 }

@@ -51,7 +51,7 @@ bool Kandas::Console::UpWorker::connectDevice(const QString &device)
     while (iterSlots.hasNext())
     {
         iterSlots.next();
-        if (iterSlots.value().device == device && iterSlots.value().state == Kandas::Disconnected)
+        if (iterSlots.value().device == device && iterSlots.value().state == Kandas::DisconnectedSlot)
         {
             int slot = iterSlots.key();
             m_remainingSlots << slot;
@@ -80,7 +80,7 @@ bool Kandas::Console::UpWorker::connectSlot(int slot)
     }
     //check whether update is necessary
     const Kandas::SlotInfo slotInfo = slotList[slot];
-    if (slotInfo.state != Kandas::Disconnected)
+    if (slotInfo.state != Kandas::DisconnectedSlot)
         return true;
     //issue update
     m_remainingSlots << slot;
@@ -92,7 +92,7 @@ bool Kandas::Console::UpWorker::connectSlot(int slot)
 
 void Kandas::Console::UpWorker::slotChanged(int slot, const QString &/*device*/, int newState)
 {
-    if (newState == Kandas::Connected && m_remainingSlots.contains(slot))
+    if (newState == Kandas::ConnectedSlot && m_remainingSlots.contains(slot))
     {
         m_remainingSlots.removeAll(slot);
         std::cout << i18n("Slot %1 connected.", slot).toUtf8().data() << std::endl;

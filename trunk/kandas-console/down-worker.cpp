@@ -50,7 +50,7 @@ bool Kandas::Console::DownWorker::disconnectDevice(const QString &device)
     while (iterSlots.hasNext())
     {
         iterSlots.next();
-        if (iterSlots.value().device == device && iterSlots.value().state == Kandas::Connected)
+        if (iterSlots.value().device == device && iterSlots.value().state == Kandas::ConnectedSlot)
         {
             int slot = iterSlots.key();
             m_remainingSlots << slot;
@@ -79,7 +79,7 @@ bool Kandas::Console::DownWorker::disconnectSlot(int slot)
     }
     //check whether update is necessary
     const Kandas::SlotInfo slotInfo = slotList[slot];
-    if (slotInfo.state != Kandas::Connected)
+    if (slotInfo.state != Kandas::ConnectedSlot)
         return true;
     //issue update
     m_remainingSlots << slot;
@@ -91,7 +91,7 @@ bool Kandas::Console::DownWorker::disconnectSlot(int slot)
 
 void Kandas::Console::DownWorker::slotChanged(int slot, const QString &/*device*/, int newState)
 {
-    if (newState == Kandas::Disconnected && m_remainingSlots.contains(slot))
+    if (newState == Kandas::DisconnectedSlot && m_remainingSlots.contains(slot))
     {
         m_remainingSlots.removeAll(slot);
         std::cout << i18n("Slot %1 disconnected.", slot).toUtf8().data() << std::endl;

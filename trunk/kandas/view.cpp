@@ -152,35 +152,24 @@ void Kandas::Client::ViewDelegate::paint(QPainter *painter, const QStyleOptionVi
     if (!d)
         return;
 
+    //paint background for selected or hovered item
+    QStyleOptionViewItemV4 opt = option;
+    QStyle* style = opt.widget ? opt.widget->style() : QApplication::style();
+    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, opt.widget);
+
+    painter->save();
     //find color group for this style
     QPalette::ColorGroup group = (option.state & QStyle::State_Enabled) ? ((option.state & QStyle::State_Active) ? QPalette::Normal : QPalette::Inactive) : QPalette::Disabled;
-    //save pen (has to be restored later)
-    QPen oldPen = painter->pen();
     //find new pen
     if (option.state & QStyle::State_Selected)
-    {
-        painter->fillRect(option.rect, option.palette.brush(group, QPalette::Highlight));
         painter->setPen(option.palette.color(group, QPalette::HighlightedText));
-    }
     else
         painter->setPen(option.palette.color(group, QPalette::Text));
     //render document
     painter->setRenderHint(QPainter::Antialiasing);
-    painter->save();
     painter->translate(option.rect.topLeft());
     d->drawContents(painter);
     painter->restore();
-    painter->setPen(oldPen);
-    //draw focus
-    if (option.state & QStyle::State_HasFocus)
-    {
-        QStyleOptionFocusRect o;
-        o.QStyleOption::operator=(option);
-        o.rect = option.rect;
-        o.state |= QStyle::State_KeyboardFocusChange;
-        o.backgroundColor = option.palette.color(group, (option.state & QStyle::State_Selected) ? QPalette::Highlight : QPalette::Background);
-        QApplication::style()->drawPrimitive(QStyle::PE_FrameFocusRect, &o, painter);
-    }
     delete d;
 }
 

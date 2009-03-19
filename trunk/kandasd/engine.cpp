@@ -89,20 +89,54 @@ void Kandas::Daemon::Engine::unregisterClient()
 
 //NDAS management
 
-void Kandas::Daemon::Engine::connectSlot(int,bool) //(int slot, bool readOnly)
+void Kandas::Daemon::Engine::connectSlot(int slot, bool readOnly)
 {
+    //check environment and slot state
+    if (m_system != Kandas::SystemChecked)
+        return;
+    if (m_slots[slot].state != Kandas::Disconnected)
+        return;
+    //call ndasadmin
+    QStringList args; args << "enable" << "-s" << QString::number(slot);
+    if (readOnly)
+        args << "-o" << "w";
+    else
+        args << "-o" << "r";
+    KProcess::startDetached("ndasadmin", args);
 }
 
-void Kandas::Daemon::Engine::disconnectSlot(int) //(int slot)
+void Kandas::Daemon::Engine::disconnectSlot(int slot)
 {
+    //check environment and slot state
+    if (m_system != Kandas::SystemChecked)
+        return;
+    if (m_slots[slot].state != Kandas::Connected)
+        return;
+    //call ndasadmin
+    QStringList args; args << "disable" << "-s" << QString::number(slot);
+    KProcess::startDetached("ndasadmin", args);
 }
 
-void Kandas::Daemon::Engine::connectDevice(const QString &,bool) //(const QString &device, bool readOnly)
+void Kandas::Daemon::Engine::connectDevice(const QString &device, bool readOnly)
 {
+    QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
+    while (iterSlots.hasNext())
+    {
+        iterSlots.next();
+        if (iterSlots.value().device == device)
+            connectSlot(iterSlots.key(), readOnly);
+    }
 }
 
-void Kandas::Daemon::Engine::disconnectDevice(const QString &) //(const QString &device)
+void Kandas::Daemon::Engine::disconnectDevice(const QString &device)
 {
+    QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
+    while (iterSlots.hasNext())
+    {
+        iterSlots.next();
+        if (iterSlots.value().device == device)
+            disconnectSlot(iterSlots.key());
+    }
 }
 
 void Kandas::Daemon::Engine::refreshData()
@@ -216,7 +250,7 @@ void Kandas::Daemon::Engine::refreshData()
             if (removedSlots.contains(slot))
             {
                 Kandas::SlotState oldState = removedSlots[slot].state;
-                if (oldState == Kandas::Connecting && state == Kandas::Disconnected || oldState == Kandas::Disconnecting && state == Kandas::Connected)
+                if ((oldState == Kandas::Connecting && state == Kandas::Disconnected) || (oldState == Kandas::Disconnecting && state == Kandas::Connected))
                     state = oldState;
             }
             //save information

@@ -75,9 +75,11 @@ Kandas::Client::View::View(QWidget *parent)
     p->m_deviceList.setItemDelegate(&p->m_deviceDelegate);
     p->m_deviceList.setModel(p->m_manager.deviceModel());
     p->m_deviceList.setSelectionMode(QAbstractItemView::SingleSelection);
+    p->m_deviceList.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     p->m_slotList.setItemDelegate(&p->m_slotDelegate);
     p->m_slotList.setModel(p->m_manager.slotModel());
     p->m_slotList.setSelectionMode(QAbstractItemView::SingleSelection);
+    p->m_slotList.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     p->m_layout.addWidget(&p->m_deviceList);
     p->m_layout.addWidget(&p->m_slotList);
@@ -205,7 +207,7 @@ void Kandas::Client::ViewDelegate::updateItemWidgets(const QList<QWidget*> widge
     sublineWidget->setText(statusText);
     buttonWidget->setIcon(KIcon("preferences-plugin"));
     //update size of layout and text color
-    container->setGeometry(option.rect);
+    container->setGeometry(QRect(QPoint(0, 0), sizeHint(option, index)));
     //update text color in palette
     QPalette basePalette = iconWidget->palette();
     if (option.state & QStyle::State_Selected)

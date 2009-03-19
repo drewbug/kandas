@@ -29,7 +29,7 @@ namespace Kandas
 
         class SlotModel : public QAbstractListModel
         {
-            friend void Kandas::Client::Manager::changeEnvironment(int state);
+            friend void Kandas::Client::Manager::changeSystem(int systemState);
             Q_OBJECT
             public:
                 SlotModel(Manager *parent = 0);

@@ -81,7 +81,7 @@ namespace Kandas
             signals:
                 void initializationComplete(const QString &daemonVersion);
             private slots:
-                void changeEnvironment(int state);
+                void changeSystem(int systemState);
                 void changeDevice(const QString &device);
                 void changeSlot(int slot, const QString &device, int state);
                 void removeDevice(const QString &device);
@@ -94,7 +94,7 @@ namespace Kandas
                 OrgKandasInterface m_interface;
                 bool m_connectionClean;
 
-                Kandas::EnvironmentState m_environment;
+                Kandas::SystemState m_system;
                 QList<DeviceInfo> m_devices;
         };
 

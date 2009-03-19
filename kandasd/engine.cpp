@@ -94,8 +94,9 @@ void Kandas::Daemon::Engine::connectSlot(int slot, bool readOnly)
     //check environment and slot state
     if (m_system != Kandas::SystemChecked)
         return;
-    if (m_slots[slot].state != Kandas::Disconnected)
+    if (m_slots[slot].state != Kandas::DisconnectedSlot)
         return;
+    m_slots[slot].state = Kandas::ConnectingSlot;
     //call ndasadmin
     QStringList args; args << "enable" << "-s" << QString::number(slot);
     if (readOnly)
@@ -110,8 +111,9 @@ void Kandas::Daemon::Engine::disconnectSlot(int slot)
     //check environment and slot state
     if (m_system != Kandas::SystemChecked)
         return;
-    if (m_slots[slot].state != Kandas::Connected)
+    if (m_slots[slot].state != Kandas::ConnectedSlot)
         return;
+    m_slots[slot].state = Kandas::DisconnectingSlot;
     //call ndasadmin
     QStringList args; args << "disable" << "-s" << QString::number(slot);
     KProcess::startDetached("ndasadmin", args);
@@ -245,12 +247,12 @@ void Kandas::Daemon::Engine::refreshData()
             const QString line = QString::fromUtf8(buffer).simplified();
             slotInfoFile.close();
             //is slot enabled?
-            Kandas::SlotState state = (line.section(' ', 0, 0) == "Enabled") ? Kandas::Connected : Kandas::Disconnected;
+            Kandas::SlotState state = (line.section(' ', 0, 0) == "Enabled") ? Kandas::ConnectedSlot : Kandas::DisconnectedSlot;
             //transitional states (we mis-use the data in removedSlots for this)
             if (removedSlots.contains(slot))
             {
                 Kandas::SlotState oldState = removedSlots[slot].state;
-                if ((oldState == Kandas::Connecting && state == Kandas::Disconnected) || (oldState == Kandas::Disconnecting && state == Kandas::Connected))
+                if ((oldState == Kandas::ConnectingSlot && state == Kandas::DisconnectedSlot) || (oldState == Kandas::DisconnectingSlot && state == Kandas::ConnectedSlot))
                     state = oldState;
             }
             //save information

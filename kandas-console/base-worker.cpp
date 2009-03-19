@@ -137,16 +137,7 @@ void Kandas::Console::BaseWorker::deviceInfo(const QString &device)
 
 void Kandas::Console::BaseWorker::slotInfo(int slot, const QString &device, int state)
 {
-    Kandas::SlotState slotState = Kandas::Unknown;
-    switch (state)
-    {
-        case Kandas::Connected: slotState = Kandas::Connected; break;
-        case Kandas::Connecting: slotState = Kandas::Connecting; break;
-        case Kandas::Disconnected: slotState = Kandas::Disconnected; break;
-        case Kandas::Disconnecting: slotState = Kandas::Disconnecting; break;
-        default: break; //leaves slotState = Kandas::Unknown
-    }
-    p->m_slots[slot] = Kandas::SlotInfo(device, slotState);
+    p->m_slots[slot] = Kandas::SlotInfo(device, (Kandas::SlotState) state);
 }
 
 void Kandas::Console::BaseWorker::executeJobs()

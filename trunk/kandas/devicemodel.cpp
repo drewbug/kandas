@@ -55,7 +55,7 @@ QVariant Kandas::Client::DeviceModel::data(const QModelIndex &index, int role) c
     foreach (Kandas::Client::SlotInfo info, p->m_devices.at(row).slotList)
     {
         ++slotCount;
-        if (info.state == Kandas::Connected)
+        if (info.state == Kandas::ConnectedSlot)
             ++connectedCount;
     }
     //data
@@ -113,6 +113,12 @@ void Kandas::Client::DeviceModel::deviceAdded()
 void Kandas::Client::DeviceModel::deviceRemoved()
 {
     endRemoveRows();
+}
+
+void Kandas::Client::DeviceModel::deviceChanged(int deviceIndex)
+{
+    const QModelIndex dataIndex = index(deviceIndex);
+    emit dataChanged(dataIndex, dataIndex);
 }
 
 #include "devicemodel.moc"

@@ -162,6 +162,7 @@ void Kandas::Client::Manager::changeSlot(int slot, const QString &device, int st
                 {
                     slotInfo.state = slotState;
                     m_slotModel->slotChanged(d, s);
+                    m_deviceModel->deviceChanged(d);
                     return;
                 }
             }

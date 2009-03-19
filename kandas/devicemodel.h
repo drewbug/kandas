@@ -45,6 +45,7 @@ namespace Kandas
                 void deviceAboutToBeRemoved(int deviceIndex);
                 void deviceAdded();
                 void deviceRemoved();
+                void deviceChanged(int deviceIndex);
             private:
                 Manager *p;
         };

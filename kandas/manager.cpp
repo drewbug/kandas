@@ -52,7 +52,7 @@ Kandas::Client::Manager::Manager()
         connect(&m_interface, SIGNAL(deviceInfo(const QString &)), this, SLOT(changeDevice(const QString &)));
         connect(&m_interface, SIGNAL(slotInfo(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
         connect(&m_interface, SIGNAL(deviceRemoved(const QString &)), this, SLOT(removeDevice(const QString &)));
-        connect(&m_interface, SIGNAL(slotRemoved(int, const QString &)), this, SLOT(removeSlot(int, const QString &)));
+        connect(&m_interface, SIGNAL(slotRemoved(int)), this, SLOT(removeSlot(int)));
         m_interface.registerClient();
         connect(m_deviceModel, SIGNAL(modelReset()), this, SLOT(resetDeviceSelection()));
     }
@@ -196,23 +196,20 @@ void Kandas::Client::Manager::removeDevice(const QString &device)
     }
 }
 
-void Kandas::Client::Manager::removeSlot(int slot, const QString &device)
+void Kandas::Client::Manager::removeSlot(int slot)
 {
     //search for device
     for (int d = 0; d < m_devices.count(); ++d)
     {
         Kandas::Client::DeviceInfo &deviceInfo = m_devices[d];
-        if (deviceInfo.device == device)
+        //try to find slot (in case that it was just changed, not added)
+        for (int s = 0; s < deviceInfo.slotList.count(); ++s)
         {
-            //try to find slot (in case that it was just changed, not added)
-            for (int s = 0; s < deviceInfo.slotList.count(); ++s)
+            if (deviceInfo.slotList[s].slot == slot)
             {
-                if (deviceInfo.slotList[s].slot == slot)
-                {
-                    m_slotModel->slotAboutToBeRemoved(d, s);
-                    deviceInfo.slotList.removeAt(s);
-                    m_slotModel->slotRemoved(d);
-                }
+                m_slotModel->slotAboutToBeRemoved(d, s);
+                deviceInfo.slotList.removeAt(s);
+                m_slotModel->slotRemoved(d);
             }
         }
     }

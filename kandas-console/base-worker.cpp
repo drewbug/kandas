@@ -36,7 +36,7 @@ namespace Kandas
                 BaseWorkerPrivate(BaseWorker *parent);
                 ~BaseWorkerPrivate();
 
-                bool m_clean;
+                bool m_clean, m_withAutoTimeout;
                 OrgKandasInterface *m_interface;
 
                 Kandas::SystemState m_system;
@@ -49,6 +49,7 @@ namespace Kandas
 
 Kandas::Console::BaseWorkerPrivate::BaseWorkerPrivate(BaseWorker *parent)
     : m_clean(true)
+    , m_withAutoTimeout(false)
     , m_interface(new OrgKandasInterface("org.kandas", "/", QDBusConnection::systemBus(), parent))
     , m_system(Kandas::SystemUnchecked)
 {
@@ -113,6 +114,11 @@ QHash<int, Kandas::SlotInfo> Kandas::Console::BaseWorker::slotsList() const
     return p->m_slots;
 }
 
+void Kandas::Console::BaseWorker::setAutoTimeout(bool enableAutoTimeout)
+{
+    p->m_withAutoTimeout = enableAutoTimeout;
+}
+
 void Kandas::Console::BaseWorker::systemInfo(int state)
 {
     switch (state)
@@ -147,6 +153,14 @@ void Kandas::Console::BaseWorker::executeJobs()
 {
     if (execute())
         qApp->quit();
+    else if (p->m_withAutoTimeout)
+        QTimer::singleShot(5000, this, SLOT(autoTimeout()));
+}
+
+void Kandas::Console::BaseWorker::autoTimeout()
+{
+    std::cerr << i18n("Operation timed out.").toUtf8().data() << std::endl;
+    qApp->quit();
 }
 
 #include "base-worker.moc"

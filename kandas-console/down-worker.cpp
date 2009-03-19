@@ -26,6 +26,7 @@ Kandas::Console::DownWorker::DownWorker(QVariant target)
     : Kandas::Console::BaseWorker()
     , m_target(target)
 {
+    setAutoTimeout(true);
 }
 
 bool Kandas::Console::DownWorker::execute()

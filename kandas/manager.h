@@ -82,8 +82,8 @@ namespace Kandas
                 void initializationComplete(const QString &daemonVersion);
             private slots:
                 void changeSystem(int systemState);
-                void changeDevice(const QString &device);
-                void changeSlot(int slot, const QString &device, int state);
+                void changeDevice(const QString &device, const QString &serial, int state, bool hasWriteKey);
+                void changeSlot(int slot, const QString &device, const QString &blockDevice, int state);
                 void removeDevice(const QString &device);
                 void removeSlot(int slot);
                 void initComplete();

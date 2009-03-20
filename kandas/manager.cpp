@@ -49,8 +49,8 @@ Kandas::Client::Manager::Manager()
     {
         connect(&m_interface, SIGNAL(initComplete()), this, SLOT(initComplete()));
         connect(&m_interface, SIGNAL(systemInfo(int)), this, SLOT(changeSystem(int)));
-        connect(&m_interface, SIGNAL(deviceInfo(const QString &)), this, SLOT(changeDevice(const QString &)));
-        connect(&m_interface, SIGNAL(slotInfo(int, const QString &, int)), this, SLOT(changeSlot(int, const QString &, int)));
+        connect(&m_interface, SIGNAL(deviceInfo(const QString &, const QString &, int, bool)), this, SLOT(changeDevice(const QString &, const QString &, int, bool)));
+        connect(&m_interface, SIGNAL(slotInfo(int, const QString &, const QString &, int)), this, SLOT(changeSlot(int, const QString &, const QString &, int)));
         connect(&m_interface, SIGNAL(deviceRemoved(const QString &)), this, SLOT(removeDevice(const QString &)));
         connect(&m_interface, SIGNAL(slotRemoved(int)), this, SLOT(removeSlot(int)));
         m_interface.registerClient();
@@ -131,8 +131,11 @@ void Kandas::Client::Manager::changeSystem(int systemState)
     }
 }
 
-void Kandas::Client::Manager::changeDevice(const QString &device)
+void Kandas::Client::Manager::changeDevice(const QString &device, const QString &serial, int state, bool hasWriteKey)
 {
+    Q_UNUSED(serial)
+    Q_UNUSED(state)
+    Q_UNUSED(hasWriteKey)
     //insert device into list if not already added
     foreach (Kandas::Client::DeviceInfo info, m_devices)
     {
@@ -145,8 +148,9 @@ void Kandas::Client::Manager::changeDevice(const QString &device)
     m_slotModel->deviceAdded(m_devices.count() - 1);
 }
 
-void Kandas::Client::Manager::changeSlot(int slot, const QString &device, int state)
+void Kandas::Client::Manager::changeSlot(int slot, const QString &device, const QString &blockDevice, int state)
 {
+    Q_UNUSED(blockDevice)
     Kandas::SlotState slotState = (Kandas::SlotState) state;
     //search for device
     for (int d = 0; d < m_devices.count(); ++d)

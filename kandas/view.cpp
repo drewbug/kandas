@@ -20,6 +20,7 @@
 #include "devicemodel.h"
 #include "iconwidget.h"
 #include "manager.h"
+#include "ndasmodel.h"
 #include "slotmodel.h"
 
 #include <QAbstractTextDocumentLayout>
@@ -28,6 +29,7 @@
 #include <QListView>
 #include <QPainter>
 #include <QTextDocument>
+#include <QTreeView>
 #include <QUrl>
 #include <QVBoxLayout>
 #include <kwidgetitemdelegate.h>
@@ -55,8 +57,9 @@ namespace Kandas
 
                 QVBoxLayout m_layout;
                 QListView m_deviceList, m_slotList;
+                QTreeView m_treeView;
                 Manager m_manager;
-                ViewDelegate m_deviceDelegate, m_slotDelegate;
+                ViewDelegate m_deviceDelegate, m_slotDelegate, m_treeDelegate;
         };
 
     }
@@ -65,6 +68,7 @@ namespace Kandas
 Kandas::Client::ViewPrivate::ViewPrivate(Kandas::Client::View *parent)
     : m_deviceDelegate(&m_deviceList, parent)
     , m_slotDelegate(&m_slotList, parent)
+    , m_treeDelegate(&m_treeView, parent)
 {
 }
 
@@ -80,9 +84,13 @@ Kandas::Client::View::View(QWidget *parent)
     p->m_slotList.setModel(p->m_manager.slotModel());
     p->m_slotList.setSelectionMode(QAbstractItemView::SingleSelection);
     p->m_slotList.setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    p->m_treeView.setItemDelegate(&p->m_treeDelegate);
+    p->m_treeView.setModel(p->m_manager.model());
+    p->m_treeView.setHeaderHidden(true);
 
     p->m_layout.addWidget(&p->m_deviceList);
     p->m_layout.addWidget(&p->m_slotList);
+    p->m_layout.addWidget(&p->m_treeView);
     setLayout(&p->m_layout);
 
     connect(p->m_deviceList.selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), &p->m_manager, SLOT(selectedDeviceChanged(const QModelIndex &)));
@@ -214,6 +222,10 @@ void Kandas::Client::ViewDelegate::updateItemWidgets(const QList<QWidget*> widge
         basePalette.setBrush(QPalette::Text, option.palette.highlightedText());
     headlineWidget->setPalette(basePalette);
     sublineWidget->setPalette(basePalette);
+    //DEBUG
+    QTreeView* tv = qobject_cast<QTreeView*>(itemView());
+    if (tv)
+        tv->expand(index);
 }
 
 void Kandas::Client::ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const

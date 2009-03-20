@@ -20,6 +20,9 @@
 #include "ndasmodel.h"
 #include "ndasslot.h"
 
+#include <QHash>
+#include <KIcon>
+#include <KIconLoader>
 #include <KLocalizedString>
 
 Kandas::Client::NdasDevice::NdasDevice(const QString &name, const QString &serial, Kandas::DeviceState state, bool hasWriteKey)
@@ -64,11 +67,71 @@ bool Kandas::Client::NdasDevice::hasWriteKey() const
 
 QVariant Kandas::Client::NdasDevice::data(int role) const
 {
-    //TODO: placeholder implementation
+    //some roles that can be served easily
     if (role == Qt::DisplayRole)
-        return i18n("Device %1", m_name);
+        return m_name;
+    //gather information - count states
+    QHash<Kandas::SlotState, int> stateCounts;
+    foreach (Kandas::Client::NdasSlot* slot, m_slots)
+        stateCounts[slot->state()] = stateCounts.value(slot->state()) + 1;
+    //gather information - fold state counts into target state counts
+    QHash<Kandas::SlotState, int> targetStateCounts;
+    targetStateCounts[Kandas::SlotOffline] = stateCounts.value(Kandas::SlotOffline);
+    targetStateCounts[Kandas::ConnectedSlot] = stateCounts.value(Kandas::ConnectedSlot) + stateCounts.value(Kandas::DisconnectingSlot);
+    targetStateCounts[Kandas::DisconnectedSlot] = stateCounts.value(Kandas::DisconnectedSlot) + stateCounts.value(Kandas::ConnectingSlot);
+    //look for dominant states
+    Kandas::SlotState dominantSlotState;
+    if (targetStateCounts[Kandas::ConnectedSlot] + targetStateCounts[Kandas::DisconnectedSlot] == 0)
+        dominantSlotState = Kandas::SlotOffline;
+    else if (targetStateCounts[Kandas::ConnectedSlot] >= targetStateCounts[Kandas::DisconnectedSlot])
+        dominantSlotState = Kandas::ConnectedSlot;
     else
-        return QVariant();
+        dominantSlotState = Kandas::DisconnectedSlot;
+    bool partial = targetStateCounts[dominantSlotState] == m_slots.count();
+    if (partial)
+    {
+        if (stateCounts.value(Kandas::ConnectingSlot) == m_slots.count())
+            dominantSlotState = Kandas::ConnectingSlot;
+        else if (stateCounts.value(Kandas::DisconnectingSlot) == m_slots.count())
+            dominantSlotState = Kandas::DisconnectingSlot;
+    }
+    //serve the other roles
+    switch (role)
+    {
+        case Qt::DecorationRole:
+            if (dominantSlotState == Kandas::ConnectedSlot || dominantSlotState == Kandas::DisconnectingSlot)
+                return KIcon("drive-harddisk", KIconLoader::global(), QStringList() << "emblem-mounted");
+            else
+                return KIcon("drive-harddisk");
+        case Kandas::Client::SecondDisplayRole:
+            switch (m_state)
+            {
+                case Kandas::DeviceOnline:
+                    return i18n("Device online");
+#if 0
+                    switch (dominantSlotState)
+                    {
+                        case Kandas::SlotOffline:
+                            return partial ? i18n("Offline") : i18n("Partially offline");
+                        case Kandas::ConnectedSlot:
+                            return partial ? i18n("Connected") : i18n("Partially connected");
+                        case Kandas::ConnectingSlot:
+                            return i18n("Connecting");
+                        case Kandas::DisconnectedSlot:
+                            return partial ? i18n("Not connected") : i18n("Partially connected");
+                        case Kandas::DisconnectingSlot:
+                            return i18n("Disconnecting");
+                    }
+#endif
+                case Kandas::DeviceOffline:
+                    return i18n("Device offline");
+                case Kandas::DeviceConnectionError:
+                    return i18n("Connection error");
+                case Kandas::DeviceLoginError:
+                    return i18n("Login error");
+            }
+    }
+    return QVariant();
 }
 
 void Kandas::Client::NdasDevice::addSlot(Kandas::Client::NdasSlot *slot)

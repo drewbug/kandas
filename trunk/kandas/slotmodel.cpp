@@ -48,14 +48,14 @@ QVariant Kandas::Client::SlotModel::data(const QModelIndex &index, int role) con
         case Qt::DecorationRole:
             if (info.state == Kandas::ConnectedSlot || info.state == Kandas::DisconnectingSlot)
                 return KIcon("network-wired", KIconLoader::global(), QStringList() << "emblem-mounted");
-            else if (info.state == Kandas::UnknownSlot)
+            else if (info.state == Kandas::SlotOffline)
                 return KIcon("unknown");
             else
                 return KIcon("network-wired", KIconLoader::global());
         case Kandas::Client::ConnectionStatusRole:
             switch (info.state)
             {
-                case Kandas::UnknownSlot:
+                case Kandas::SlotOffline:
                     return i18n("State could not be determined. Check your installation.");
                 case Kandas::ConnectedSlot:
                     return i18n("Connected");

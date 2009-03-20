@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2008 Stefan Majewsky <majewsky@gmx.net>
+ *   Copyright (C) 2009 Stefan Majewsky <majewsky@gmx.net>
  *
  *   This program is free software; you can redistribute it and/or
  *   modify it under the terms of the GNU General Public
@@ -16,46 +16,32 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KANDAS_DEFINITIONS_H
-#define KANDAS_DEFINITIONS_H
+#ifndef KANDAS_DAEMON_DEVICE_H
+#define KANDAS_DAEMON_DEVICE_H
 
-#include <QString>
+#include "definitions.h"
 
 namespace Kandas
 {
-
-    enum DeviceState
+    namespace Daemon
     {
-        DeviceOffline = 0,
-        DeviceOnline = 1,
-        DeviceConnectionError = 10,
-        DeviceLoginError = 11
-    };
 
-    enum SlotState
-    {
-        SlotOffline = 0,
-        DisconnectedSlot = 1,
-        ConnectedSlot,
-        DisconnectingSlot = 10,
-        ConnectingSlot
-    };
+        class Device
+        {
+            public:
+                Device(const QString& metadataLine); //a line from /proc/ndas/devs containing information about the device
 
-    enum SystemState
-    {
-        SystemUnchecked = 0,
-        SystemChecked = 1,
-        NoDriverFound = 10, //kernel module is not loaded
-        NoAdminFound //the ndasadmin program could not be found in $PATH
-    };
+                QString name() const;
+                QString serial() const;
+                Kandas::DeviceState state() const;
+                bool hasWriteKey() const;
+            private:
+                QString m_name, m_serial;
+                Kandas::DeviceState m_state;
+                bool m_hasWriteKey;
+        };
 
-    struct SlotInfo
-    {
-        SlotState state;
-        QString device;
-        SlotInfo(const QString &slotDevice = QString(), SlotState slotState = Kandas::SlotOffline) : state(slotState), device(slotDevice) {}
-    };
-
+    }
 }
 
-#endif // KANDAS_DEFINITIONS_H
+#endif // KANDAS_DAEMON_DEVICE_H

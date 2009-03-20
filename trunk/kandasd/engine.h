@@ -63,9 +63,9 @@ namespace Kandas
                 void disconnectDevice(const QString &device);
             Q_SIGNALS:
                 void systemInfo(int state);
-                void deviceInfo(const QString &device);
+                void deviceInfo(const QString &device, const QString &serial, int state, bool hasWriteKey);
                 void deviceRemoved(const QString &device);
-                void slotInfo(int slot, const QString &device, int state);
+                void slotInfo(int slot, const QString &device, const QString &blockDevice, int state);
                 void slotRemoved(int slot);
                 void initComplete();
             private Q_SLOTS:

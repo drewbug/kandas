@@ -36,7 +36,7 @@ namespace Kandas
 
                 virtual bool execute();
             private slots:
-                void slotChanged(int slot, const QString &device, int newState);
+                void slotChanged(int slot, const QString &device, const QString &blockDevice, int newState);
             private:
                 bool disconnectDevice(const QString &device);
                 bool disconnectSlot(int slot);

@@ -40,8 +40,8 @@ namespace Kandas
                 OrgKandasInterface *m_interface;
 
                 Kandas::SystemState m_system;
-                QList<QString> m_devices;
-                QHash<int, Kandas::SlotInfo> m_slots;
+                Kandas::Console::DeviceList m_devices;
+                Kandas::Console::SlotList m_slots;
         };
 
     }
@@ -69,6 +69,8 @@ Kandas::Console::BaseWorkerPrivate::BaseWorkerPrivate(BaseWorker *parent)
 Kandas::Console::BaseWorkerPrivate::~BaseWorkerPrivate()
 {
     delete m_interface;
+    qDeleteAll(m_devices);
+    qDeleteAll(m_slots);
 }
 
 Kandas::Console::BaseWorker::BaseWorker()
@@ -76,8 +78,8 @@ Kandas::Console::BaseWorker::BaseWorker()
 {
     //connect interface signals
     connect(p->m_interface, SIGNAL(systemInfo(int)), SLOT(systemInfo(int)));
-    connect(p->m_interface, SIGNAL(deviceInfo(const QString&)), SLOT(deviceInfo(const QString&)));
-    connect(p->m_interface, SIGNAL(slotInfo(int, const QString&, int)), SLOT(slotInfo(int, const QString&, int)));
+    connect(p->m_interface, SIGNAL(deviceInfo(const QString&, const QString&, int, bool)), SLOT(deviceInfo(const QString&, const QString&, int, bool)));
+    connect(p->m_interface, SIGNAL(slotInfo(int, const QString&, const QString&, int)), SLOT(slotInfo(int, const QString&, const QString&, int)));
     connect(p->m_interface, SIGNAL(initComplete()), SLOT(executeJobs()));
     //initiation sequence
     p->m_interface->registerClient();
@@ -104,12 +106,12 @@ Kandas::SystemState Kandas::Console::BaseWorker::system() const
     return p->m_system;
 }
 
-QList<QString> Kandas::Console::BaseWorker::devicesList() const
+Kandas::Console::DeviceList Kandas::Console::BaseWorker::devicesList() const
 {
     return p->m_devices;
 }
 
-QHash<int, Kandas::SlotInfo> Kandas::Console::BaseWorker::slotsList() const
+Kandas::Console::SlotList Kandas::Console::BaseWorker::slotsList() const
 {
     return p->m_slots;
 }
@@ -121,23 +123,41 @@ void Kandas::Console::BaseWorker::setAutoTimeout(bool enableAutoTimeout)
 
 void Kandas::Console::BaseWorker::systemInfo(int state)
 {
-    switch (state)
-    {
-        case Kandas::SystemChecked: p->m_system = Kandas::SystemChecked; break;
-        case Kandas::NoDriverFound: p->m_system = Kandas::NoDriverFound; break;
-        case Kandas::NoAdminFound: p->m_system = Kandas::NoAdminFound; break;
-        default: p->m_system = Kandas::SystemUnchecked; break;
-    }
+    p->m_system = (Kandas::SystemState) state;
 }
 
-void Kandas::Console::BaseWorker::deviceInfo(const QString &device)
+void Kandas::Console::BaseWorker::deviceInfo(const QString &deviceName, const QString &serial, int state, bool hasWriteKey)
 {
+    Kandas::Console::Device* device = new Kandas::Console::Device;
+    device->name = deviceName;
+    device->serial = serial;
+    device->state = (Kandas::DeviceState) state;
+    device->hasWriteKey = hasWriteKey;
+    //if a device with this name does already exist, replace it
+    Kandas::Console::Device* oldDevice = p->m_devices.device(deviceName);
+    if (oldDevice)
+    {
+        p->m_devices.removeAll(oldDevice);
+        delete oldDevice;
+    }
     p->m_devices << device;
 }
 
-void Kandas::Console::BaseWorker::slotInfo(int slot, const QString &device, int state)
+void Kandas::Console::BaseWorker::slotInfo(int slotNumber, const QString &device, const QString &blockDevice, int state)
 {
-    p->m_slots[slot] = Kandas::SlotInfo(device, (Kandas::SlotState) state);
+    Kandas::Console::Slot* slot = new Kandas::Console::Slot;
+    slot->number = slotNumber;
+    slot->device = device;
+    slot->blockDevice = blockDevice;
+    slot->state = (Kandas::SlotState) state;
+    //if a slot with this name does already exist, replace it
+    Kandas::Console::Slot* oldSlot = p->m_slots.slot(slotNumber);
+    if (oldSlot)
+    {
+        p->m_slots.removeAll(oldSlot);
+        delete oldSlot;
+    }
+    p->m_slots << slot;
 }
 
 void Kandas::Console::BaseWorker::executeJobs()

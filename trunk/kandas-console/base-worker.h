@@ -23,7 +23,7 @@
 #include <QList>
 #include <QObject>
 #include <KLocalizedString>
-#include <kandasd/definitions.h>
+#include "base-data.h"
 
 class OrgKandasInterface;
 
@@ -51,14 +51,14 @@ namespace Kandas
                 OrgKandasInterface *interface() const;
 
                 Kandas::SystemState system() const;
-                QList<QString> devicesList() const;
-                QHash<int, Kandas::SlotInfo> slotsList() const;
+                Kandas::Console::DeviceList devicesList() const;
+                Kandas::Console::SlotList slotsList() const;
 
                 void setAutoTimeout(bool enableAutoTimeout);
             private slots:
                 void systemInfo(int state);
-                void deviceInfo(const QString &device);
-                void slotInfo(int slot, const QString &device, int state);
+                void deviceInfo(const QString &device, const QString &serial, int state, bool hasWriteKey);
+                void slotInfo(int slot, const QString &device, const QString &blockDevice, int state);
                 void executeJobs();
                 void autoTimeout();
             private:

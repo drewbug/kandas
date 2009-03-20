@@ -72,7 +72,7 @@ QString Kandas::Daemon::Engine::interfaceVersion()
 
 void Kandas::Daemon::Engine::registerClient()
 {
-    m_clientCount++;
+    ++m_clientCount;
     //make sure the client has up-to-date data
     refreshData(); //systemInfo(), slotInfo(), and clientInfo() signals are now sent out
     m_autoRefreshTimer.start(Kandas::Daemon::RefreshInterval);
@@ -81,8 +81,7 @@ void Kandas::Daemon::Engine::registerClient()
 
 void Kandas::Daemon::Engine::unregisterClient()
 {
-    m_clientCount--;
-    if (m_clientCount <= 0)
+    if (--m_clientCount <= 0)
     {
         m_clientCount = 0;
         m_autoRefreshTimer.stop();
@@ -230,14 +229,14 @@ void Kandas::Daemon::Engine::refreshData()
         delete oldDevice;
     }
     foreach (Kandas::Daemon::Device* device, m_devices)
-        emit deviceInfo(device->name());
+        emit deviceInfo(device->name(), device->serial(), device->state(), device->hasWriteKey());
     foreach (Kandas::Daemon::Slot* oldSlot, removedSlots)
     {
         emit slotRemoved(oldSlot->number());
         delete oldSlot;
     }
     foreach (Kandas::Daemon::Slot* slot, m_slots)
-        emit slotInfo(slot->number(), slot->deviceName(), slot->state());
+        emit slotInfo(slot->number(), slot->deviceName(), slot->blockDeviceName(), slot->state());
 }
 
 #include "engine.moc"

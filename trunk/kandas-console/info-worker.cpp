@@ -75,41 +75,69 @@ void Kandas::Console::InfoWorker::listEnvironment()
 void Kandas::Console::InfoWorker::listDevices()
 {
     static const QString deviceHeader = i18n("Device");
+    static const QString serialHeader = i18n("Serial");
     static const QString slotsHeader = i18n("Associated slots");
+    static const QString stateHeader = i18n("Current state");
     static const int columnPadding = 3;
     static const char paddingCharacterRaw = ' ';
     static const QChar paddingCharacter(paddingCharacterRaw);
-    //gather information
+    //gather information (note: the slot list is expected to always be shorter than the header!)
     int maxDeviceNameLength = deviceHeader.length();
+    int maxSerialLength = serialHeader.length();
     QHash<QString, QList<int> > deviceSlots;
-    foreach (QString device, devicesList())
+    foreach (Kandas::Console::Device* device, devicesList())
     {
-        deviceSlots[device] = QList<int>();
-        maxDeviceNameLength = qMax(maxDeviceNameLength, device.length());
+        deviceSlots[device->name] = QList<int>();
+        maxDeviceNameLength = qMax(maxDeviceNameLength, device->name.length());
+        maxSerialLength = qMax(maxSerialLength, device->serial.length());
     }
-    QHashIterator<int, Kandas::SlotInfo> iterSlots(slotsList());
-    while (iterSlots.hasNext())
+    foreach (Kandas::Console::Slot* slot, slotsList())
     {
-        QString device = iterSlots.next().value().device;
+        QString device = slot->device;
         if (deviceSlots.contains(device))
-            deviceSlots[device] << iterSlots.key();
+            deviceSlots[device] << slot->number;
     }
     //output - header
     int deviceNameColumnWidth = maxDeviceNameLength + columnPadding;
+    int serialColumnWidth = maxSerialLength + columnPadding;
+    int slotsColumnWidth = slotsHeader.length() + columnPadding;
     std::cout << deviceHeader.toUtf8().data()
               << QString(deviceNameColumnWidth - deviceHeader.length(), paddingCharacter).toUtf8().data()
+              << serialHeader.toUtf8().data()
+              << QString(serialColumnWidth - serialHeader.length(), paddingCharacter).toUtf8().data()
               << slotsHeader.toUtf8().data()
+              << QString(columnPadding, paddingCharacter).toUtf8().data() //the width of the slot list column is always defined by the header!
+              << stateHeader.toUtf8().data()
               << std::endl;
     //output - lists
-    QHashIterator<QString, QList<int> > iterDevices(deviceSlots);
-    while (iterDevices.hasNext())
+    foreach (Kandas::Console::Device* device, devicesList())
     {
-        QString device = iterDevices.next().key();
-        std::cout << device.toUtf8().data()
-                  << QString(deviceNameColumnWidth - device.length(), paddingCharacter).toUtf8().data();
-        foreach (int slot, iterDevices.value())
+        std::cout << device->name.toUtf8().data()
+                  << QString(deviceNameColumnWidth - device->name.length(), paddingCharacter).toUtf8().data()
+                  << device->serial.toUtf8().data()
+                  << QString(serialColumnWidth - device->serial.length(), paddingCharacter).toUtf8().data();
+        int slotsColumnContentWidth = 0;
+        foreach (int slot, deviceSlots[device->name])
+        {
             std::cout << slot << paddingCharacterRaw;
-        std::cout << std::endl;
+            slotsColumnContentWidth += 1 + QString::number(slot).length();
+        }
+        std::cout << QString(slotsColumnWidth - slotsColumnContentWidth, paddingCharacter).toUtf8().data();
+        switch (device->state)
+        {
+            case DeviceOffline:
+                std::cout << i18n("Offline").toUtf8().data() << std::endl;
+                break;
+            case DeviceOnline:
+                std::cout << i18n("Online").toUtf8().data() << std::endl;
+                break;
+            case DeviceConnectionError:
+                std::cout << i18n("Connection error").toUtf8().data() << std::endl;
+                break;
+            case DeviceLoginError:
+                std::cout << i18n("Login error").toUtf8().data() << std::endl;
+                break;
+        }
     }
 }
 
@@ -117,43 +145,46 @@ void Kandas::Console::InfoWorker::listSlots()
 {
     static const QString slotHeader = i18n("Slot");
     static const QString deviceHeader = i18n("At device");
+    static const QString blockDeviceHeader = i18n("UNIX device");
     static const QString stateHeader = i18n("Current state");
-    static const QString integerToString("%1");
     static const int columnPadding = 3;
     static const char paddingCharacterRaw = ' ';
     static const QChar paddingCharacter(paddingCharacterRaw);
     //gather information
     int maxSlotNumberLength = slotHeader.length();
     int maxDeviceNameLength = deviceHeader.length();
-    QHashIterator<int, Kandas::SlotInfo> iterSlots(slotsList());
-    while (iterSlots.hasNext())
+    int maxBlockDeviceNameLength = blockDeviceHeader.length();
+    foreach (Kandas::Console::Slot* slot, slotsList())
     {
-        iterSlots.next();
-        maxSlotNumberLength = qMax(maxSlotNumberLength, integerToString.arg(iterSlots.key()).length());
-        maxDeviceNameLength = qMax(maxDeviceNameLength, iterSlots.value().device.length());
+        maxSlotNumberLength = qMax(maxSlotNumberLength, QString::number(slot->number).length());
+        maxDeviceNameLength = qMax(maxDeviceNameLength, slot->device.length());
+        maxBlockDeviceNameLength = qMax(maxBlockDeviceNameLength, slot->blockDevice.length());
     }
     //output - header
     int slotNumberColumnWidth = maxSlotNumberLength + columnPadding;
     int deviceNameColumnWidth = maxDeviceNameLength + columnPadding;
+    int blockDeviceNameColumnWidth = maxBlockDeviceNameLength + columnPadding;
     std::cout << slotHeader.toUtf8().data()
               << QString(slotNumberColumnWidth - slotHeader.length(), paddingCharacter).toUtf8().data()
               << deviceHeader.toUtf8().data()
               << QString(deviceNameColumnWidth - deviceHeader.length(), paddingCharacter).toUtf8().data()
+              << blockDeviceHeader.toUtf8().data()
+              << QString(blockDeviceNameColumnWidth - blockDeviceHeader.length(), paddingCharacter).toUtf8().data()
               << stateHeader.toUtf8().data()
               << std::endl;
     //output - slots
-    iterSlots.toFront();
-    while (iterSlots.hasNext())
+    foreach (Kandas::Console::Slot* slot, slotsList())
     {
-        Kandas::SlotInfo info = iterSlots.next().value();
-        std::cout << iterSlots.key()
-                  << QString(slotNumberColumnWidth - integerToString.arg(iterSlots.key()).length(), paddingCharacter).toUtf8().data()
-                  << info.device.toUtf8().data()
-                  << QString(deviceNameColumnWidth - info.device.length(), paddingCharacter).toUtf8().data();
-        switch (info.state)
+        std::cout << slot->number
+                  << QString(slotNumberColumnWidth - QString::number(slot->number).length(), paddingCharacter).toUtf8().data()
+                  << slot->device.toUtf8().data()
+                  << QString(deviceNameColumnWidth - slot->device.length(), paddingCharacter).toUtf8().data()
+                  << slot->blockDevice.toUtf8().data()
+                  << QString(blockDeviceNameColumnWidth - slot->blockDevice.length(), paddingCharacter).toUtf8().data();
+        switch (slot->state)
         {
             case Kandas::SlotOffline:
-                std::cout << i18n("Undetermined").toUtf8().data() << std::endl;
+                std::cout << i18n("Unavailable").toUtf8().data() << std::endl;
                 break;
             case Kandas::ConnectedSlot:
                 std::cout << i18n("Connected").toUtf8().data() << std::endl;

@@ -16,8 +16,8 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KANDAS_DAEMON_DEVICE_H
-#define KANDAS_DAEMON_DEVICE_H
+#ifndef KANDAS_DAEMON_SLOT_H
+#define KANDAS_DAEMON_SLOT_H
 
 #include "definitions.h"
 #include <QList>
@@ -27,33 +27,36 @@ namespace Kandas
     namespace Daemon
     {
 
-        class Device
+        class Slot
         {
             public:
-                Device(const QString& metadataLine); //a line from /proc/ndas/devs containing information about the device
+                Slot(const QString &device, int slotNumber);
 
-                QString name() const;
-                QString serial() const;
-                Kandas::DeviceState state() const;
-                bool hasWriteKey() const;
+                int number() const;
+                QString deviceName() const;
+                QString blockDeviceName() const; //something like /dev/ndas-12345678-0
+                Kandas::SlotState state() const;
+
+                void setState(Kandas::SlotState state);
+                void setPreviousState(Kandas::SlotState state); //used to keep transitional states when appropriate
             private:
-                QString m_name, m_serial;
-                Kandas::DeviceState m_state;
-                bool m_hasWriteKey;
+                int m_number;
+                QString m_device, m_blockDevice;
+                Kandas::SlotState m_state;
         };
 
-        class DeviceList : public QList<Kandas::Daemon::Device*>
+        class SlotList : public QList<Kandas::Daemon::Slot*>
         {
             public:
-                DeviceList();
-                DeviceList(const Kandas::Daemon::DeviceList& other);
+                SlotList();
+                SlotList(const Kandas::Daemon::SlotList& other);
 
-                //helper functions (similar to QList::contains and QList::value) that look for devices with a given name
-                bool contains(const QString& deviceName) const;
-                Kandas::Daemon::Device* device(const QString& deviceName) const;
+                //helper functions (similar to QList::contains and QList::value) that look for slots with a given slot number
+                bool contains(int slotNumber) const;
+                Kandas::Daemon::Slot* slot(int slotNumber) const;
         };
 
     }
 }
 
-#endif // KANDAS_DAEMON_DEVICE_H
+#endif // KANDAS_DAEMON_SLOT_H

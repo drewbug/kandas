@@ -20,6 +20,8 @@
 #define KANDAS_DAEMON_ENGINE_H
 
 #include "definitions.h"
+#include "device.h"
+#include "slot.h"
 
 #include <QHash>
 #include <QList>
@@ -37,14 +39,17 @@ namespace Kandas
         const int RefreshInterval = 2000; //refresh every three seconds
 
         class Device;
+        class Slot;
 
         class Engine : public QObject
         {
             Q_OBJECT
             Q_CLASSINFO("D-Bus interface", "org.kandas")
             public:
-                Engine(const QString &infoSourceDir);
+                Engine();
                 bool clean() const;
+
+                static QString InformationSourceDirectory;
             public Q_SLOTS:
                 QString daemonVersion();
                 QString interfaceVersion();
@@ -67,14 +72,13 @@ namespace Kandas
                 void refreshData();
             private:
                 bool m_clean;
-                QString m_infoSourceDir;
 
                 int m_clientCount;
                 QTimer m_autoRefreshTimer;
 
                 Kandas::SystemState m_system;
-                QList<Kandas::Daemon::Device*> m_devices;
-                QHash<int, Kandas::SlotInfo> m_slots;
+                Kandas::Daemon::DeviceList m_devices;
+                Kandas::Daemon::SlotList m_slots;
         };
 
     }

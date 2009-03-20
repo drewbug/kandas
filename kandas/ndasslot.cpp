@@ -1,0 +1,71 @@
+/***************************************************************************
+ *   Copyright 2009 Stefan Majewsky <majewsky@gmx.net>
+ *
+ *   This program is free software; you can redistribute it and/or
+ *   modify it under the terms of the GNU General Public
+ *   License as published by the Free Software Foundation; either
+ *   version 2 of the License, or (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ ***************************************************************************/
+
+#include "ndasslot.h"
+#include "ndasmodel.h"
+
+#include <KLocalizedString>
+
+Kandas::Client::NdasSlot::NdasSlot(int number, const QString &deviceName, const QString &blockDeviceName, Kandas::SlotState state)
+    : m_number(number)
+    , m_deviceName(deviceName)
+    , m_blockDeviceName(blockDeviceName)
+    , m_state(state)
+{
+}
+
+Kandas::Client::NdasSlot::~NdasSlot()
+{
+    //only necessary to make the class polymorphic
+}
+
+void Kandas::Client::NdasSlot::update(const QString &deviceName, const QString &blockDeviceName, Kandas::SlotState state)
+{
+    m_deviceName = deviceName;
+    m_blockDeviceName = blockDeviceName;
+    m_state = state;
+}
+
+int Kandas::Client::NdasSlot::number() const
+{
+    return m_number;
+}
+
+QString Kandas::Client::NdasSlot::deviceName() const
+{
+    return m_deviceName;
+}
+
+QString Kandas::Client::NdasSlot::blockDeviceName() const
+{
+    return m_blockDeviceName;
+}
+
+Kandas::SlotState Kandas::Client::NdasSlot::state() const
+{
+    return m_state;
+}
+
+QVariant Kandas::Client::NdasSlot::data(int role) const
+{
+    //TODO: placeholder implementation
+    if (role == Qt::DisplayRole)
+        return i18n("Slot %1", m_number);
+    else
+        return QVariant();
+}

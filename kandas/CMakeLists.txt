@@ -11,6 +11,10 @@ set(kandas_SRCS
     iconwidget.cpp
     main.cpp
     manager.cpp
+    ndasdata.cpp
+    ndasdevice.cpp
+    ndasmodel.cpp
+    ndasslot.cpp
     slotmodel.cpp
     view.cpp
     window.cpp

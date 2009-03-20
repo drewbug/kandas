@@ -36,6 +36,8 @@ namespace Kandas
                 QString serial() const;
                 Kandas::DeviceState state() const;
                 bool hasWriteKey() const;
+
+                QList<int> getSlotNumbers() const; //warning: this method does not provide caching, it reads the slot file on every access
             private:
                 QString m_name, m_serial;
                 Kandas::DeviceState m_state;

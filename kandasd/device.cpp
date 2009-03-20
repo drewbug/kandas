@@ -17,7 +17,9 @@
  ***************************************************************************/
 
 #include "device.h"
+#include "engine.h"
 
+#include <QFile>
 #include <QRegExp>
 #include <QStringList>
 
@@ -60,6 +62,27 @@ Kandas::DeviceState Kandas::Daemon::Device::state() const
 bool Kandas::Daemon::Device::hasWriteKey() const
 {
     return m_hasWriteKey;
+}
+
+QList<int> Kandas::Daemon::Device::getSlotNumbers() const
+{
+    QList<int> result;
+    //read slot list file
+    const QString slotListPath = QString("%1/devices/%2/slots").arg(Kandas::Daemon::Engine::InformationSourceDirectory);
+    QFile slotListFile(slotListPath.arg(m_name));
+    if (slotListFile.exists() && slotListFile.open(QIODevice::ReadOnly) && slotListFile.isReadable())
+    {
+        const int bufferSize = 1024; char buffer[bufferSize];
+        while (slotListFile.readLine(buffer, bufferSize) != -1)
+        {
+            const int slotNumber = QString::fromUtf8(buffer).simplified().toInt();
+            if (slotNumber == 0) //means that an error occured during the conversion
+                continue;
+            result << slotNumber;
+        }
+        slotListFile.close();
+    }
+    return result;
 }
 
 //BEGIN Kandas::Daemon::DeviceList

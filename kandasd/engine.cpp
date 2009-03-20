@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "engine.h"
+#include "device.h"
 #include "kandasadaptor.h"
 
 #include <QDir>
@@ -176,8 +177,11 @@ void Kandas::Daemon::Engine::refreshData()
         while (iterSlots.hasNext())
             emit slotRemoved(iterSlots.next().key());
         m_slots.clear();
-        foreach (QString device, m_devices)
-            emit deviceRemoved(device);
+        foreach (Kandas::Daemon::Device* device, m_devices)
+        {
+            emit deviceRemoved(device->name());
+            delete device;
+        }
         m_devices.clear();
         return;
     }
@@ -185,7 +189,12 @@ void Kandas::Daemon::Engine::refreshData()
     // update list of devices             //
     ////////////////////////////////////////
     //save copy of old devices list - by now, we have to assume that all devices have been removed
-    QList<QString> removedDevices(m_devices);
+    QList<QString> removedDevices;
+    foreach (Kandas::Daemon::Device* device, m_devices)
+    {
+        removedDevices << device->name();
+        delete device;
+    }
     m_devices.clear();
     //open devices list
     static const QString devicesListPath = QString("%1/devs").arg(m_infoSourceDir);
@@ -202,22 +211,22 @@ void Kandas::Daemon::Engine::refreshData()
         return;
     }
     //read devices list
-    char buffer[1024];
-    const int bufferSize = sizeof(buffer);
+    const int bufferSize = 1024;
+    char buffer[bufferSize];
     devicesListFile.readLine(buffer, bufferSize); //skip first line (human-readable captions)
-    static const QRegExp whitespace("\\s+");
     while (devicesListFile.readLine(buffer, bufferSize) != -1)
     {
-        QString deviceName = QString::fromUtf8(buffer).simplified().section(whitespace, 0, 0);
-        m_devices << deviceName;
-        removedDevices.removeAll(deviceName); //this device is available - the assumption that it was removed is incorrect
+        const QString metadataLine = QString::fromUtf8(buffer).simplified();
+        Kandas::Daemon::Device* device = new Kandas::Daemon::Device(metadataLine);
+        m_devices << device;
+        removedDevices.removeAll(device->name()); //this device is available - the assumption that it was removed is incorrect
     }
     devicesListFile.close();
     //propagate information
     foreach (QString device, removedDevices)
         emit deviceRemoved(device);
-    foreach (QString device, m_devices)
-        emit deviceInfo(device);
+    foreach (Kandas::Daemon::Device* device, m_devices)
+        emit deviceInfo(device->name());
     ////////////////////////////////////////
     // update list of slots               //
     ////////////////////////////////////////
@@ -227,9 +236,9 @@ void Kandas::Daemon::Engine::refreshData()
     //read slot numbers from device lists
     static const QString slotListPath = QString("%1/devices/%2/slots").arg(m_infoSourceDir);
     static const QString slotInfoPath = QString("%1/slots/%2/info").arg(m_infoSourceDir);
-    foreach (QString device, m_devices)
+    foreach (Kandas::Daemon::Device* device, m_devices)
     {
-        QFile slotListFile(slotListPath.arg(device));
+        QFile slotListFile(slotListPath.arg(device->name()));
         if (!slotListFile.exists() || !slotListFile.open(QIODevice::ReadOnly) || !slotListFile.isReadable())
             continue;
         while (slotListFile.readLine(buffer, bufferSize) != -1)
@@ -256,7 +265,7 @@ void Kandas::Daemon::Engine::refreshData()
                     state = oldState;
             }
             //save information
-            m_slots[slot] = Kandas::SlotInfo(device, state);
+            m_slots[slot] = Kandas::SlotInfo(device->name(), state);
             removedSlots.remove(slot); //this slot is available - the assumption that it was removed is incorrect
         }
         slotListFile.close();

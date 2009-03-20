@@ -152,7 +152,7 @@ void Kandas::Console::InfoWorker::listSlots()
                   << QString(deviceNameColumnWidth - info.device.length(), paddingCharacter).toUtf8().data();
         switch (info.state)
         {
-            case Kandas::UnknownSlot:
+            case Kandas::SlotOffline:
                 std::cout << i18n("Undetermined").toUtf8().data() << std::endl;
                 break;
             case Kandas::ConnectedSlot:

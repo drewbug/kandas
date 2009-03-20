@@ -36,6 +36,8 @@ namespace Kandas
         const QString InterfaceVersion(InterfaceVersionRaw);
         const int RefreshInterval = 2000; //refresh every three seconds
 
+        class Device;
+
         class Engine : public QObject
         {
             Q_OBJECT
@@ -71,7 +73,7 @@ namespace Kandas
                 QTimer m_autoRefreshTimer;
 
                 Kandas::SystemState m_system;
-                QList<QString> m_devices;
+                QList<Kandas::Daemon::Device*> m_devices;
                 QHash<int, Kandas::SlotInfo> m_slots;
         };
 

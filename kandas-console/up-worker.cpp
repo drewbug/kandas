@@ -38,59 +38,57 @@ bool Kandas::Console::UpWorker::execute()
         return connectDevice(m_target.toString());
 }
 
-bool Kandas::Console::UpWorker::connectDevice(const QString &device)
+bool Kandas::Console::UpWorker::connectDevice(const QString &deviceName)
 {
     //check whether device exists
-    if (!devicesList().contains(device))
+    if (!devicesList().device(deviceName))
     {
-        std::cerr << i18n("ERROR: Device \"%1\" is not available.", device).toUtf8().data();
+        std::cerr << i18n("ERROR: Device \"%1\" is not available.", deviceName).toUtf8().data();
         return true; //do nothing, exit immediately
     }
     //get a list of all slots that need to be up'ed, and send request to KaNDASd
-    QHashIterator<int, Kandas::SlotInfo> iterSlots = slotsList();
-    while (iterSlots.hasNext())
+    Kandas::Console::SlotList slotList = slotsList();
+    foreach (Kandas::Console::Slot* slot, slotList)
     {
-        iterSlots.next();
-        if (iterSlots.value().device == device && iterSlots.value().state == Kandas::DisconnectedSlot)
+        if (slot->device == deviceName && slot->state == Kandas::DisconnectedSlot)
         {
-            int slot = iterSlots.key();
-            m_remainingSlots << slot;
-            interface()->connectSlot(slot, m_readOnly);
+            m_remainingSlots << slot->number;
+            interface()->connectSlot(slot->number, m_readOnly);
         }
     }
     //exit immediately if nothing is to do, else wait for all slots to be connected
     if (m_remainingSlots.count() != 0)
     {
         std::cout << i18np("Waiting for 1 slot to connect...", "Waiting for %1 slots to connect...", m_remainingSlots.count()).toUtf8().data() << std::endl;
-        connect(interface(), SIGNAL(slotInfo(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
+        connect(interface(), SIGNAL(slotInfo(int, const QString &, const QString &, int)), this, SLOT(slotChanged(int, const QString &, const QString &, int)));
         return false;
     }
     else
         return true;
 }
 
-bool Kandas::Console::UpWorker::connectSlot(int slot)
+bool Kandas::Console::UpWorker::connectSlot(int slotNumber)
 {
-    const QHash<int, Kandas::SlotInfo> slotList = slotsList();
+    Kandas::Console::SlotList slotList = slotsList();
     //check whether slot exists
-    if (!slotList.contains(slot))
+    Kandas::Console::Slot* slot = slotList.slot(slotNumber);
+    if (!slot)
     {
-        std::cerr << i18n("ERROR: Slot %1 is not available.", slot).toUtf8().data();
+        std::cerr << i18n("ERROR: Slot %1 is not available.", slotNumber).toUtf8().data();
         return true; //do nothing, exit immediately
     }
     //check whether update is necessary
-    const Kandas::SlotInfo slotInfo = slotList[slot];
-    if (slotInfo.state != Kandas::DisconnectedSlot)
+    if (slot->state != Kandas::DisconnectedSlot)
         return true;
     //issue update
-    m_remainingSlots << slot;
-    interface()->connectSlot(slot, m_readOnly);
+    m_remainingSlots << slotNumber;
+    interface()->connectSlot(slotNumber, m_readOnly);
     std::cout << i18n("Waiting for slot to connect...").toUtf8().data() << std::endl;
-    connect(interface(), SIGNAL(slotInfo(int, const QString &, int)), this, SLOT(slotChanged(int, const QString &, int)));
+    connect(interface(), SIGNAL(slotInfo(int, const QString &, const QString &, int)), this, SLOT(slotChanged(int, const QString &, const QString &, int)));
     return false;
 }
 
-void Kandas::Console::UpWorker::slotChanged(int slot, const QString &/*device*/, int newState)
+void Kandas::Console::UpWorker::slotChanged(int slot, const QString &/*device*/, const QString &/*blockDevice*/, int newState)
 {
     if (newState == Kandas::ConnectedSlot && m_remainingSlots.contains(slot))
     {

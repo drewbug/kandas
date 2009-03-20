@@ -21,10 +21,14 @@
     </signal>
     <signal name="deviceInfo">
       <arg name="device" type="s" direction="out"/>
+      <arg name="serial" type="s" direction="out"/>
+      <arg name="state" type="i" direction="out"/>
+      <arg name="writable" type="b" direction="out"/>
     </signal>
     <signal name="slotInfo">
       <arg name="slot" type="i" direction="out"/>
       <arg name="device" type="s" direction="out"/>
+      <arg name="blockdevice" type="s" direction="out"/>
       <arg name="state" type="i" direction="out"/>
     </signal>
     <signal name="deviceRemoved">

@@ -61,3 +61,32 @@ bool Kandas::Daemon::Device::hasWriteKey() const
 {
     return m_hasWriteKey;
 }
+
+//BEGIN Kandas::Daemon::DeviceList
+
+Kandas::Daemon::DeviceList::DeviceList()
+{
+}
+
+Kandas::Daemon::DeviceList::DeviceList(const Kandas::Daemon::DeviceList& other)
+    : QList<Kandas::Daemon::Device*>(other)
+{
+}
+
+bool Kandas::Daemon::DeviceList::contains(const QString& deviceName) const
+{
+    foreach (Kandas::Daemon::Device* device, *this)
+        if (device->name() == deviceName)
+            return true;
+    return false;
+}
+
+Kandas::Daemon::Device* Kandas::Daemon::DeviceList::device(const QString& deviceName) const
+{
+    foreach (Kandas::Daemon::Device* device, *this)
+        if (device->name() == deviceName)
+            return device;
+    return 0;
+}
+
+//END Kandas::Daemon::DeviceList

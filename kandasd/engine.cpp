@@ -25,12 +25,13 @@
 #include <KDebug> //do not remove, is needed by kError and kWarning
 #include <KProcess>
 
-//singleton functions
+//instance functions
 
-Kandas::Daemon::Engine::Engine(const QString &infoSourceDir)
+QString Kandas::Daemon::Engine::InformationSourceDirectory;
+
+Kandas::Daemon::Engine::Engine()
     : QObject()
     , m_clean(true)
-    , m_infoSourceDir(infoSourceDir)
     , m_clientCount(0)
     , m_system(Kandas::SystemUnchecked)
 {
@@ -95,9 +96,9 @@ void Kandas::Daemon::Engine::connectSlot(int slot, bool readOnly)
     //check environment and slot state
     if (m_system != Kandas::SystemChecked)
         return;
-    if (m_slots[slot].state != Kandas::DisconnectedSlot)
+    if (m_slots.slot(slot)->state() != Kandas::DisconnectedSlot)
         return;
-    m_slots[slot].state = Kandas::ConnectingSlot;
+    m_slots.slot(slot)->setState(Kandas::ConnectingSlot);
     //call ndasadmin
     QStringList args; args << "enable" << "-s" << QString::number(slot);
     if (readOnly)
@@ -112,9 +113,9 @@ void Kandas::Daemon::Engine::disconnectSlot(int slot)
     //check environment and slot state
     if (m_system != Kandas::SystemChecked)
         return;
-    if (m_slots[slot].state != Kandas::ConnectedSlot)
+    if (m_slots.slot(slot)->state() != Kandas::ConnectedSlot)
         return;
-    m_slots[slot].state = Kandas::DisconnectingSlot;
+    m_slots.slot(slot)->setState(Kandas::DisconnectingSlot);
     //call ndasadmin
     QStringList args; args << "disable" << "-s" << QString::number(slot);
     KProcess::startDetached("ndasadmin", args);
@@ -122,38 +123,35 @@ void Kandas::Daemon::Engine::disconnectSlot(int slot)
 
 void Kandas::Daemon::Engine::connectDevice(const QString &device, bool readOnly)
 {
-    QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
-    while (iterSlots.hasNext())
-    {
-        iterSlots.next();
-        if (iterSlots.value().device == device)
-            connectSlot(iterSlots.key(), readOnly);
-    }
+    foreach (Kandas::Daemon::Slot* slot, m_slots)
+        if (slot->deviceName() == device)
+            connectSlot(slot->number(), readOnly);
 }
 
 void Kandas::Daemon::Engine::disconnectDevice(const QString &device)
 {
-    QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
-    while (iterSlots.hasNext())
-    {
-        iterSlots.next();
-        if (iterSlots.value().device == device)
-            disconnectSlot(iterSlots.key());
-    }
+    foreach (Kandas::Daemon::Slot* slot, m_slots)
+        if (slot->deviceName() == device)
+            disconnectSlot(slot->number());
 }
 
 void Kandas::Daemon::Engine::refreshData()
 {
+    //flush device and slot lists, but keep lists of the device names and slot numbers in order to emit the deviceRemoved/slotRemoved signals later
+    Kandas::Daemon::DeviceList removedDevices(m_devices);
+    Kandas::Daemon::SlotList removedSlots(m_slots);
+    m_devices.clear();
+    m_slots.clear();
     ////////////////////////////////////////
     // determine state of driver          //
     ////////////////////////////////////////
-    Kandas::SystemState newSystem = Kandas::SystemUnchecked;
+    m_system = Kandas::SystemUnchecked;
     //check availability of NDAS driver through existence of information source directory (cannot check kernel modules because that would be incompatible to KaNDASsimul)
-    static const QDir dir(m_infoSourceDir);
+    static const QDir dir(InformationSourceDirectory);
     if (!dir.exists())
-        newSystem = Kandas::NoDriverFound;
+        m_system = Kandas::NoDriverFound;
     //check available of ndasadmin program
-    if (newSystem == Kandas::SystemUnchecked)
+    if (m_system == Kandas::SystemUnchecked)
     {
         static const QString whichProgram = QLatin1String("which");
         static const QStringList whichArgs(QLatin1String("ndasadmin"));
@@ -163,51 +161,46 @@ void Kandas::Daemon::Engine::refreshData()
         process.start();
         process.waitForFinished();
         if (QString::fromUtf8(process.readAllStandardOutput()).simplified().isEmpty())
-            newSystem = Kandas::NoAdminFound;
+            m_system = Kandas::NoAdminFound;
     }
     //system is sane if no regression has been found
-    if (newSystem == Kandas::SystemUnchecked)
-        newSystem = Kandas::SystemChecked;
-    m_system = newSystem;
-    emit systemInfo(newSystem);
+    if (m_system == Kandas::SystemUnchecked)
+        m_system = Kandas::SystemChecked;
+    emit systemInfo(m_system);
     //if system is not sane, flush devices and slot list and do not continue further tests
-    if (newSystem != Kandas::SystemChecked)
+    if (m_system != Kandas::SystemChecked)
     {
-        QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
-        while (iterSlots.hasNext())
-            emit slotRemoved(iterSlots.next().key());
-        m_slots.clear();
-        foreach (Kandas::Daemon::Device* device, m_devices)
+        foreach (Kandas::Daemon::Slot* slot, removedSlots)
+        {
+            emit slotRemoved(slot->number());
+            delete slot;
+        }
+        foreach (Kandas::Daemon::Device* device, removedDevices)
         {
             emit deviceRemoved(device->name());
             delete device;
         }
-        m_devices.clear();
         return;
     }
     ////////////////////////////////////////
     // update list of devices             //
     ////////////////////////////////////////
-    //save copy of old devices list - by now, we have to assume that all devices have been removed
-    QList<QString> removedDevices;
-    foreach (Kandas::Daemon::Device* device, m_devices)
-    {
-        removedDevices << device->name();
-        delete device;
-    }
-    m_devices.clear();
     //open devices list
-    static const QString devicesListPath = QString("%1/devs").arg(m_infoSourceDir);
+    const QString devicesListPath = QString("%1/devs").arg(InformationSourceDirectory);
     QFile devicesListFile(devicesListPath);
     if (!devicesListFile.exists() || !devicesListFile.open(QIODevice::ReadOnly) || !devicesListFile.isReadable())
     {
         //devices list could not be opened - assume that there are no devices and slots, leave lists empty and tell that everything has been removed
-        QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
-        while (iterSlots.hasNext())
-            emit slotRemoved(iterSlots.next().key());
-        m_slots.clear();
-        foreach (QString device, removedDevices)
-            emit deviceRemoved(device);
+        foreach (Kandas::Daemon::Slot* slot, removedSlots)
+        {
+            emit slotRemoved(slot->number());
+            delete slot;
+        }
+        foreach (Kandas::Daemon::Device* device, removedDevices)
+        {
+            emit deviceRemoved(device->name());
+            delete device;
+        }
         return;
     }
     //read devices list
@@ -219,23 +212,28 @@ void Kandas::Daemon::Engine::refreshData()
         const QString metadataLine = QString::fromUtf8(buffer).simplified();
         Kandas::Daemon::Device* device = new Kandas::Daemon::Device(metadataLine);
         m_devices << device;
-        removedDevices.removeAll(device->name()); //this device is available - the assumption that it was removed is incorrect
+        //this device is available - the assumption that it was removed is incorrect
+        if (removedDevices.contains(device->name()))
+        {
+            Kandas::Daemon::Device* oldDevice = removedDevices.device(device->name());
+            removedDevices.removeAll(oldDevice);
+            delete oldDevice;
+        }
     }
     devicesListFile.close();
     //propagate information
-    foreach (QString device, removedDevices)
-        emit deviceRemoved(device);
+    foreach (Kandas::Daemon::Device* oldDevice, removedDevices)
+    {
+        emit deviceRemoved(oldDevice->name());
+        delete oldDevice;
+    }
     foreach (Kandas::Daemon::Device* device, m_devices)
         emit deviceInfo(device->name());
     ////////////////////////////////////////
     // update list of slots               //
     ////////////////////////////////////////
-    //save copy of old slot list - by now, we have to assume that all slots have been removed
-    QHash<int, Kandas::SlotInfo> removedSlots(m_slots);
-    m_slots.clear();
     //read slot numbers from device lists
-    static const QString slotListPath = QString("%1/devices/%2/slots").arg(m_infoSourceDir);
-    static const QString slotInfoPath = QString("%1/slots/%2/info").arg(m_infoSourceDir);
+    const QString slotListPath = QString("%1/devices/%2/slots").arg(InformationSourceDirectory);
     foreach (Kandas::Daemon::Device* device, m_devices)
     {
         QFile slotListFile(slotListPath.arg(device->name()));
@@ -243,43 +241,31 @@ void Kandas::Daemon::Engine::refreshData()
             continue;
         while (slotListFile.readLine(buffer, bufferSize) != -1)
         {
-            const int slot = QString::fromUtf8(buffer).simplified().toInt();
-            if (slot == 0) //means that an error occured during the conversion
+            const int slotNumber = QString::fromUtf8(buffer).simplified().toInt();
+            if (slotNumber == 0) //means that an error occured during the conversion
                 continue;
-            //open slot info file
-            QFile slotInfoFile(slotInfoPath.arg(slot));
-            if (!slotInfoFile.exists() || !slotInfoFile.open(QIODevice::ReadOnly) || !slotInfoFile.isReadable())
-                continue;
-            slotInfoFile.readLine(buffer, bufferSize); //skip first line (human-readable captions)
-            if (slotInfoFile.readLine(buffer, bufferSize) == -1)
-                continue;
-            const QString line = QString::fromUtf8(buffer).simplified();
-            slotInfoFile.close();
-            //is slot enabled?
-            Kandas::SlotState state = (line.section(' ', 0, 0) == "Enabled") ? Kandas::ConnectedSlot : Kandas::DisconnectedSlot;
-            //transitional states (we mis-use the data in removedSlots for this)
-            if (removedSlots.contains(slot))
+            //create slot (and read information for slot)
+            Kandas::Daemon::Slot* slot = new Kandas::Daemon::Slot(device->name(), slotNumber);
+            m_slots << slot;
+            //this slot is available - the assumption that it was removed is incorrect
+            if (removedSlots.contains(slotNumber))
             {
-                Kandas::SlotState oldState = removedSlots[slot].state;
-                if ((oldState == Kandas::ConnectingSlot && state == Kandas::DisconnectedSlot) || (oldState == Kandas::DisconnectingSlot && state == Kandas::ConnectedSlot))
-                    state = oldState;
+                Kandas::Daemon::Slot* oldSlot = removedSlots.slot(slotNumber);
+                slot->setPreviousState(oldSlot->state());
+                removedSlots.removeAll(oldSlot);
+                delete oldSlot;
             }
-            //save information
-            m_slots[slot] = Kandas::SlotInfo(device->name(), state);
-            removedSlots.remove(slot); //this slot is available - the assumption that it was removed is incorrect
         }
         slotListFile.close();
     }
     //propagate information
-    QHashIterator<int, Kandas::SlotInfo> iterRemovedSlots(removedSlots);
-    while (iterRemovedSlots.hasNext())
-        emit slotRemoved(iterRemovedSlots.next().key());
-    QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
-    while (iterSlots.hasNext())
+    foreach (Kandas::Daemon::Slot* oldSlot, removedSlots)
     {
-        iterSlots.next();
-        emit slotInfo(iterSlots.key(), iterSlots.value().device, iterSlots.value().state);
+        emit slotRemoved(oldSlot->number());
+        delete oldSlot;
     }
+    foreach (Kandas::Daemon::Slot* slot, m_slots)
+        emit slotInfo(slot->number(), slot->deviceName(), slot->state());
 }
 
 #include "engine.moc"

@@ -11,6 +11,7 @@ set(kandasd_SRCS
     device.cpp
     engine.cpp
     main.cpp
+    slot.cpp
 )
 qt4_add_dbus_adaptor(kandasd_SRCS org.kandas.xml engine.h Kandas::Daemon::Engine)
 

@@ -19,6 +19,8 @@
 #include "ndasslot.h"
 #include "ndasmodel.h"
 
+#include <KIcon>
+#include <KIconLoader>
 #include <KLocalizedString>
 
 Kandas::Client::NdasSlot::NdasSlot(int number, const QString &deviceName, const QString &blockDeviceName, Kandas::SlotState state)
@@ -63,7 +65,39 @@ Kandas::SlotState Kandas::Client::NdasSlot::state() const
 
 QVariant Kandas::Client::NdasSlot::data(int role) const
 {
-    //TODO: placeholder implementation
+    switch (role)
+    {
+        case Qt::DisplayRole:
+            return i18n("Slot %1", m_number);
+        case Qt::DecorationRole:
+            switch (m_state)
+            {
+                case Kandas::SlotOffline:
+                    return KIcon("unknown");
+                case Kandas::ConnectedSlot:
+                case Kandas::DisconnectingSlot:
+                    return KIcon("network-wired", KIconLoader::global(), QStringList() << "emblem-mounted");
+                case Kandas::DisconnectedSlot:
+                case Kandas::ConnectingSlot:
+                    return KIcon("network-wired");
+            }
+        case Kandas::Client::SecondDisplayRole:
+            switch (m_state)
+            {
+                case Kandas::SlotOffline:
+                    return i18n("Slot offline or unavailable");
+                case Kandas::ConnectedSlot:
+                    return i18n("Connected");
+                case Kandas::DisconnectedSlot:
+                    return i18n("Disconnected");
+                case Kandas::ConnectingSlot:
+                    return i18n("Connecting");
+                case Kandas::DisconnectingSlot:
+                    return i18n("Disconnecting");
+            }
+        default:
+            return QVariant();
+    }
     if (role == Qt::DisplayRole)
         return i18n("Slot %1", m_number);
     else

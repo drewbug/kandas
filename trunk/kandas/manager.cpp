@@ -19,6 +19,7 @@
 #include "manager.h"
 #include "devicemodel.h"
 #include "slotmodel.h"
+#include "ndasmodel.h"
 
 #include <iostream>
 #include <QTimer>
@@ -31,6 +32,7 @@ Kandas::Client::Manager::Manager()
     , m_interface("org.kandas", "/", QDBusConnection::systemBus(), this)
     , m_connectionClean(true)
     , m_system(Kandas::SystemUnchecked)
+    , m_model(new Kandas::Client::NdasModel)
 {
     //check version
     QString version = m_interface.interfaceVersion().value();
@@ -64,6 +66,7 @@ Kandas::Client::Manager::~Manager()
 {
     m_interface.unregisterClient();
     delete m_deviceModel;
+    delete m_model;
 }
 
 bool Kandas::Client::Manager::error() const
@@ -121,6 +124,11 @@ Kandas::Client::SlotModel *Kandas::Client::Manager::slotModel() const
     return m_slotModel;
 }
 
+Kandas::Client::NdasModel *Kandas::Client::Manager::model() const
+{
+    return m_model;
+}
+
 void Kandas::Client::Manager::changeSystem(int systemState)
 {
     if (m_system != systemState)
@@ -133,9 +141,7 @@ void Kandas::Client::Manager::changeSystem(int systemState)
 
 void Kandas::Client::Manager::changeDevice(const QString &device, const QString &serial, int state, bool hasWriteKey)
 {
-    Q_UNUSED(serial)
-    Q_UNUSED(state)
-    Q_UNUSED(hasWriteKey)
+    m_model->updateDevice(device, serial, (Kandas::DeviceState) state, hasWriteKey);
     //insert device into list if not already added
     foreach (Kandas::Client::DeviceInfo info, m_devices)
     {
@@ -150,7 +156,7 @@ void Kandas::Client::Manager::changeDevice(const QString &device, const QString 
 
 void Kandas::Client::Manager::changeSlot(int slot, const QString &device, const QString &blockDevice, int state)
 {
-    Q_UNUSED(blockDevice)
+    m_model->updateSlot(slot, device, blockDevice, (Kandas::SlotState) state);
     Kandas::SlotState slotState = (Kandas::SlotState) state;
     //search for device
     for (int d = 0; d < m_devices.count(); ++d)
@@ -188,6 +194,7 @@ void Kandas::Client::Manager::changeSlot(int slot, const QString &device, const 
 
 void Kandas::Client::Manager::removeDevice(const QString &device)
 {
+    m_model->removeDevice(device);
     for (int d = 0; d < m_devices.count(); ++d)
     {
         if (m_devices[d].device == device)
@@ -202,6 +209,7 @@ void Kandas::Client::Manager::removeDevice(const QString &device)
 
 void Kandas::Client::Manager::removeSlot(int slot)
 {
+    m_model->removeSlot(slot);
     //search for device
     for (int d = 0; d < m_devices.count(); ++d)
     {

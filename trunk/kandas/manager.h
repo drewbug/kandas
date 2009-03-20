@@ -34,6 +34,7 @@ namespace Kandas
 
         class DeviceModel;
         class SlotModel;
+        class NdasModel;
 
         struct SlotInfo
         {
@@ -70,6 +71,7 @@ namespace Kandas
 
                 DeviceModel *deviceModel() const;
                 SlotModel *slotModel() const;
+                Kandas::Client::NdasModel *model() const;
             public slots:
                 void connectDevice(const QString &device, bool readOnly);
                 void connectSlot(int slot, bool readOnly);
@@ -96,6 +98,8 @@ namespace Kandas
 
                 Kandas::SystemState m_system;
                 QList<DeviceInfo> m_devices;
+
+                Kandas::Client::NdasModel *m_model;
         };
 
     }

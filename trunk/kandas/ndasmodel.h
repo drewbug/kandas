@@ -20,6 +20,7 @@
 #define KANDAS_CLIENT_NDASMODEL_H
 
 #include <QAbstractItemModel>
+#include <kandasd/definitions.h>
 
 namespace Kandas
 {
@@ -31,6 +32,7 @@ namespace Kandas
 
         enum NdasRole
         {
+            SecondDisplayRole = Qt::UserRole + 1
         };
 
         class NdasModel : public QAbstractItemModel
@@ -42,9 +44,22 @@ namespace Kandas
                 virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
                 virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
                 virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+                virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
                 virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
                 virtual QModelIndex parent(const QModelIndex &index) const;
+
+#if 0
+                void addDevice(Kandas::Client::NdasDevice *device);
+                void removeDevice(Kandas::Client::NdasDevice *device, bool deleteDevice = true);
+                void addSlot(Kandas::Client::NdasSlot *slot);
+                void removeSlot(Kandas::Client::NdasSlot *slot, bool deleteSlot = true);
+                void updateSlot(Kandas::Client::NdasSlot *slot);
+#endif
+                void updateDevice(const QString &deviceName, const QString &serial, Kandas::DeviceState state, bool hasWriteKey);
+                void updateSlot(int slotNumber, const QString &deviceName, const QString &blockDeviceName, Kandas::SlotState state);
+                void removeDevice(const QString &deviceName);
+                void removeSlot(int slotNumber);
             private:
                 QList<Kandas::Client::NdasDevice*> m_devices;
         };

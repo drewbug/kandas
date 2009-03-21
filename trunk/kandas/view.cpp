@@ -122,7 +122,6 @@ void Kandas::Client::View::actionTriggered(const QPersistentModelIndex &index, c
         Kandas::Client::NdasSlot* slot = ndasdata_cast<Kandas::Client::NdasSlot*>(index.internalPointer());
         p->m_manager.disconnectSlot(slot->number());
     }
-    //TODO: allow to choose between read/write and readonly mode
 }
 
 #include "view.moc"

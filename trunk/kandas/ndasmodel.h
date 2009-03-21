@@ -32,8 +32,9 @@ namespace Kandas
 
         enum NdasRole
         {
-            SecondDisplayRole = Qt::UserRole + 1,
-            SecondDecorationRole
+            SecondDisplayRole = Qt::UserRole + 1, //second text line
+            SecondDecorationRole, //icon for action button at the right
+            ActionRole //some string that identifies the action associated with the action button
         };
 
         class NdasModel : public QAbstractItemModel
@@ -50,13 +51,6 @@ namespace Kandas
                 virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
                 virtual QModelIndex parent(const QModelIndex &index) const;
 
-#if 0
-                void addDevice(Kandas::Client::NdasDevice *device);
-                void removeDevice(Kandas::Client::NdasDevice *device, bool deleteDevice = true);
-                void addSlot(Kandas::Client::NdasSlot *slot);
-                void removeSlot(Kandas::Client::NdasSlot *slot, bool deleteSlot = true);
-                void updateSlot(Kandas::Client::NdasSlot *slot);
-#endif
                 void updateDevice(const QString &deviceName, const QString &serial, Kandas::DeviceState state, bool hasWriteKey);
                 void updateSlot(int slotNumber, const QString &deviceName, const QString &blockDeviceName, Kandas::SlotState state);
                 void removeDevice(const QString &deviceName);

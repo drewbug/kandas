@@ -28,6 +28,7 @@ namespace Kandas
 
         class ViewDelegate : public KWidgetItemDelegate
         {
+            Q_OBJECT
             public:
                 ViewDelegate(QAbstractItemView *view, QObject *parent = 0);
 
@@ -35,6 +36,8 @@ namespace Kandas
                 virtual void updateItemWidgets(const QList<QWidget *> widgets, const QStyleOptionViewItem &option, const QPersistentModelIndex &index) const;
                 virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
                 virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+            Q_SIGNALS:
+                void actionTriggered(const QPersistentModelIndex &index, const QString &action);
         };
 
     }

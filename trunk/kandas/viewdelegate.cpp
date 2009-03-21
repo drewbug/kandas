@@ -60,6 +60,7 @@ void Kandas::Client::ViewDelegate::updateItemWidgets(const QList<QWidget *> widg
     const QVariant decoration = index.data(Qt::DecorationRole);
     const QString secondText = index.data(Kandas::Client::SecondDisplayRole).toString();
     const QVariant secondDecoration = index.data(Kandas::Client::SecondDecorationRole);
+    const QString action = index.data(Kandas::Client::ActionRole).toString();
     //retrieve widgets
     QWidget* container = widgets[0];
     QGridLayout* layout = qobject_cast<QGridLayout*>(container->layout());
@@ -72,6 +73,12 @@ void Kandas::Client::ViewDelegate::updateItemWidgets(const QList<QWidget *> widg
     sublineWidget->setText(secondText);
     iconWidget->setIcon(qvariant_cast<QIcon>(decoration));
     buttonWidget->setIcon(qvariant_cast<QIcon>(secondDecoration));
+    buttonWidget->setAction(action);
+    if (!buttonWidget->hasIndex())
+    {
+        buttonWidget->setIndex(index);
+        connect(buttonWidget, SIGNAL(triggered(const QPersistentModelIndex &, const QString &)), this, SIGNAL(actionTriggered(const QPersistentModelIndex &, const QString &)));
+    }
     //update size of layout and text color
     container->setGeometry(QRect(QPoint(0, 0), option.rect.size()));
     //update text color in palette

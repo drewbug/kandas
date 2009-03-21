@@ -21,6 +21,7 @@
 
 #include <QIcon>
 #include <QLabel>
+#include <QPersistentModelIndex>
 
 namespace Kandas
 {
@@ -31,16 +32,27 @@ namespace Kandas
         {
             Q_OBJECT
             public:
-                IconWidget(const QSize& size, QWidget* parent = 0);
+                IconWidget(const QSize &size, QWidget *parent = 0);
+                ~IconWidget();
+
+                bool hasIndex() const;
+
                 void setActive(bool active, bool force = false);
-                void setIcon(const QIcon& icon);
+                void setAction(const QString &action);
+                void setIcon(const QIcon &icon);
+                void setIndex(const QPersistentModelIndex &index);
+            Q_SIGNALS:
+                void triggered(const QPersistentModelIndex &index, const QString &action);
             protected:
-                virtual void enterEvent(QEvent* event);
-                virtual void leaveEvent(QEvent* event);
+                virtual void enterEvent(QEvent *event);
+                virtual void leaveEvent(QEvent *event);
+                virtual void mousePressEvent(QMouseEvent *event);
             private:
                 QIcon m_icon;
                 QSize m_size;
                 bool m_active;
+                QString m_action;
+                QPersistentModelIndex* m_index;
         };
 
     }

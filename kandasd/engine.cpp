@@ -90,33 +90,43 @@ void Kandas::Daemon::Engine::unregisterClient()
 
 //NDAS management
 
-void Kandas::Daemon::Engine::connectSlot(int slot, bool readOnly)
+void Kandas::Daemon::Engine::connectSlot(int slotNumber, bool readOnly)
 {
     //check environment and slot state
     if (m_system != Kandas::SystemChecked)
         return;
-    if (m_slots.slot(slot)->state() != Kandas::DisconnectedSlot)
+    Kandas::Daemon::Slot* slot = m_slots.slot(slotNumber);
+    if (!slot)
         return;
-    m_slots.slot(slot)->setState(Kandas::ConnectingSlot);
+    if (slot->state() != Kandas::DisconnectedSlot)
+        return;
+    //update slot state
+    slot->setState(Kandas::ConnectingSlot);
+    emit slotInfo(slotNumber, slot->deviceName(), slot->blockDeviceName(), slot->state());
     //call ndasadmin
-    QStringList args; args << "enable" << "-s" << QString::number(slot);
+    QStringList args; args << "enable" << "-s" << QString::number(slotNumber);
     if (readOnly)
-        args << "-o" << "w";
-    else
         args << "-o" << "r";
+    else
+        args << "-o" << "w";
     KProcess::startDetached("ndasadmin", args);
 }
 
-void Kandas::Daemon::Engine::disconnectSlot(int slot)
+void Kandas::Daemon::Engine::disconnectSlot(int slotNumber)
 {
     //check environment and slot state
     if (m_system != Kandas::SystemChecked)
         return;
-    if (m_slots.slot(slot)->state() != Kandas::ConnectedSlot)
+    Kandas::Daemon::Slot* slot = m_slots.slot(slotNumber);
+    if (!slot)
         return;
-    m_slots.slot(slot)->setState(Kandas::DisconnectingSlot);
+    if (slot->state() != Kandas::ConnectedSlot)
+        return;
+    //update slot state
+    slot->setState(Kandas::DisconnectingSlot);
+    emit slotInfo(slotNumber, slot->deviceName(), slot->blockDeviceName(), slot->state());
     //call ndasadmin
-    QStringList args; args << "disable" << "-s" << QString::number(slot);
+    QStringList args; args << "disable" << "-s" << QString::number(slotNumber);
     KProcess::startDetached("ndasadmin", args);
 }
 

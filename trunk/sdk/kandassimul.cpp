@@ -31,53 +31,60 @@ Kandas::Simulator::~Simulator()
 {
 }
 
-void Kandas::Simulator::addDevice(const QString &device)
+void Kandas::Simulator::setDevice(const QString &device, const QString &serial, Kandas::DeviceState state, bool hasWriteKey)
 {
     if (!m_devices.contains(device))
     {
-        m_devices << device;
-        write();
+        m_devices[device] = Kandas::DeviceSimulation();
         std::cout << "Device added." << std::endl;
     }
     else
-        std::cout << "ERROR: Device was already added." << std::endl;
+        std::cout << "Device updated." << std::endl;
+    m_devices[device].serial = serial;
+    m_devices[device].state = state;
+    m_devices[device].hasWriteKey = hasWriteKey;
+    write();
 }
 
 void Kandas::Simulator::removeDevice(const QString &device)
 {
     if (m_devices.contains(device))
     {
-        m_devices.removeAll(device);
-        QMutableHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
+        m_devices.remove(device);
+        std::cout << "Device removed." << std::endl;
+        QMutableHashIterator<int, Kandas::SlotSimulation> iterSlots(m_slots);
         while (iterSlots.hasNext())
         {
             if (iterSlots.next().value().device == device)
+            {
+                std::cout << "Slot " << iterSlots.key() << " auto-removed." << std::endl;
                 iterSlots.remove();
+            }
         }
         write();
-        std::cout << "Device removed." << std::endl;
     }
     else
         std::cout << "ERROR: Device does not exist." << std::endl;
 }
 
-void Kandas::Simulator::setSlot(int slot, const QString &device, int state)
+void Kandas::Simulator::setSlot(int slot, const QString &device, Kandas::SlotState state)
 {
     if (!m_devices.contains(device))
-        m_devices << device;
-    if (m_slots.contains(slot))
     {
-        m_slots[slot].state = (Kandas::SlotState) state;
-        m_slots[slot].device = device;
-        write();
-        std::cout << "Slot updated." << std::endl;
+        std::cout << "ERROR: Device does not exist." << std::endl;
+        return;
     }
-    else
+    if (!m_slots.contains(slot))
     {
-        m_slots[slot] = Kandas::SlotInfo(device, (Kandas::SlotState) state);
-        write();
+        m_slots[slot] = Kandas::SlotSimulation();
         std::cout << "Slot added." << std::endl;
     }
+    else
+        std::cout << "Slot updated." << std::endl;
+    m_slots[slot].device = device;
+    m_slots[slot].blockDevice = QString("ndassimul-%1-0").arg(m_devices[device].serial);
+    m_slots[slot].state = state;
+    write();
 }
 
 void Kandas::Simulator::removeSlot(int slot)
@@ -94,6 +101,8 @@ void Kandas::Simulator::removeSlot(int slot)
 
 void Kandas::Simulator::write()
 {
+    QHashIterator<QString, Kandas::DeviceSimulation> iterDevices(m_devices);
+    QHashIterator<int, Kandas::SlotSimulation> iterSlots(m_slots);
     //create and flush directory
     QDir baseDir(m_baseDirectory);
     if (!baseDir.exists())
@@ -103,14 +112,34 @@ void Kandas::Simulator::write()
     if (devList.open(QIODevice::WriteOnly | QIODevice::Truncate) && devList.isWritable())
     {
         devList.write(QByteArray("#discard\n"));
-        foreach (QString device, m_devices)
-            devList.write(QString("%1\n").arg(device).toUtf8());
+        iterDevices.toFront();
+        while (iterDevices.hasNext())
+        {
+            Kandas::DeviceSimulation device = iterDevices.next().value();
+            QString deviceName = iterDevices.key();
+            QString lineTemplate("%1 discard %2 %3 discard %4 discard\n");
+            QString stateText;
+            switch (device.state)
+            {
+                case Kandas::DeviceOffline: stateText = "Offline"; break;
+                case Kandas::DeviceOnline: stateText = "Online"; break;
+                case Kandas::DeviceConnectionError: stateText = "Connection Error"; break;
+                case Kandas::DeviceLoginError: stateText = "Login Error"; break;
+            }
+            devList.write(lineTemplate
+                .arg(deviceName)
+                .arg(device.hasWriteKey ? "true" : "false")
+                .arg(device.serial)
+                .arg(stateText).toUtf8()
+            );
+        }
     }
     devList.close();
     //for each device, write slot list
-    QHashIterator<int, Kandas::SlotInfo> iterSlots(m_slots);
-    foreach (QString device, m_devices)
+    iterDevices.toFront();
+    while (iterDevices.hasNext())
     {
+        QString device = iterDevices.next().key();
         baseDir.mkpath(QString("%1/devices/%2").arg(m_baseDirectory).arg(device));
         QFile slotList(QString("%1/devices/%2/slots").arg(m_baseDirectory).arg(device));
         if (slotList.open(QIODevice::WriteOnly | QIODevice::Truncate) && slotList.isWritable())
@@ -130,14 +159,18 @@ void Kandas::Simulator::write()
     while (iterSlots.hasNext())
     {
         iterSlots.next();
-        if (iterSlots.value().state == Kandas::Undetermined)
+        if (iterSlots.value().state == Kandas::SlotOffline)
             continue;
         baseDir.mkpath(QString("%1/slots/%2").arg(m_baseDirectory).arg(iterSlots.key()));
+        QFile slotDevName(QString("%1/slots/%2/devname").arg(m_baseDirectory).arg(iterSlots.key()));
+        if (slotDevName.open(QIODevice::WriteOnly | QIODevice::Truncate) && slotDevName.isWritable())
+            slotDevName.write(iterSlots.value().blockDevice.toUtf8());
+        slotDevName.close();
         QFile slotInfo(QString("%1/slots/%2/info").arg(m_baseDirectory).arg(iterSlots.key()));
         if (slotInfo.open(QIODevice::WriteOnly | QIODevice::Truncate) && slotInfo.isWritable())
         {
             slotInfo.write(QByteArray("#discard\n"));
-            slotInfo.write((iterSlots.value().state == Kandas::Connected || iterSlots.value().state == Kandas::Disconnecting) ? "Enabled\n" : "Disabled\n");
+            slotInfo.write((iterSlots.value().state == Kandas::ConnectedSlot || iterSlots.value().state == Kandas::DisconnectingSlot) ? "Enabled\n" : "Disabled\n");
         }
         slotInfo.close();
     }
@@ -149,19 +182,19 @@ void Kandas::Simulator::loop()
     forever
     {
         std::cout << "KaNDASsimul:" << m_baseDirectory.toUtf8().data() << "> ";
-        char buffer[1024];
-        std::cin.getline(buffer, 1024);
+        const int bufferSize = 1024; char buffer[bufferSize];
+        std::cin.getline(buffer, bufferSize);
         QString command = QString(buffer).simplified();
         QStringList args = command.split(' ');
         QString commandName = args.at(0);
         if (commandName == "dev")
         {
-            if (args.count() != 2)
+            if (args.count() != 5)
             {
                 std::cout << "ERROR: Wrong argument count." << std::endl;
                 continue;
             }
-            addDevice(args[1]);
+            setDevice(args[1], args[2], (Kandas::DeviceState) args[3].toInt(), args[4].toInt() != 0);
         }
         else if (commandName == "rmdev")
         {
@@ -179,7 +212,7 @@ void Kandas::Simulator::loop()
                 std::cout << "ERROR: Wrong argument count." << std::endl;
                 continue;
             }
-            setSlot(args[1].toInt(), args[2], args[3].toInt());
+            setSlot(args[1].toInt(), args[2], (Kandas::SlotState) args[3].toInt());
         }
         else if (commandName == "rmslot")
         {
@@ -199,14 +232,20 @@ void Kandas::Simulator::loop()
             std::cout << "\n"
                 "KaNDASsimul simulates an NDAS driver's procfs in the given directory.\n"
                 "Available commands on the KaNDASsimul prompt are:\n\n"
-                "dev [name]                       Adds a device with this name.\n"
-                "rmdev [name]                     Removes a device with this name.\n"
-                "slot [number] [device] [state]   Adds or changes this slot.\n"
-                "rmslot [number]                  Removes this slot.\n"
-                "quit | exit | help               Just too obvious.\n\n"
-                "Possible states for the 'slot' command are:\n\n"
-                "10                               Slot is disconnected.\n"
-                "11                               Slot is connected.\n"
+                "dev [name] [serial] [state] [writable] Adds or changes this device.\n"
+                "rmdev [name]                           Removes this device.\n"
+                "slot [number] [device] [state]         Adds or changes this slot.\n"
+                "rmslot [number]                        Removes this slot.\n"
+                "quit | exit | help                     Just too obvious.\n\n"
+                "Possible values for 'writable' are 0 or 1.\n\n"
+                "Possible states for the 'dev' command are:\n"
+                "0                                      Device is offline.\n"
+                "1                                      Device is online.\n"
+                "10                                     Connection error on device.\n"
+                "11                                     Login error on device.\n\n"
+                "Possible states for the 'slot' command are:\n"
+                "10                                     Slot is disconnected.\n"
+                "11                                     Slot is connected.\n\n"
                 "It is not possible to emulate unavailability and transition states.\n"
             << std::endl;
         }

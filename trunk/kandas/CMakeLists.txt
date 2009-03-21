@@ -17,6 +17,7 @@ set(kandas_SRCS
     ndasslot.cpp
     slotmodel.cpp
     view.cpp
+    viewdelegate.cpp
     window.cpp
 )
 find_path(KANDASD_INTERFACE_PATH NAMES org.kandas.xml PATH_SUFFIXES kandasd)

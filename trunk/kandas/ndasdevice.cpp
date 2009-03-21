@@ -103,12 +103,17 @@ QVariant Kandas::Client::NdasDevice::data(int role) const
                 return KIcon("drive-harddisk", KIconLoader::global(), QStringList() << "emblem-mounted");
             else
                 return KIcon("drive-harddisk");
+        case Kandas::Client::SecondDecorationRole:
+            if (dominantSlotState == Kandas::DisconnectedSlot)
+                return KIcon("media-playback-start");
+            else if (dominantSlotState == Kandas::ConnectedSlot)
+                return KIcon("media-eject");
+            else //transitional state or offline
+                return KIcon();
         case Kandas::Client::SecondDisplayRole:
             switch (m_state)
             {
                 case Kandas::DeviceOnline:
-                    return i18n("Device online");
-#if 0
                     switch (dominantSlotState)
                     {
                         case Kandas::SlotOffline:
@@ -122,7 +127,6 @@ QVariant Kandas::Client::NdasDevice::data(int role) const
                         case Kandas::DisconnectingSlot:
                             return i18n("Disconnecting");
                     }
-#endif
                 case Kandas::DeviceOffline:
                     return i18n("Device offline");
                 case Kandas::DeviceConnectionError:

@@ -7,7 +7,6 @@ add_definitions (${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
 include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
 
 set(kandas_SRCS
-    devicemodel.cpp
     iconwidget.cpp
     main.cpp
     manager.cpp
@@ -15,7 +14,6 @@ set(kandas_SRCS
     ndasdevice.cpp
     ndasmodel.cpp
     ndasslot.cpp
-    slotmodel.cpp
     view.cpp
     viewdelegate.cpp
     window.cpp

@@ -21,9 +21,6 @@
 
 #include "interface.h"
 
-#include <QHash>
-#include <QList>
-class QModelIndex;
 #include <QObject>
 #include <kandasd/definitions.h>
 
@@ -32,35 +29,10 @@ namespace Kandas
     namespace Client
     {
 
-        class DeviceModel;
-        class SlotModel;
         class NdasModel;
-
-        struct SlotInfo
-        {
-            SlotInfo(int slotNumber, Kandas::SlotState slotState) : slot(slotNumber), state(slotState) {}
-            SlotInfo(const SlotInfo &other) : slot(other.slot), state(other.state) {}
-            int slot;
-            Kandas::SlotState state;
-        };
-
-        struct DeviceInfo
-        {
-            DeviceInfo(const QString &deviceName) : device(deviceName) {}
-            DeviceInfo(const DeviceInfo &other) : device(other.device), slotList(other.slotList) {}
-            QString device;
-            QList<SlotInfo> slotList;
-        };
-
-        enum Role { //role extensions for QAbstractItemModel::data
-            ConnectionStatusRole = Qt::UserRole + 1,
-            ItemIdentifierRole
-        };
 
         class Manager : public QObject
         {
-            friend class DeviceModel;
-            friend class SlotModel;
             Q_OBJECT
             public:
                 Manager();
@@ -69,17 +41,12 @@ namespace Kandas
                 bool error() const;
                 QVariant errorContent(int role) const; //returns QString() if no problem has been found
 
-                DeviceModel *deviceModel() const;
-                SlotModel *slotModel() const;
                 Kandas::Client::NdasModel *model() const;
             public slots:
                 void connectDevice(const QString &device, bool readOnly);
                 void connectSlot(int slot, bool readOnly);
                 void disconnectDevice(const QString &device);
                 void disconnectSlot(int slot);
-
-                void selectedDeviceChanged(const QModelIndex &device);
-                void resetDeviceSelection();
             signals:
                 void initializationComplete(const QString &daemonVersion);
             private slots:
@@ -90,15 +57,10 @@ namespace Kandas
                 void removeSlot(int slot);
                 void initComplete();
             private:
-                DeviceModel *m_deviceModel;
-                SlotModel *m_slotModel;
-
                 OrgKandasInterface m_interface;
                 bool m_connectionClean;
 
                 Kandas::SystemState m_system;
-                QList<DeviceInfo> m_devices;
-
                 Kandas::Client::NdasModel *m_model;
         };
 

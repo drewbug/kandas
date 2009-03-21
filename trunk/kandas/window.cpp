@@ -39,7 +39,7 @@ Kandas::Client::MainWindow::MainWindow()
     setCentralWidget(m_view);
     connect(m_view, SIGNAL(initializationComplete(const QString &)), this, SLOT(initializationComplete(const QString &)));
     //late GUI initialisation
-    setupGUI();
+    setupGUI(QSize(400, 300));
     setWindowIcon(KIcon("folder-remote"));
 }
 
@@ -49,38 +49,6 @@ Kandas::Client::MainWindow::~MainWindow()
 
 void Kandas::Client::MainWindow::setupActions()
 {
-    //TODO: States of actions according to selection states.
-    //connect device
-    KActionMenu *actConnDev = new KActionMenu(KIcon("media-playback-start"), i18n("Connect device"), actionCollection());
-    actConnDev->setDelayed(false);
-    actConnDev->setStickyMenu(true);
-    KAction *actConnDevRead = new KAction(KIcon("media-playback-start"), i18n("Read access"), actConnDev);
-    actConnDev->addAction(actConnDevRead);
-    KAction *actConnDevWrite = new KAction(KIcon("media-record"), i18n("Write access"), actConnDev);
-    actConnDev->addAction(actConnDevWrite);
-    actionCollection()->addAction("kandas_device_connect", actConnDev);
-    //disconnect device
-    KAction *actDiscDev = new KAction(KIcon("media-eject"), i18n("Disconnect device"), actionCollection());
-    actionCollection()->addAction("kandas_device_disconnect", actDiscDev);
-    //connect slot
-    KActionMenu *actConnSlot = new KActionMenu(KIcon("media-playback-start"), i18n("Connect slot"), actionCollection());
-    actConnSlot->setDelayed(false);
-    actConnSlot->setStickyMenu(true);
-    KAction *actConnSlotRead = new KAction(KIcon("media-playback-start"), i18n("Read access"), actConnSlot);
-    actConnSlot->addAction(actConnSlotRead);
-    KAction *actConnSlotWrite = new KAction(KIcon("media-record"), i18n("Write access"), actConnSlot);
-    actConnSlot->addAction(actConnSlotWrite);
-    actionCollection()->addAction("kandas_slot_connect", actConnSlot);
-    //disconnect slot
-    KAction *actDiscSlot = new KAction(KIcon("media-eject"), i18n("Disconnect slot"), actionCollection());
-    actionCollection()->addAction("kandas_slot_disconnect", actDiscSlot);
-    //meta-object connections
-    connect(actConnDevRead, SIGNAL(triggered()), m_view, SLOT(connectDeviceRead()));
-    connect(actConnDevWrite, SIGNAL(triggered()), m_view, SLOT(connectDeviceWrite()));
-    connect(actDiscDev, SIGNAL(triggered()), m_view, SLOT(disconnectDevice()));
-    connect(actConnSlotRead, SIGNAL(triggered()), m_view, SLOT(connectSlotRead()));
-    connect(actConnSlotWrite, SIGNAL(triggered()), m_view, SLOT(connectSlotWrite()));
-    connect(actDiscSlot, SIGNAL(triggered()), m_view, SLOT(disconnectSlot()));
 }
 
 void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVersion)

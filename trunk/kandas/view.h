@@ -19,8 +19,7 @@
 #ifndef KANDAS_CLIENT_VIEW_H
 #define KANDAS_CLIENT_VIEW_H
 
-class QModelIndex;
-#include <QWidget>
+#include <QTreeView>
 
 namespace Kandas
 {
@@ -28,21 +27,12 @@ namespace Kandas
     {
         class ViewPrivate;
 
-        class View : public QWidget
+        class View : public QTreeView
         {
             Q_OBJECT
             public:
                 View(QWidget *parent = 0);
                 ~View();
-            public slots:
-                void resetDeviceSelection();
-
-                void connectDeviceRead();
-                void connectDeviceWrite();
-                void connectSlotRead();
-                void connectSlotWrite();
-                void disconnectDevice();
-                void disconnectSlot();
             signals:
                 void initializationComplete(const QString &name);
             private:

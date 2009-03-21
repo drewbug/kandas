@@ -14,6 +14,7 @@ set(kandas_SRCS
     ndasdevice.cpp
     ndasmodel.cpp
     ndasslot.cpp
+    ndassystemmodel.cpp
     view.cpp
     viewdelegate.cpp
     window.cpp

@@ -30,6 +30,7 @@ namespace Kandas
     {
 
         class NdasModel;
+        class NdasSystemModel;
 
         class Manager : public QObject
         {
@@ -38,18 +39,17 @@ namespace Kandas
                 Manager();
                 ~Manager();
 
-                bool error() const;
-                QVariant errorContent(int role) const; //returns QString() if no problem has been found
-
                 Kandas::Client::NdasModel *model() const;
-            public slots:
+                Kandas::Client::NdasSystemModel *systemModel() const;
+            public Q_SLOTS:
                 void connectDevice(const QString &device, bool readOnly);
                 void connectSlot(int slot, bool readOnly);
                 void disconnectDevice(const QString &device);
                 void disconnectSlot(int slot);
-            signals:
+            Q_SIGNALS:
                 void initializationComplete(const QString &daemonVersion);
-            private slots:
+                void systemStateChanged(Kandas::SystemState state);
+            private Q_SLOTS:
                 void changeSystem(int systemState);
                 void changeDevice(const QString &device, const QString &serial, int state, bool hasWriteKey);
                 void changeSlot(int slot, const QString &device, const QString &blockDevice, int state);
@@ -58,10 +58,8 @@ namespace Kandas
                 void initComplete();
             private:
                 OrgKandasInterface m_interface;
-                bool m_connectionClean;
-
-                Kandas::SystemState m_system;
                 Kandas::Client::NdasModel *m_model;
+                Kandas::Client::NdasSystemModel *m_systemModel;
         };
 
     }

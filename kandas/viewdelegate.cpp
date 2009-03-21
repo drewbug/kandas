@@ -73,7 +73,7 @@ void Kandas::Client::ViewDelegate::updateItemWidgets(const QList<QWidget *> widg
     iconWidget->setIcon(qvariant_cast<QIcon>(decoration));
     buttonWidget->setIcon(qvariant_cast<QIcon>(secondDecoration));
     //update size of layout and text color
-    container->setGeometry(QRect(QPoint(0, 0), sizeHint(option, index)));
+    container->setGeometry(QRect(QPoint(0, 0), option.rect.size()));
     //update text color in palette
     QPalette basePalette = iconWidget->palette();
     if (option.state & QStyle::State_Selected)

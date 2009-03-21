@@ -112,89 +112,6 @@ QModelIndex Kandas::Client::NdasModel::parent(const QModelIndex &index) const
     return QModelIndex();
 }
 
-#if 0
-
-void Kandas::Client::NdasModel::addDevice(Kandas::Client::NdasDevice *device)
-{
-    int row = m_devices.count();
-    beginInsertRows(QModelIndex(), row, row);
-    m_devices << device;
-    endInsertRows();
-}
-
-void Kandas::Client::NdasModel::removeDevice(Kandas::Client::NdasDevice *device, bool deleteDevice)
-{
-    //find device in list
-    int row = m_devices.indexOf(device);
-    if (row == -1)
-        return;
-    //remove device from model
-    beginRemoveRows(QModelIndex(), row, row);
-    m_devices.removeAll(device);
-    endRemoveRows();
-    //delete device
-    if (deleteDevice)
-        deleteDevice;
-}
-
-void Kandas::Client::NdasModel::addSlot(Kandas::Client::NdasSlot *slot)
-{
-    //find device
-    int deviceIndex = -1;
-    for (int i = 0; i < m_devices.count(); ++i)
-        if (slot->deviceName() == m_devices[i]->name())
-            deviceIndex = i;
-    if (deviceIndex == -1)
-        return;
-    //insert slot
-    int row = m_devices[deviceIndex]->slotList().count();
-    QModelIndex parent = createIndex(deviceIndex, 0, (void*) m_devices[deviceIndex]);
-    beginInsertRows(parent, row, row);
-    m_devices[deviceIndex]->addSlot(slot);
-    endInsertRows();
-}
-
-void Kandas::Client::NdasModel::removeSlot(Kandas::Client::NdasSlot *slot, bool deleteSlot)
-{
-    //find device and slot
-    int deviceIndex = -1, slotIndex = -1;
-    for (int i = 0; i < m_devices.count(); ++i)
-    {
-        if (m_devices[i]->slotList().contains(slot))
-        {
-            deviceIndex = i;
-            slotIndex = m_devices[i]->slotList().indexOf(slot);
-        }
-    }
-    if (deviceIndex == -1 || slotIndex == -1)
-        return;
-    //remove slot from model
-    QModelIndex parent = createIndex(deviceIndex, 0, (void*) m_devices[deviceIndex]);
-    beginRemoveRows(parent, slotIndex, slotIndex);
-    m_devices[deviceIndex]->removeSlot(slot);
-    endRemoveRows();
-    //delete slot
-    if (deleteSlot)
-        delete slot;
-}
-
-void Kandas::Client::NdasModel::updateSlot(Kandas::Client::NdasSlot *slot)
-{
-    //check association of slot and device
-    for (int i = 0; i < m_devices.count(); ++i)
-    {
-        if (m_devices[i]->slotList().contains(slot))
-        {
-            if (slot->deviceName() != m_devices[i]->name())
-            {
-                //association is broken because device name in slot has changed
-            }
-        }
-    }
-}
-
-#endif
-
 void Kandas::Client::NdasModel::updateDevice(const QString &deviceName, const QString &serial, Kandas::DeviceState state, bool hasWriteKey)
 {
     //check if device exists
@@ -322,7 +239,18 @@ void Kandas::Client::NdasModel::removeDevice(const QString &deviceName)
         Kandas::Client::NdasDevice* device = m_devices[d];
         if (device->name() == deviceName)
         {
-            //remove from model
+            //workaround for a problem in KWidgetItemDelegate: explicitly remove all slots in this device
+            QModelIndex parent = createIndex(d, 0, (void*) device);
+            int slotCount = device->slotList().count();
+            beginRemoveRows(parent, 0, slotCount - 1);
+            QList<Kandas::Client::NdasSlot*> slotList = device->slotList();
+            foreach (Kandas::Client::NdasSlot* slot, slotList)
+            {
+                device->removeSlot(slot);
+                delete slot;
+            }
+            endRemoveRows();
+            //remove device from model
             beginRemoveRows(QModelIndex(), d, d);
             m_devices.removeAt(d);
             endRemoveRows();

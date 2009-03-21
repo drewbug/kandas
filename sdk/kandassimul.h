@@ -27,6 +27,19 @@
 namespace Kandas
 {
 
+    struct DeviceSimulation
+    {
+        QString serial;
+        Kandas::DeviceState state;
+        bool hasWriteKey;
+    };
+
+    struct SlotSimulation
+    {
+        QString device, blockDevice;
+        Kandas::SlotState state;
+    };
+
     class Simulator
     {
         public:
@@ -35,14 +48,14 @@ namespace Kandas
 
             void loop();
         protected:
-            void addDevice(const QString &device);
+            void setDevice(const QString &device, const QString &serial, Kandas::DeviceState state, bool hasWriteKey);
             void removeDevice(const QString &device);
-            void setSlot(int slot, const QString &device, int state);
+            void setSlot(int slot, const QString &device, Kandas::SlotState state);
             void removeSlot(int slot);
             void write();
         private:
-            QHash<int, Kandas::SlotInfo> m_slots;
-            QList<QString> m_devices;
+            QHash<QString, Kandas::DeviceSimulation> m_devices;
+            QHash<int, Kandas::SlotSimulation> m_slots;
             QString m_baseDirectory;
     };
 

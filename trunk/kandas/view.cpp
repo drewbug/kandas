@@ -59,6 +59,8 @@ Kandas::Client::ViewPrivate::ViewPrivate(Kandas::Client::View *parent)
     m_errorView.setModel(m_manager.systemModel());
     m_errorView.setSelectionMode(QAbstractItemView::NoSelection);
     m_errorView.setHeaderHidden(true);
+    m_errorView.setItemsExpandable(false);
+    m_errorView.setRootIsDecorated(false);
 }
 
 Kandas::Client::View::View(QWidget *parent)

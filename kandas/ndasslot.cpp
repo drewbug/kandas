@@ -81,6 +81,18 @@ QVariant Kandas::Client::NdasSlot::data(int role) const
                 case Kandas::ConnectingSlot:
                     return KIcon("network-wired");
             }
+        case Kandas::Client::SecondDecorationRole:
+            switch (m_state)
+            {
+                case Kandas::ConnectedSlot:
+                    return KIcon("media-playback-start");
+                case Kandas::DisconnectedSlot:
+                    return KIcon("media-eject");
+                case Kandas::SlotOffline:
+                case Kandas::ConnectingSlot:
+                case Kandas::DisconnectingSlot:
+                    return KIcon();
+            }
         case Kandas::Client::SecondDisplayRole:
             switch (m_state)
             {

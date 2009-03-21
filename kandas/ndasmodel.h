@@ -32,7 +32,8 @@ namespace Kandas
 
         enum NdasRole
         {
-            SecondDisplayRole = Qt::UserRole + 1
+            SecondDisplayRole = Qt::UserRole + 1,
+            SecondDecorationRole
         };
 
         class NdasModel : public QAbstractItemModel

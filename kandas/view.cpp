@@ -18,13 +18,12 @@
 
 #include "view.h"
 #include "devicemodel.h"
-#include "iconwidget.h"
 #include "manager.h"
 #include "ndasmodel.h"
 #include "slotmodel.h"
+#include "viewdelegate.h"
 
 #include <QAbstractTextDocumentLayout>
-#include <QApplication>
 #include <QLabel>
 #include <QListView>
 #include <QPainter>
@@ -38,17 +37,6 @@ namespace Kandas
 {
     namespace Client
     {
-
-        class ViewDelegate : public KWidgetItemDelegate
-        {
-            public:
-                ViewDelegate(QAbstractItemView *view, QObject *parent = 0);
-
-                virtual QList<QWidget *> createItemWidgets() const;
-                virtual void updateItemWidgets(const QList<QWidget*> widgets, const QStyleOptionViewItem& option, const QPersistentModelIndex& index) const;
-                virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-                virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
-        };
 
         class ViewPrivate
         {
@@ -163,90 +151,6 @@ void Kandas::Client::View::disconnectSlot()
     QModelIndex selected = p->m_slotList.selectionModel()->currentIndex();
     int slot = p->m_manager.slotModel()->data(selected, Kandas::Client::ItemIdentifierRole).toInt();
     p->m_manager.disconnectSlot(slot);
-}
-
-Kandas::Client::ViewDelegate::ViewDelegate(QAbstractItemView *view, QObject *parent)
-    : KWidgetItemDelegate(view, parent)
-{
-}
-
-QList<QWidget *> Kandas::Client::ViewDelegate::createItemWidgets() const
-{
-    //container widget
-    QWidget *container = new QWidget;
-    QGridLayout *layout = new QGridLayout;
-    container->setLayout(layout);
-    //contained widgets
-    static const QSize iconSize(48, 48);
-    Kandas::Client::IconWidget* iconWidget = new Kandas::Client::IconWidget(iconSize);
-    iconWidget->setEnabled(false);
-    Kandas::Client::IconWidget* buttonWidget = new Kandas::Client::IconWidget(iconSize);
-    QLabel* headlineWidget = new QLabel;
-    QLabel* sublineWidget = new QLabel;
-    QFont headlineFont = headlineWidget->font();
-    headlineFont.setBold(true);
-    headlineWidget->setFont(headlineFont);
-    //build layout
-    layout->addWidget(iconWidget, 0, 0, 2, 1);
-    layout->addWidget(headlineWidget, 0, 1, Qt::AlignLeft | Qt::AlignBottom);
-    layout->addWidget(sublineWidget, 1, 1, Qt::AlignLeft | Qt::AlignTop);
-    layout->addWidget(buttonWidget, 0, 2, 2, 1);
-    return QList<QWidget *>() << container;
-}
-
-#include <KIcon>
-
-void Kandas::Client::ViewDelegate::updateItemWidgets(const QList<QWidget*> widgets, const QStyleOptionViewItem& option, const QPersistentModelIndex& index) const
-{
-    //retrieve data
-    const QString displayText = index.model()->data(index, Qt::DisplayRole).toString();
-    const QVariant decoration = index.model()->data(index, Qt::DecorationRole);
-    const QString statusText = index.model()->data(index, Kandas::Client::ConnectionStatusRole).toString();
-    //retrieve widgets
-    QWidget* container = widgets[0];
-    QGridLayout* layout = qobject_cast<QGridLayout*>(container->layout());
-    Kandas::Client::IconWidget* iconWidget = qobject_cast<Kandas::Client::IconWidget*>(layout->itemAtPosition(0, 0)->widget());
-    QLabel* headlineWidget = qobject_cast<QLabel*>(layout->itemAtPosition(0, 1)->widget());
-    QLabel* sublineWidget = qobject_cast<QLabel*>(layout->itemAtPosition(1, 1)->widget());
-    Kandas::Client::IconWidget* buttonWidget = qobject_cast<Kandas::Client::IconWidget*>(layout->itemAtPosition(0, 2)->widget());
-    //update icon
-    iconWidget->setIcon(qvariant_cast<QIcon>(decoration));
-    headlineWidget->setText(displayText);
-    sublineWidget->setText(statusText);
-    buttonWidget->setIcon(KIcon("preferences-plugin"));
-    //update size of layout and text color
-    container->setGeometry(QRect(QPoint(0, 0), sizeHint(option, index)));
-    //update text color in palette
-    QPalette basePalette = iconWidget->palette();
-    if (option.state & QStyle::State_Selected)
-        basePalette.setBrush(QPalette::Text, option.palette.highlightedText());
-    headlineWidget->setPalette(basePalette);
-    sublineWidget->setPalette(basePalette);
-    //DEBUG
-    QTreeView* tv = qobject_cast<QTreeView*>(itemView());
-    if (tv)
-        tv->expand(index);
-}
-
-void Kandas::Client::ViewDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    //paint background for selected or hovered item
-    QStyleOptionViewItemV4 opt = option;
-    itemView()->style()->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, 0);
-    //paint widgets
-    KWidgetItemDelegate::paintWidgets(painter, option, index); //is deprecated in KDE 4.2, but we want to support 4.1 also
-}
-
-QSize Kandas::Client::ViewDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    Q_UNUSED(option)
-    Q_UNUSED(index)
-    //only the height of the size hint is interesting
-    static const int topMargin = QApplication::style()->pixelMetric(QStyle::PM_LayoutTopMargin);
-    static const int bottomMargin = QApplication::style()->pixelMetric(QStyle::PM_LayoutBottomMargin);
-    static const int iconSize = 48;
-    static const int verticalSizeHint = iconSize + topMargin + bottomMargin;
-    return QSize(itemView()->viewport()->width(), verticalSizeHint);
 }
 
 #include "view.moc"

@@ -18,32 +18,31 @@
 
 #include "manager.h"
 #include "ndasmodel.h"
+#include "ndassystemmodel.h"
 
 #include <iostream>
 #include <QTimer>
-#include <KIcon>
 #include <KLocalizedString>
 
 Kandas::Client::Manager::Manager()
     : m_interface("org.kandas", "/", QDBusConnection::systemBus(), this)
-    , m_connectionClean(true)
-    , m_system(Kandas::SystemUnchecked)
     , m_model(new Kandas::Client::NdasModel)
+    , m_systemModel(new Kandas::Client::NdasSystemModel)
 {
     //check version
     QString version = m_interface.interfaceVersion().value();
     if (version.isEmpty()) //no KaNDASd instance running
     {
-        std::cerr << i18n("ERROR: KaNDASd is not running.").toUtf8().data() << std::endl;
-        m_connectionClean = false;
+        m_systemModel->setConnectionError(i18n("KaNDASd is not running."));
+        QTimer::singleShot(0, this, SLOT(initComplete()));
     }
-    else if (version != "0.2")
+    else if (version != QLatin1String("0.2"))
     {
-        std::cerr << i18n("ERROR: Unknown KaNDASd version \"%1\" detected.", version).toUtf8().data() << std::endl;
-        m_connectionClean = false;
+        m_systemModel->setConnectionError(i18n("Unknown KaNDASd version \"%1\" detected.", version));
+        QTimer::singleShot(0, this, SLOT(initComplete()));
     }
     //connect interface
-    if (m_connectionClean)
+    else
     {
         connect(&m_interface, SIGNAL(initComplete()), this, SLOT(initComplete()));
         connect(&m_interface, SIGNAL(systemInfo(int)), this, SLOT(changeSystem(int)));
@@ -52,79 +51,32 @@ Kandas::Client::Manager::Manager()
         connect(&m_interface, SIGNAL(deviceRemoved(const QString &)), this, SLOT(removeDevice(const QString &)));
         connect(&m_interface, SIGNAL(slotRemoved(int)), this, SLOT(removeSlot(int)));
         m_interface.registerClient();
+        return;
     }
-    else
-        QTimer::singleShot(0, this, SLOT(initComplete()));
 }
 
 Kandas::Client::Manager::~Manager()
 {
     m_interface.unregisterClient();
     delete m_model;
+    delete m_systemModel;
 }
-
-#if 0
-//TODO: create a Kandas::NdasSystemModel that mimics this functionality
-
-bool Kandas::Client::Manager::error() const
-{
-    return !m_connectionClean || m_system != Kandas::SystemChecked;
-}
-
-QVariant Kandas::Client::Manager::errorContent(int role) const
-{
-    if (!m_connectionClean)
-    {
-        switch (role)
-        {
-            case Qt::DisplayRole:
-                return i18n("Could not connect to KaNDASd service");
-            case Kandas::Client::ConnectionStatusRole:
-                return i18n("Please check your installation.");
-            case Qt::DecorationRole:
-                return KIcon("dialog-cancel");
-        }
-    }
-    else if (m_system != Kandas::SystemChecked)
-    {
-        switch (role)
-        {
-            case Qt::DisplayRole:
-                switch ((int) m_system) //without (int), I get an absurd warning about missing handling of SaneEnvironment
-                {
-                    case Kandas::SystemUnchecked:
-                        return i18n("Waiting for system check");
-                    case Kandas::NoDriverFound:
-                        return i18n("NDAS driver is not loaded");
-                    case Kandas::NoAdminFound:
-                        return i18n("NDAS admin program could not be found");
-                }
-            case Kandas::Client::ConnectionStatusRole:
-                if (m_system == Kandas::SystemUnchecked)
-                    return QString();
-                else
-                    return i18n("Please check your installation.");
-            case Qt::DecorationRole:
-                return KIcon("dialog-cancel");
-        }
-    }
-    return QVariant();
-}
-
-#endif
 
 Kandas::Client::NdasModel *Kandas::Client::Manager::model() const
 {
     return m_model;
 }
 
+Kandas::Client::NdasSystemModel *Kandas::Client::Manager::systemModel() const
+{
+    return m_systemModel;
+}
+
 void Kandas::Client::Manager::changeSystem(int systemState)
 {
-    if (m_system != systemState)
-    {
-        m_system = (Kandas::SystemState) systemState;
-        //TODO: let model react on new system state
-    }
+    Kandas::SystemState state = (Kandas::SystemState) systemState;
+    m_systemModel->setState(state);
+    emit systemStateChanged(state); //lets the view change its model if necessary
 }
 
 void Kandas::Client::Manager::changeDevice(const QString &device, const QString &serial, int state, bool hasWriteKey)
@@ -150,10 +102,10 @@ void Kandas::Client::Manager::removeSlot(int slot)
 void Kandas::Client::Manager::initComplete()
 {
     disconnect(&m_interface, SIGNAL(initComplete()), this, SLOT(initComplete()));
-    if (m_connectionClean)
+    if (m_systemModel->connectionError().isEmpty())
         emit initializationComplete(m_interface.daemonVersion());
     else
-    emit initializationComplete(QString());
+        emit initializationComplete(QString());
 }
 
 void Kandas::Client::Manager::connectDevice(const QString &device, bool readOnly)

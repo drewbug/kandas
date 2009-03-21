@@ -19,7 +19,10 @@
 #include "view.h"
 #include "manager.h"
 #include "ndasmodel.h"
+#include "ndassystemmodel.h"
 #include "viewdelegate.h"
+
+#include <QTreeView>
 
 namespace Kandas
 {
@@ -32,31 +35,55 @@ namespace Kandas
                 ViewPrivate(Kandas::Client::View *parent);
 
                 Manager m_manager;
-                ViewDelegate m_delegate;
+                QTreeView m_normalView, m_errorView;
+                ViewDelegate m_normalDelegate, m_errorDelegate;
         };
 
     }
 }
 
 Kandas::Client::ViewPrivate::ViewPrivate(Kandas::Client::View *parent)
-    : m_delegate(parent, parent)
+    : m_normalDelegate(&m_normalView, parent)
+    , m_errorDelegate(&m_errorView, parent)
 {
+    m_normalView.setItemDelegate(&m_normalDelegate);
+    m_normalView.setHeaderHidden(true);
+    m_normalView.setModel(m_manager.model());
+    m_errorView.setItemDelegate(&m_errorDelegate);
+    m_errorView.setHeaderHidden(true);
+    m_errorView.setModel(m_manager.systemModel());
 }
 
 Kandas::Client::View::View(QWidget *parent)
-    : QTreeView(parent)
+    : QStackedWidget(parent)
     , p(new Kandas::Client::ViewPrivate(this))
 {
-    setItemDelegate(&p->m_delegate);
-    setModel(p->m_manager.model());
-    setHeaderHidden(true);
+    addWidget(&p->m_normalView);
+    addWidget(&p->m_errorView);
+    if (p->m_manager.systemModel()->clean())
+        setCurrentWidget(&p->m_normalView);
+    else
+        setCurrentWidget(&p->m_errorView);
 
     connect(&p->m_manager, SIGNAL(initializationComplete(const QString &)), this, SIGNAL(initializationComplete(const QString &)));
+    connect(&p->m_manager, SIGNAL(systemStateChanged(Kandas::SystemState)), this, SLOT(systemStateChanged(Kandas::SystemState)));
 }
 
 Kandas::Client::View::~View()
 {
     delete p;
+}
+
+void Kandas::Client::View::systemStateChanged(Kandas::SystemState state)
+{
+    Q_UNUSED(state)
+    QWidget* newWidget;
+    if (p->m_manager.systemModel()->clean())
+        newWidget = &p->m_normalView;
+    else
+        newWidget = &p->m_errorView;
+    if (currentWidget() != newWidget)
+        setCurrentWidget(newWidget);
 }
 
 #include "view.moc"

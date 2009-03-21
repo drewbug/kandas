@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2008-2009 Stefan Majewsky <majewsky@gmx.net>
+ *   Copyright 2009 Stefan Majewsky <majewsky@gmx.net>
  *
  *   This program is free software; you can redistribute it and/or
  *   modify it under the terms of the GNU General Public
@@ -16,33 +16,37 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KANDAS_CLIENT_VIEW_H
-#define KANDAS_CLIENT_VIEW_H
+#ifndef KANDAS_CLIENT_NDASSYSTEMMODEL_H
+#define KANDAS_CLIENT_NDASSYSTEMMODEL_H
 
-#include <QStackedWidget>
+#include <QStandardItem>
 #include <kandasd/definitions.h>
 
 namespace Kandas
 {
     namespace Client
     {
-        class ViewPrivate;
 
-        class View : public QStackedWidget
+        class NdasSystemModel : public QStandardItemModel
         {
-            Q_OBJECT
             public:
-                View(QWidget *parent = 0);
-                ~View();
-            Q_SIGNALS:
-                void initializationComplete(const QString &name);
-            private Q_SLOTS:
-                void systemStateChanged(Kandas::SystemState state);
+                NdasSystemModel(QObject *parent = 0);
+
+                bool clean() const;
+                QString connectionError() const;
+                Kandas::SystemState state() const;
+
+                void setConnectionError(const QString &errorMessage);
+                void setState(Kandas::SystemState state);
             private:
-                ViewPrivate *p;
+                void updateContents();
+
+                QStandardItem *m_item;
+                QString m_errorMessage;
+                Kandas::SystemState m_state;
         };
 
     }
 }
 
-#endif // KANDAS_CLIENT_VIEW_H
+#endif // KANDAS_CLIENT_NDASSYSTEMMODEL_H

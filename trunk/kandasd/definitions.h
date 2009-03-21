@@ -19,8 +19,6 @@
 #ifndef KANDAS_DEFINITIONS_H
 #define KANDAS_DEFINITIONS_H
 
-#include <QString>
-
 namespace Kandas
 {
 
@@ -47,13 +45,6 @@ namespace Kandas
         SystemChecked = 1,
         NoDriverFound = 10, //kernel module is not loaded
         NoAdminFound //the ndasadmin program could not be found in $PATH
-    };
-
-    struct SlotInfo
-    {
-        SlotState state;
-        QString device;
-        SlotInfo(const QString &slotDevice = QString(), SlotState slotState = Kandas::SlotOffline) : state(slotState), device(slotDevice) {}
     };
 
 }

@@ -19,9 +19,11 @@
 #ifndef KANDAS_CLIENT_NDASDEVICE_H
 #define KANDAS_CLIENT_NDASDEVICE_H
 
-#include <QList>
-#include <kandasd/definitions.h>
 #include "ndasdata.h"
+
+#include <QList>
+#include <QString>
+#include <kandasd/definitions.h>
 
 namespace Kandas
 {

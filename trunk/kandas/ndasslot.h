@@ -19,8 +19,10 @@
 #ifndef KANDAS_CLIENT_NDASSLOT_H
 #define KANDAS_CLIENT_NDASSLOT_H
 
-#include <kandasd/definitions.h>
 #include "ndasdata.h"
+
+#include <QString>
+#include <kandasd/definitions.h>
 
 namespace Kandas
 {

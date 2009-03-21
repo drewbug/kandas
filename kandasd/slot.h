@@ -21,6 +21,7 @@
 
 #include "definitions.h"
 #include <QList>
+#include <QString>
 
 namespace Kandas
 {

@@ -18,15 +18,29 @@
 
 #include "iconwidget.h"
 
-Kandas::Client::IconWidget::IconWidget(const QSize& size, QWidget* parent)
+#include <QMouseEvent>
+
+Kandas::Client::IconWidget::IconWidget(const QSize &size, QWidget *parent)
     : QLabel(parent)
     , m_size(size)
     , m_active(false)
+    , m_index(0)
 {
+    qRegisterMetaType<QPersistentModelIndex>("QPersistentModelIndex");
     setMinimumSize(size);
     setMaximumSize(size);
     //initialize pixmap
     setActive(m_active, true);
+}
+
+Kandas::Client::IconWidget::~IconWidget()
+{
+    delete m_index;
+}
+
+bool Kandas::Client::IconWidget::hasIndex() const
+{
+    return m_index != 0;
 }
 
 void Kandas::Client::IconWidget::setActive(bool active, bool force)
@@ -38,22 +52,39 @@ void Kandas::Client::IconWidget::setActive(bool active, bool force)
     }
 }
 
-void Kandas::Client::IconWidget::setIcon(const QIcon& icon)
+void Kandas::Client::IconWidget::setAction(const QString &action)
+{
+    m_action = action;
+}
+
+void Kandas::Client::IconWidget::setIcon(const QIcon &icon)
 {
     m_icon = icon;
     setActive(m_active, true);
 }
 
-void Kandas::Client::IconWidget::enterEvent(QEvent* event)
+void Kandas::Client::IconWidget::setIndex(const QPersistentModelIndex &index)
+{
+    delete m_index;
+    m_index = new QPersistentModelIndex(index);
+}
+
+void Kandas::Client::IconWidget::enterEvent(QEvent *event)
 {
     Q_UNUSED(event)
     setActive(isEnabled());
 }
 
-void Kandas::Client::IconWidget::leaveEvent(QEvent* event)
+void Kandas::Client::IconWidget::leaveEvent(QEvent *event)
 {
     Q_UNUSED(event)
     setActive(false);
+}
+
+void Kandas::Client::IconWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton && isEnabled() && m_index)
+        emit triggered(*m_index, m_action);
 }
 
 #include "iconwidget.moc"

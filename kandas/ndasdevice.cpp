@@ -110,6 +110,13 @@ QVariant Kandas::Client::NdasDevice::data(int role) const
                 return KIcon("media-eject");
             else //transitional state or offline
                 return KIcon();
+        case Kandas::Client::ActionRole:
+            if (dominantSlotState == Kandas::DisconnectedSlot)
+                return QLatin1String("connect-device");
+            else if (dominantSlotState == Kandas::ConnectedSlot)
+                return QLatin1String("disconnect-device");
+            else //transitional state or offline
+                return QString();
         case Kandas::Client::SecondDisplayRole:
             switch (m_state)
             {

@@ -18,7 +18,9 @@
 
 #include "view.h"
 #include "manager.h"
+#include "ndasdevice.h"
 #include "ndasmodel.h"
+#include "ndasslot.h"
 #include "ndassystemmodel.h"
 #include "viewdelegate.h"
 
@@ -67,6 +69,8 @@ Kandas::Client::View::View(QWidget *parent)
 
     connect(&p->m_manager, SIGNAL(initializationComplete(const QString &)), this, SIGNAL(initializationComplete(const QString &)));
     connect(&p->m_manager, SIGNAL(systemStateChanged(Kandas::SystemState)), this, SLOT(systemStateChanged(Kandas::SystemState)));
+    connect(&p->m_normalDelegate, SIGNAL(actionTriggered(const QPersistentModelIndex &, const QString &)), this, SLOT(actionTriggered(const QPersistentModelIndex &, const QString &)));
+
 }
 
 Kandas::Client::View::~View()
@@ -84,6 +88,32 @@ void Kandas::Client::View::systemStateChanged(Kandas::SystemState state)
         newWidget = &p->m_errorView;
     if (currentWidget() != newWidget)
         setCurrentWidget(newWidget);
+}
+
+void Kandas::Client::View::actionTriggered(const QPersistentModelIndex &index, const QString &action)
+{
+    QModelIndex dataIndex(index);
+    if (action == QLatin1String("connect-device"))
+    {
+        Kandas::Client::NdasDevice* device = ndasdata_cast<Kandas::Client::NdasDevice*>(index.internalPointer());
+        p->m_manager.connectDevice(device->name(), true);
+    }
+    else if (action == QLatin1String("disconnect-device"))
+    {
+        Kandas::Client::NdasDevice* device = ndasdata_cast<Kandas::Client::NdasDevice*>(index.internalPointer());
+        p->m_manager.disconnectDevice(device->name());
+    }
+    else if (action == QLatin1String("connect-slot"))
+    {
+        Kandas::Client::NdasSlot* slot = ndasdata_cast<Kandas::Client::NdasSlot*>(index.internalPointer());
+        p->m_manager.connectSlot(slot->number(), true);
+    }
+    else if (action == QLatin1String("disconnect-slot"))
+    {
+        Kandas::Client::NdasSlot* slot = ndasdata_cast<Kandas::Client::NdasSlot*>(index.internalPointer());
+        p->m_manager.disconnectSlot(slot->number());
+    }
+    //TODO: allow to choose between read/write and readonly mode
 }
 
 #include "view.moc"

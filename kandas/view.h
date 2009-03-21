@@ -19,6 +19,7 @@
 #ifndef KANDAS_CLIENT_VIEW_H
 #define KANDAS_CLIENT_VIEW_H
 
+#include <QPersistentModelIndex>
 #include <QStackedWidget>
 #include <kandasd/definitions.h>
 
@@ -38,6 +39,7 @@ namespace Kandas
                 void initializationComplete(const QString &name);
             private Q_SLOTS:
                 void systemStateChanged(Kandas::SystemState state);
+                void actionTriggered(const QPersistentModelIndex &index, const QString &action);
             private:
                 ViewPrivate *p;
         };

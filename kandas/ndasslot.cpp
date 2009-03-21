@@ -82,17 +82,19 @@ QVariant Kandas::Client::NdasSlot::data(int role) const
                     return KIcon("network-wired");
             }
         case Kandas::Client::SecondDecorationRole:
-            switch (m_state)
-            {
-                case Kandas::ConnectedSlot:
-                    return KIcon("media-eject");
-                case Kandas::DisconnectedSlot:
-                    return KIcon("media-playback-start");
-                case Kandas::SlotOffline:
-                case Kandas::ConnectingSlot:
-                case Kandas::DisconnectingSlot:
-                    return KIcon();
-            }
+            if (m_state == Kandas::DisconnectedSlot)
+                return KIcon("media-playback-start");
+            else if (m_state == Kandas::ConnectedSlot)
+                return KIcon("media-eject");
+            else //transitional state or offline
+                return KIcon();
+        case Kandas::Client::ActionRole:
+            if (m_state == Kandas::DisconnectedSlot)
+                return QLatin1String("connect-slot");
+            else if (m_state == Kandas::ConnectedSlot)
+                return QLatin1String("disconnect-slot");
+            else //transitional state or offline
+                return QString();
         case Kandas::Client::SecondDisplayRole:
             switch (m_state)
             {

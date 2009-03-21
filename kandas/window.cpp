@@ -49,6 +49,12 @@ Kandas::Client::MainWindow::~MainWindow()
 
 void Kandas::Client::MainWindow::setupActions()
 {
+    KAction* addDeviceAct = new KAction(KIcon("list-add"), i18n("Add device"), actionCollection());
+    actionCollection()->addAction("kandas_device_add", addDeviceAct);
+    addDeviceAct->setEnabled(false); //TODO: implement this action
+    KAction* removeDeviceAct = new KAction(KIcon("list-remove"), i18n("Remove device"), actionCollection());
+    actionCollection()->addAction("kandas_device_remove", removeDeviceAct);
+    removeDeviceAct->setEnabled(false); //TODO: implement this action
 }
 
 void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVersion)

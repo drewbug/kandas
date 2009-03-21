@@ -85,9 +85,9 @@ QVariant Kandas::Client::NdasSlot::data(int role) const
             switch (m_state)
             {
                 case Kandas::ConnectedSlot:
-                    return KIcon("media-playback-start");
-                case Kandas::DisconnectedSlot:
                     return KIcon("media-eject");
+                case Kandas::DisconnectedSlot:
+                    return KIcon("media-playback-start");
                 case Kandas::SlotOffline:
                 case Kandas::ConnectingSlot:
                 case Kandas::DisconnectingSlot:

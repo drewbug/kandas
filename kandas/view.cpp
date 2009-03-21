@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include "view.h"
+#include "connectmenu.h"
 #include "manager.h"
 #include "ndasdevice.h"
 #include "ndasmodel.h"
@@ -96,7 +97,8 @@ void Kandas::Client::View::actionTriggered(const QPersistentModelIndex &index, c
     if (action == QLatin1String("connect-device"))
     {
         Kandas::Client::NdasDevice* device = ndasdata_cast<Kandas::Client::NdasDevice*>(index.internalPointer());
-        p->m_manager.connectDevice(device->name(), true);
+        new Kandas::Client::ConnectMenu(&p->m_manager, device->name());
+//         p->m_manager.connectDevice(device->name(), true);
     }
     else if (action == QLatin1String("disconnect-device"))
     {
@@ -106,7 +108,8 @@ void Kandas::Client::View::actionTriggered(const QPersistentModelIndex &index, c
     else if (action == QLatin1String("connect-slot"))
     {
         Kandas::Client::NdasSlot* slot = ndasdata_cast<Kandas::Client::NdasSlot*>(index.internalPointer());
-        p->m_manager.connectSlot(slot->number(), true);
+        new Kandas::Client::ConnectMenu(&p->m_manager, slot->number());
+//         p->m_manager.connectSlot(slot->number(), true);
     }
     else if (action == QLatin1String("disconnect-slot"))
     {

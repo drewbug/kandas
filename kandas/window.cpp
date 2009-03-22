@@ -17,8 +17,10 @@
  ***************************************************************************/
 
 #include "window.h"
+#include "adddialog.h"
 #include "view.h"
 
+#include <QTimer>
 #include <KAction>
 #include <KActionCollection>
 #include <KActionMenu>
@@ -27,7 +29,7 @@
 #include <KStatusBar>
 
 Kandas::Client::MainWindow::MainWindow()
-    : KXmlGuiWindow()
+    : m_addDialog(0)
     , m_view(new Kandas::Client::View(this))
 {
     //early GUI initialisation
@@ -41,20 +43,28 @@ Kandas::Client::MainWindow::MainWindow()
     //late GUI initialisation
     setupGUI(QSize(400, 300));
     setWindowIcon(KIcon("folder-remote"));
+    QTimer::singleShot(0, this, SLOT(setupDialogs()));
 }
 
 Kandas::Client::MainWindow::~MainWindow()
 {
+    delete m_addDialog;
 }
 
 void Kandas::Client::MainWindow::setupActions()
 {
     KAction* addDeviceAct = new KAction(KIcon("list-add"), i18n("Add device"), actionCollection());
     actionCollection()->addAction("kandas_device_add", addDeviceAct);
-    addDeviceAct->setEnabled(false); //TODO: implement this action
+    connect(addDeviceAct, SIGNAL(triggered()), this, SLOT(showAddDialog()));
     KAction* removeDeviceAct = new KAction(KIcon("list-remove"), i18n("Remove device"), actionCollection());
     actionCollection()->addAction("kandas_device_remove", removeDeviceAct);
     removeDeviceAct->setEnabled(false); //TODO: implement this action
+}
+
+void Kandas::Client::MainWindow::setupDialogs()
+{
+    if (!m_addDialog)
+        m_addDialog = new Kandas::Client::AddDialog(m_view->manager());
 }
 
 void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVersion)
@@ -64,6 +74,12 @@ void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVer
     else
         statusBar()->changeItem(i18n("Connected to KaNDASd %1", daemonVersion), 1);
     show();
+}
+
+void Kandas::Client::MainWindow::showAddDialog()
+{
+    if (m_addDialog)
+        m_addDialog->showDialog();
 }
 
 #include "window.moc"

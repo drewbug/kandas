@@ -108,6 +108,11 @@ void Kandas::Client::Manager::initComplete()
         emit initializationComplete(QString());
 }
 
+Kandas::AddDeviceResult Kandas::Client::Manager::addDevice(const QString &device, const QStringList &readKey, const QString &writeKey)
+{
+    return (Kandas::AddDeviceResult) m_interface.addDevice(device, readKey, writeKey).value();
+}
+
 void Kandas::Client::Manager::connectDevice(const QString &device, bool readOnly)
 {
     m_interface.connectDevice(device, readOnly);

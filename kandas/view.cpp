@@ -85,6 +85,11 @@ Kandas::Client::View::~View()
     delete p;
 }
 
+Kandas::Client::Manager *Kandas::Client::View::manager() const
+{
+    return &p->m_manager;
+}
+
 void Kandas::Client::View::systemStateChanged(Kandas::SystemState state)
 {
     Q_UNUSED(state)

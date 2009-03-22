@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright 2008-2009 Stefan Majewsky <majewsky@gmx.net>
+ *   Copyright 2009 Stefan Majewsky <majewsky@gmx.net>
  *
  *   This program is free software; you can redistribute it and/or
  *   modify it under the terms of the GNU General Public
@@ -16,12 +16,11 @@
  *   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  ***************************************************************************/
 
-#ifndef KANDAS_CLIENT_VIEW_H
-#define KANDAS_CLIENT_VIEW_H
+#ifndef KANDAS_CLIENT_ADDDIALOG_H
+#define KANDAS_CLIENT_ADDDIALOG_H
 
-#include <QPersistentModelIndex>
-#include <QStackedWidget>
-#include <kandasd/definitions.h>
+#include <KDialog>
+#include "ui_adddialog.h"
 
 namespace Kandas
 {
@@ -29,26 +28,24 @@ namespace Kandas
     {
 
         class Manager;
-        class ViewPrivate;
 
-        class View : public QStackedWidget
+        class AddDialog : public KDialog
         {
             Q_OBJECT
             public:
-                View(QWidget *parent = 0);
-                ~View();
-
-                Kandas::Client::Manager *manager() const;
-            Q_SIGNALS:
-                void initializationComplete(const QString &name);
+                AddDialog(Kandas::Client::Manager *manager);
+            public Q_SLOTS:
+                void showDialog();
             private Q_SLOTS:
-                void systemStateChanged(Kandas::SystemState state);
-                void actionTriggered(const QPersistentModelIndex &index, const QString &action);
+                void handleInput();
+                void handleOkClicked();
             private:
-                ViewPrivate *p;
+                Kandas::Client::Manager *m_manager;
+                QWidget *m_widget;
+                Ui::AddDialogWidget m_ui;
         };
 
     }
 }
 
-#endif // KANDAS_CLIENT_VIEW_H
+#endif // KANDAS_CLIENT_ADDDIALOG_H

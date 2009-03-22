@@ -17,6 +17,7 @@ set(kandas_SRCS
     ndasmodel.cpp
     ndasslot.cpp
     ndassystemmodel.cpp
+    removedialog.cpp
     view.cpp
     viewdelegate.cpp
     window.cpp

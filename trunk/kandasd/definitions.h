@@ -47,6 +47,15 @@ namespace Kandas
         NoAdminFound //the ndasadmin program could not be found in $PATH
     };
 
+    enum AddDeviceResult
+    {
+        DeviceAdded = 0, //everything else means failure
+        DeviceAdditionFailed = 1, //some failure occured, but the reason could not be determined by KaNDASd
+        InvalidDeviceKey, //the read key or write key is invalid
+        InvalidDeviceName, //the device name is invalid (contains slashes)
+        DeviceExistsAlready //a device with this name does already exist
+    };
+
 }
 
 #endif // KANDAS_DEFINITIONS_H

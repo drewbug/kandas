@@ -72,11 +72,10 @@ QVariant Kandas::Client::NdasSlot::data(int role) const
         case Qt::DecorationRole:
             switch (m_state)
             {
-                case Kandas::SlotOffline:
-                    return KIcon("unknown");
                 case Kandas::ConnectedSlot:
                 case Kandas::DisconnectingSlot:
                     return KIcon("network-wired", KIconLoader::global(), QStringList() << "emblem-mounted");
+                case Kandas::SlotOffline:
                 case Kandas::DisconnectedSlot:
                 case Kandas::ConnectingSlot:
                     return KIcon("network-wired");

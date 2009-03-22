@@ -36,10 +36,11 @@ QList<QWidget *> Kandas::Client::ViewDelegate::createItemWidgets() const
     QGridLayout *layout = new QGridLayout;
     container->setLayout(layout);
     //contained widgets
-    static const QSize iconSize(48, 48);
-    Kandas::Client::IconWidget* iconWidget = new Kandas::Client::IconWidget(iconSize);
+    static const QSize bigIconSize(48, 48);
+    static const QSize smallIconSize(32, 32);
+    Kandas::Client::IconWidget* iconWidget = new Kandas::Client::IconWidget(bigIconSize);
     iconWidget->setEnabled(false);
-    Kandas::Client::IconWidget* buttonWidget = new Kandas::Client::IconWidget(iconSize);
+    Kandas::Client::IconWidget* buttonWidget = new Kandas::Client::IconWidget(smallIconSize);
     QLabel* headlineWidget = new QLabel;
     QLabel* sublineWidget = new QLabel;
     QFont headlineFont = headlineWidget->font();

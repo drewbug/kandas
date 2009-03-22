@@ -13,9 +13,9 @@ KaNDASd defines some state enumerations which are transferred over D-Bus as inte
     string interfaceVersion();
 }}}
 
-Check the interface version of the running KaNDASd instance as the interface may differ between versions. For stable versions and current development versions, such differences will be noted on this page. Example version strings are _0.1_ or _0.2_.
+Check the interface version of the running KaNDASd instance as the interface may differ between versions. Example version strings are _0.1_ or _0.2_. This page documents the interface version _0.2_.
 
-The daemon version is not of programmatic relevance. However, you can use it in your UI's about dialog, or whatever you deserve.
+The daemon version is not of programmatic relevance. However, you can use it in your UI's about dialog if you want.
 
 == Registration of a new client ==
 
@@ -23,71 +23,52 @@ The daemon version is not of programmatic relevance. However, you can use it in 
   //Methods:
     void registerClient();
     void unregisterClient();
-    void refreshData();
 }}}
 
-When clients are registered on the server using the *registerClient* function, KaNDASd will eventually start to automatically refresh its data structures in intervals of three seconds. If you need a data update but cannot wait for the next auto-update, call the *refreshData* function manually. For average use cases, a manual refresh should be unnecessary. When shutting down your client, always unregister it as KaNDASd will stop to schedule automatic refreshes once all clients are disconnected.
+When clients are registered on the server using the *registerClient* function, KaNDASd will start to automatically refresh its data structures in intervals of two seconds. When shutting down your client, always unregister it as KaNDASd will stop to schedule automatic refreshes once all clients are disconnected.
 
-== Initiation of the client's data structures ==
+== Upkeep of client data structures ==
 
 {{{
-  //Methods:
-    void initClient();
   //Signals:
-    void initEnvironmentInfo(int state);
-    void initDeviceInfo(string device);
-    void initSlotInfo(int slot, string device, int state);
+    void systemInfo(int state);
+    void deviceInfo(string device, string serial, int state, bool writable);
+    void slotInfo(int slot, string device, string blockDevice, int state);
+    void deviceRemoved(string device);
+    void slotRemoved(int slot);
     void initComplete();
   //Enumerations:
-    enum EnvironmentState
+    enum Kandas::SystemState
     {
-        UnknownEnvironment = 0,
-        SaneEnvironment = 1,
+        SystemUnchecked = 0,
+        SystemChecked = 1,
         NoDriverFound = 10,
-        NoAdminFound = 11
+        NoAdminFound
     };
-    enum SlotState
+    enum Kandas::DeviceState
     {
-        Undetermined = 0,
-        Disconnected = 10,
-        Connected = 11,
-        Disconnecting = 20,
-        Connecting = 21
+        DeviceOffline = 0,
+        DeviceOnline = 1,
+        DeviceConnectionError = 10,
+        DeviceLoginError = 11
+    };
+    enum Kandas::SlotState
+    {
+        SlotOffline = 0,
+        DisconnectedSlot = 1,
+        ConnectedSlot,
+        DisconnectingSlot = 10,
+        ConnectingSlot
     };
 }}}
 
-When starting your client you'll need the current state of the NDAS driver. Call the *initClient* function and you'll receive a sequence consisting of an *initEnvironmentInfo* signal, some *initDeviceInfo* signals, some *initSlotInfo* signals, and a *initComplete* signal (in this order). The signals contain information about the environment, the devices (one *initDeviceInfo* signal describes one device), and the slots (again, one signal means one slot). If your client is a direct modifier, you can start your operations in the handler for the *initComplete* signal.
+KaNDASd automatically scans the NDAS driver regularly for changes. These are propagated to clients through a sequence of *systemInfo*, *deviceInfo* and *slotInfo* signals (in this order). Note that the complete information is sent in every update round, even if nothing has changed. The state that is given with every signal is always a value of one of the three enumerations above. For example, the state that comes with a *deviceInfo* signal can safely be casted into a `Kandas::DeviceState` value.
 
-Note that any operations will be rejected by KaNDASd if the environment is not sane; any operations on a specific slot will be rejected if this slot has an undetermined state (or a state that makes the operation illogic; of course one cannot disconnect a disconnected slot). If operations fail or are rejected by KaNDASd, no specific error message will appear.
+A data update is scheduled when a new client registers with the *registerClient* method. After the next update, KaNDASd will send a *initComplete* signal to indicate that the client has recieved all data it might need.
 
-== Stay informed about changes ==
+Any further operations will be rejected by KaNDASd if the system state is not checked or invalid; any operations on a specific slot will be rejected if this slot is offline, or when the state makes the operation illogic (of course one cannot disconnect a disconnected slot). KaNDASd will not send an error message when operations fail or are rejected.
 
-{{{
-  //Signals:
-    void environmentChanged(int state);
-    void deviceAdded(string device);
-    void deviceRemoved(string device);
-    void slotAdded(int slot, string device, int state);
-    void slotChanged(int slot, string device, int state);
-    void slotRemoved(int slot, string device);
-  //Enumerations
-    enum EnvironmentState; //see above for full definition
-    enum SlotState;        //see above for full definition
-}}}
-
-As noted earlier, KaNDASd does automatically scan the NDAS driver for changes. These are propagated to clients using these signals. Note that if a device with slots is removed, the *deviceRemoved* signal is emitted before the *slotRemoved* signals. I recommend that you remove the slots with the *deviceRemoved* signal; you can then safely ignore the *slotRemoved* signals.
-
-== Change the environment state ==
-
-{{{
-  //Methods:
-    void startDriver();
-    void stopDriver();
-}}}
-
-If any slots are connected, a call to *stopDriver* will fail without further notification. You should catch the *environmentChanged* signal to find out whether the operation was successful.
-
-== Connect and disconnect ==
+== Connection management ==
 
 {{{
   //Methods:
@@ -97,4 +78,26 @@ If any slots are connected, a call to *stopDriver* will fail without further not
     void disconnectSlot(int slot);
 }}}
 
-The *connectDevice* and *disconnectDevice* functions simply call the according slot methods for all slots available at this device. If the connection fails for one slot (e.g. because it is already connected), the operation will not be aborted; each slot connection is independent in this process. Again, all functions can fail without notification. Catch the *slotChanged* signals to find whether the operation was successful.
+The *connectDevice* and *disconnectDevice* functions simply call the according slot methods for all slots available at this device. If the connection fails for one slot (e.g. because it is already connected), the operation will not be aborted; each slot connection is independent in this process. As noted earlier, all functions can fail without notification. Catch the *slotChanged* signals to find whether the operation was successful.
+
+== Device management ==
+
+{{{
+  //Methods:
+    int addDevice(string device, stringlist readKey, string writeKey);
+    void removeDevice(string device);
+  //Enumerations:
+    enum Kandas::AddDeviceResult
+    {
+        DeviceAdded = 0,
+        DeviceAdditionFailed = 1,
+        InvalidDeviceKey,
+        InvalidDeviceName,
+        DeviceExistsAlready
+    };
+}}}
+
+Use these methods to register or unregister devices. The *addDevice* method returns a value from the `AddDeviceResult` enumeration, that may indicate a failure reason. For example, the operation fails if the given keys are invalid, or if a device with this name does already exist. You can prevent most of these failure reasons with the following checks:
+
+ * The device name may not contain slashes or blank spaces. (All other UTF-8 characters should be possible.)
+ * The readKey has to be a list of 4 key blocks, and the writeKey (optional!) has to be a single key block. Each key block has to consist of 5 ASCII alphanumeric characters.

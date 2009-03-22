@@ -117,6 +117,13 @@ QVariant Kandas::Client::NdasDevice::data(int role) const
                 return QLatin1String("disconnect-device");
             else //transitional state or offline
                 return QString();
+        case Kandas::Client::ActionDescriptionRole:
+            if (dominantSlotState == Kandas::DisconnectedSlot)
+                return i18n("Connect this device");
+            else if (dominantSlotState == Kandas::ConnectedSlot)
+                return i18n("Disconnect this device");
+            else //transitional state or offline
+                return QString();
         case Kandas::Client::SecondDisplayRole:
             switch (m_state)
             {

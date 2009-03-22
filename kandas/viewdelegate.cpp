@@ -62,6 +62,7 @@ void Kandas::Client::ViewDelegate::updateItemWidgets(const QList<QWidget *> widg
     const QString secondText = index.data(Kandas::Client::SecondDisplayRole).toString();
     const QVariant secondDecoration = index.data(Kandas::Client::SecondDecorationRole);
     const QString action = index.data(Kandas::Client::ActionRole).toString();
+    const QString actionDescription = index.data(Kandas::Client::ActionDescriptionRole).toString();
     //retrieve widgets
     QWidget* container = widgets[0];
     QGridLayout* layout = qobject_cast<QGridLayout*>(container->layout());
@@ -75,6 +76,7 @@ void Kandas::Client::ViewDelegate::updateItemWidgets(const QList<QWidget *> widg
     iconWidget->setIcon(qvariant_cast<QIcon>(decoration));
     buttonWidget->setIcon(qvariant_cast<QIcon>(secondDecoration));
     buttonWidget->setAction(action);
+    buttonWidget->setToolTip(actionDescription);
     if (!buttonWidget->hasIndex())
     {
         buttonWidget->setIndex(index);

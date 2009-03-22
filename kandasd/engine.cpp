@@ -113,7 +113,7 @@ int Kandas::Daemon::Engine::addDevice(const QString &deviceName, const QList<QSt
     if (m_devices.device(deviceName))
         return Kandas::DeviceExistsAlready;
     //validate input
-    if (deviceName.contains('/'))
+    if (deviceName.contains('/') || deviceName.contains(' ')) //spaces in the device name are possible, but interfere with the parsing of /proc/ndas/devs
         return Kandas::InvalidDeviceName;
     if (readKey.count() != 4)
         return Kandas::InvalidDeviceKey;

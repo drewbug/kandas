@@ -45,7 +45,8 @@ Kandas::Client::MainWindow::MainWindow()
     setCentralWidget(m_view);
     connect(m_view, SIGNAL(initializationComplete(const QString &)), this, SLOT(initializationComplete(const QString &)));
     //late GUI initialisation
-    setupGUI(QSize(400, 300));
+    setupGUI();
+    setMinimumSize(QSize(300, 300));
     setWindowIcon(KIcon("folder-remote"));
     QTimer::singleShot(0, this, SLOT(setupDialogs()));
 }
@@ -58,9 +59,9 @@ Kandas::Client::MainWindow::~MainWindow()
 
 void Kandas::Client::MainWindow::setupActions()
 {
-    m_addDialogAct = new KAction(KIcon("list-add"), i18n("Add device"), actionCollection());
+    m_addDialogAct = new KAction(KIcon("list-add"), i18n("Add device..."), actionCollection());
     actionCollection()->addAction("kandas_device_add", m_addDialogAct);
-    m_removeDialogAct = new KAction(KIcon("list-remove"), i18n("Remove device"), actionCollection());
+    m_removeDialogAct = new KAction(KIcon("list-remove"), i18n("Remove device..."), actionCollection());
     actionCollection()->addAction("kandas_device_remove", m_removeDialogAct);
 }
 

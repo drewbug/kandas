@@ -30,7 +30,9 @@
 #include <KStatusBar>
 
 Kandas::Client::MainWindow::MainWindow()
-    : m_addDialog(0)
+    : m_addDialogAct(0)
+    , m_removeDialogAct(0)
+    , m_addDialog(0)
     , m_removeDialog(0)
     , m_view(new Kandas::Client::View(this))
 {
@@ -56,41 +58,37 @@ Kandas::Client::MainWindow::~MainWindow()
 
 void Kandas::Client::MainWindow::setupActions()
 {
-    KAction* addDeviceAct = new KAction(KIcon("list-add"), i18n("Add device"), actionCollection());
-    actionCollection()->addAction("kandas_device_add", addDeviceAct);
-    connect(addDeviceAct, SIGNAL(triggered()), this, SLOT(showAddDialog()));
-    KAction* removeDeviceAct = new KAction(KIcon("list-remove"), i18n("Remove device"), actionCollection());
-    actionCollection()->addAction("kandas_device_remove", removeDeviceAct);
-    connect(removeDeviceAct, SIGNAL(triggered()), this, SLOT(showRemoveDialog()));
+    m_addDialogAct = new KAction(KIcon("list-add"), i18n("Add device"), actionCollection());
+    actionCollection()->addAction("kandas_device_add", m_addDialogAct);
+    m_removeDialogAct = new KAction(KIcon("list-remove"), i18n("Remove device"), actionCollection());
+    actionCollection()->addAction("kandas_device_remove", m_removeDialogAct);
 }
 
 void Kandas::Client::MainWindow::setupDialogs()
 {
     if (!m_addDialog)
+    {
         m_addDialog = new Kandas::Client::AddDialog(m_view->manager());
+        connect(m_addDialogAct, SIGNAL(triggered()), m_addDialog, SLOT(showDialog()));
+    }
     if (!m_removeDialog)
+    {
         m_removeDialog = new Kandas::Client::RemoveDialog(m_view->manager());
+        connect(m_removeDialogAct, SIGNAL(triggered()), m_removeDialog, SLOT(showDialog()));
+    }
 }
 
 void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVersion)
 {
     if (daemonVersion.isEmpty())
+    {
         statusBar()->changeItem(i18n("No connection to KaNDASd"), 1);
+        m_addDialogAct->setEnabled(false);
+        m_removeDialogAct->setEnabled(false);
+    }
     else
         statusBar()->changeItem(i18n("Connected to KaNDASd %1", daemonVersion), 1);
     show();
-}
-
-void Kandas::Client::MainWindow::showAddDialog()
-{
-    if (m_addDialog && !m_addDialog->isVisible())
-        m_addDialog->showDialog();
-}
-
-void Kandas::Client::MainWindow::showRemoveDialog()
-{
-    if (m_removeDialog && !m_removeDialog->isVisible())
-        m_removeDialog->showDialog();
 }
 
 #include "window.moc"

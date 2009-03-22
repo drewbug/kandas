@@ -42,6 +42,8 @@ namespace Kandas
                 Kandas::Client::NdasModel *model() const;
                 Kandas::Client::NdasSystemModel *systemModel() const;
             public Q_SLOTS:
+                Kandas::AddDeviceResult addDevice(const QString &device, const QStringList &readKey, const QString &writeKey = QString());
+
                 void connectDevice(const QString &device, bool readOnly);
                 void connectSlot(int slot, bool readOnly);
                 void disconnectDevice(const QString &device);

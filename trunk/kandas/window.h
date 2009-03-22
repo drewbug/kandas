@@ -26,6 +26,7 @@ namespace Kandas
     namespace Client
     {
 
+        class AddDialog;
         class View;
 
         class MainWindow : public KXmlGuiWindow
@@ -34,11 +35,16 @@ namespace Kandas
             public:
                 explicit MainWindow();
                 ~MainWindow();
-            public slots:
+            public Q_SLOTS:
                 void initializationComplete(const QString &daemonVersion);
+            private Q_SLOTS:
+                void showAddDialog();
+                void setupDialogs();
             private:
                 void setupActions();
-                View *m_view;
+
+                Kandas::Client::AddDialog *m_addDialog;
+                Kandas::Client::View *m_view;
         };
 
     }

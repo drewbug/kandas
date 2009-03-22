@@ -72,7 +72,7 @@ void Kandas::Client::IconWidget::setIndex(const QPersistentModelIndex &index)
 void Kandas::Client::IconWidget::enterEvent(QEvent *event)
 {
     Q_UNUSED(event)
-    setActive(isEnabled());
+    setActive(!m_action.isEmpty());
 }
 
 void Kandas::Client::IconWidget::leaveEvent(QEvent *event)

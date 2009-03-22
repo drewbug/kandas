@@ -1,0 +1,98 @@
+<ui version="4.0" >
+ <class>AddDialogWidget</class>
+ <widget class="QWidget" name="AddDialogWidget" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>Form</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" >
+   <item row="0" column="0" >
+    <widget class="QLabel" name="nameLabel" >
+     <property name="text" >
+      <string>Choose a device name:</string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="readKeyLabel" >
+     <property name="text" >
+      <string>Read access key:</string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1" colspan="4" >
+    <widget class="QLineEdit" name="nameWidget" />
+   </item>
+   <item row="1" column="1" >
+    <widget class="QLineEdit" name="readKeyWidget1" >
+     <property name="maxLength" >
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" >
+    <widget class="QLineEdit" name="readKeyWidget2" >
+     <property name="maxLength" >
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3" >
+    <widget class="QLineEdit" name="readKeyWidget3" >
+     <property name="maxLength" >
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4" >
+    <widget class="QLineEdit" name="readKeyWidget4" >
+     <property name="maxLength" >
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLineEdit" name="writeKeyWidget" >
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="maxLength" >
+      <number>5</number>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" >
+    <widget class="QLabel" name="writeKeyLabel" >
+     <property name="text" >
+      <string>Write access key:</string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" colspan="3" >
+    <widget class="QLabel" name="writeKeyLabel2" >
+     <property name="text" >
+      <string>(optional)</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

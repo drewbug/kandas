@@ -32,7 +32,7 @@ namespace Kandas
     namespace Daemon
     {
 
-        const char DaemonVersionRaw[] = "trunk";
+        const char DaemonVersionRaw[] = "0.2";
         const QString DaemonVersion(DaemonVersionRaw);
         const char InterfaceVersionRaw[] = "0.2";
         const QString InterfaceVersion(InterfaceVersionRaw);

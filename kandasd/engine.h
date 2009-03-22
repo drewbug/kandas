@@ -36,7 +36,7 @@ namespace Kandas
         const QString DaemonVersion(DaemonVersionRaw);
         const char InterfaceVersionRaw[] = "0.2";
         const QString InterfaceVersion(InterfaceVersionRaw);
-        const int RefreshInterval = 2000; //refresh every three seconds
+        const int RefreshInterval = 2000; //refresh every two seconds
 
         class Device;
         class Slot;

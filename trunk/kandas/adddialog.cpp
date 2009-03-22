@@ -19,8 +19,32 @@
 #include "adddialog.h"
 #include "manager.h"
 
+#include <QValidator>
 #include <KLocalizedString>
 #include <KMessageBox>
+
+namespace Kandas
+{
+    namespace Client
+    {
+
+        class DeviceNameValidator : public QValidator
+        {
+            public:
+                DeviceNameValidator(QObject *parent)
+                    : QValidator(parent)
+                {
+                }
+                virtual QValidator::State validate(QString &input, int &pos) const
+                {
+                    Q_UNUSED(pos)
+                    input = input.remove('/').remove(' ');
+                    return QValidator::Acceptable;
+                }
+        };
+
+    }
+}
 
 Kandas::Client::AddDialog::AddDialog(Kandas::Client::Manager *manager)
     : m_manager(manager)
@@ -35,6 +59,7 @@ Kandas::Client::AddDialog::AddDialog(Kandas::Client::Manager *manager)
     connect(this, SIGNAL(okClicked()), this, SLOT(handleOkClicked()));
     //setup input validation
     const QString keyInputMask = QLatin1String(">NNNNN"); //allow ASCII alphanumeric characters, convert to uppercase automatically
+    m_ui.nameWidget->setValidator(new Kandas::Client::DeviceNameValidator(m_ui.nameWidget));
     connect(m_ui.nameWidget, SIGNAL(textChanged(const QString &)), this, SLOT(handleInput()));
     m_ui.readKeyWidget1->setInputMask(keyInputMask);
     connect(m_ui.readKeyWidget1, SIGNAL(textChanged(const QString &)), this, SLOT(handleInput()));

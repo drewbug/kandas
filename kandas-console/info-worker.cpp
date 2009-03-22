@@ -33,12 +33,17 @@ Kandas::Console::InfoWorker::InfoWorker(bool listEnv, bool listDevices, bool lis
 bool Kandas::Console::InfoWorker::execute()
 {
     if (m_listEnv)
+    {
         listEnvironment();
-    if (m_listDevices && devicesList().count() != 0)
+    }
+    if (m_listDevices)
     {
         if (m_listEnv)
             std::cout << std::endl; //some space between both lists
-        listDevices();
+        if (devicesList().isEmpty())
+            std::cout << i18n("No devices registered").toUtf8().data() << std::endl;
+        else
+            listDevices();
     }
     if (m_listSlots && slotsList().count() != 0)
     {

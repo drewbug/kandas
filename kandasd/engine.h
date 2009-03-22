@@ -57,6 +57,9 @@ namespace Kandas
                 void registerClient();
                 void unregisterClient();
 
+                int addDevice(const QString &deviceName, const QList<QString> &readKey, const QString &writeKey);
+                void removeDevice(const QString &deviceName);
+
                 void connectSlot(int slot, bool readOnly);
                 void disconnectSlot(int slot);
                 void connectDevice(const QString &device, bool readOnly);

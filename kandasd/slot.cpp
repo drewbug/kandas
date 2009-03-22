@@ -33,6 +33,8 @@ Kandas::Daemon::Slot::Slot(const QString &device, int slotNumber)
     QString blockDeviceNameTemplate("/dev/%1");
     if (blockDeviceInfoFile.exists() && blockDeviceInfoFile.open(QIODevice::ReadOnly) && blockDeviceInfoFile.isReadable())
         m_blockDevice = blockDeviceNameTemplate.arg(QString::fromUtf8(blockDeviceInfoFile.readAll()));
+    if (m_blockDevice == blockDeviceNameTemplate.arg(QString()))
+        m_blockDevice.clear(); //no block device name found
     blockDeviceInfoFile.close();
     //read info file
     const int bufferSize = 1024; char buffer[bufferSize];

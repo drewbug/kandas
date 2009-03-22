@@ -90,6 +90,69 @@ void Kandas::Daemon::Engine::unregisterClient()
 
 //NDAS management
 
+bool validateKeyBlock(const QString &keyBlock, bool allowEmpty = false)
+{
+    const int length = keyBlock.length();
+    if (allowEmpty && length == 0)
+        return true;
+    if (length != 5)
+        return false;
+    for (int i = 0; i < 5; ++i)
+    {
+        const QChar character = keyBlock.at(i);
+        //only accept ASCII letters or arabic numbers
+        if (!character.isLetterOrNumber() || character.unicode() >= 128)
+            return false;
+    }
+    return true;
+}
+
+int Kandas::Daemon::Engine::addDevice(const QString &deviceName, const QList<QString> &readKey, const QString &writeKey)
+{
+    //only register new device if no device with this name exists
+    if (m_devices.device(deviceName))
+        return Kandas::DeviceExistsAlready;
+    //validate input
+    if (deviceName.contains('/'))
+        return Kandas::InvalidDeviceName;
+    if (readKey.count() != 4)
+        return Kandas::InvalidDeviceKey;
+    foreach (const QString &keyBlock, readKey)
+        if (!validateKeyBlock(keyBlock))
+            return Kandas::InvalidDeviceKey;
+    if (!validateKeyBlock(writeKey, true))
+        return Kandas::InvalidDeviceKey;
+    //build key string
+    QString keyString = QStringList(readKey).join(QChar('-'));
+    if (!writeKey.isEmpty())
+        keyString += '-' + writeKey;
+    //call ndasadmin
+    QStringList args; args << "register" << keyString << "-n" << deviceName << "-b";
+    KProcess process;
+    process.setProgram("ndasadmin", args);
+    process.setOutputChannelMode(KProcess::OnlyStderrChannel);
+    process.start();
+    process.waitForFinished();
+    const QString errorOutput = QString::fromUtf8(process.readAllStandardError()).simplified();
+    if (errorOutput.isEmpty())
+        return Kandas::DeviceAdded;
+    else if (errorOutput.contains(QLatin1String("register: invalid NDAS ID.")))
+        return Kandas::InvalidDeviceKey;
+    else
+        return Kandas::DeviceAdditionFailed;
+    //
+}
+
+void Kandas::Daemon::Engine::removeDevice(const QString &deviceName)
+{
+    //unegister device only if a device with this name exists
+    if (!m_devices.device(deviceName))
+        return;
+    //call ndasadmin
+    QStringList args; args << "unregister" << "-n" << deviceName;
+    KProcess::startDetached("ndasadmin", args);
+}
+
 void Kandas::Daemon::Engine::connectSlot(int slotNumber, bool readOnly)
 {
     //check environment and slot state

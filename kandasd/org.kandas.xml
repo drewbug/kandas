@@ -38,6 +38,15 @@
       <arg name="slot" type="i" direction="out"/>
     </signal>
     <!-- NDAS management -->
+    <method name="addDevice">
+      <arg name="device" type="s" direction="in"/>
+      <arg name="readKey" type="as" direction="in"/>
+      <arg name="writeKey" type="s" direction="in"/>
+      <arg name="result" type="i" direction="out"/>
+    </method>
+    <method name="removeDevice">
+      <arg name="device" type="s" direction="in"/>
+    </method>
     <method name="connectSlot">
       <arg name="slot" type="i" direction="in"/>
       <arg name="readOnly" type="b" direction="in"/>

@@ -19,6 +19,7 @@
 #ifndef KANDAS_CLIENT_WINDOW_H
 #define KANDAS_CLIENT_WINDOW_H
 
+class KAction;
 #include <KXmlGuiWindow>
 
 namespace Kandas
@@ -39,12 +40,11 @@ namespace Kandas
             public Q_SLOTS:
                 void initializationComplete(const QString &daemonVersion);
             private Q_SLOTS:
-                void showAddDialog();
-                void showRemoveDialog();
+                void setupActions();
                 void setupDialogs();
             private:
-                void setupActions();
-
+                KAction *m_addDialogAct;
+                KAction *m_removeDialogAct;
                 Kandas::Client::AddDialog *m_addDialog;
                 Kandas::Client::RemoveDialog *m_removeDialog;
                 Kandas::Client::View *m_view;

@@ -44,6 +44,8 @@ Kandas::Client::RemoveDialog::RemoveDialog(Kandas::Client::Manager *manager)
 
 void Kandas::Client::RemoveDialog::showDialog()
 {
+    if (isVisible())
+        return;
     m_view->selectionModel()->clear();
     m_view->setFocus(Qt::OtherFocusReason);
     enableButton(KDialog::User1, false);

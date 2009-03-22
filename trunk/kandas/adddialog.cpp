@@ -75,6 +75,8 @@ Kandas::Client::AddDialog::AddDialog(Kandas::Client::Manager *manager)
 
 void Kandas::Client::AddDialog::showDialog()
 {
+    if (isVisible())
+        return;
     //clear everything
     m_ui.nameWidget->clear();
     m_ui.readKeyWidget1->clear();

@@ -45,11 +45,11 @@ Kandas::Client::Manager::Manager()
     else
     {
         connect(&m_interface, SIGNAL(initComplete()), this, SLOT(initComplete()));
-        connect(&m_interface, SIGNAL(systemInfo(int)), this, SLOT(changeSystem(int)));
-        connect(&m_interface, SIGNAL(deviceInfo(const QString &, const QString &, int, bool)), this, SLOT(changeDevice(const QString &, const QString &, int, bool)));
-        connect(&m_interface, SIGNAL(slotInfo(int, const QString &, const QString &, int)), this, SLOT(changeSlot(int, const QString &, const QString &, int)));
-        connect(&m_interface, SIGNAL(deviceRemoved(const QString &)), this, SLOT(removeDevice(const QString &)));
-        connect(&m_interface, SIGNAL(slotRemoved(int)), this, SLOT(removeSlot(int)));
+        connect(&m_interface, SIGNAL(systemInfo(int)), this, SLOT(systemChanged(int)));
+        connect(&m_interface, SIGNAL(deviceInfo(const QString &, const QString &, int, bool)), this, SLOT(deviceChanged(const QString &, const QString &, int, bool)));
+        connect(&m_interface, SIGNAL(slotInfo(int, const QString &, const QString &, int)), this, SLOT(slotChanged(int, const QString &, const QString &, int)));
+        connect(&m_interface, SIGNAL(deviceRemoved(const QString &)), this, SLOT(deviceRemoved(const QString &)));
+        connect(&m_interface, SIGNAL(slotRemoved(int)), this, SLOT(slotRemoved(int)));
         m_interface.registerClient();
         return;
     }
@@ -72,29 +72,29 @@ Kandas::Client::NdasSystemModel *Kandas::Client::Manager::systemModel() const
     return m_systemModel;
 }
 
-void Kandas::Client::Manager::changeSystem(int systemState)
+void Kandas::Client::Manager::systemChanged(int systemState)
 {
     Kandas::SystemState state = (Kandas::SystemState) systemState;
     m_systemModel->setState(state);
     emit systemStateChanged(state); //lets the view change its model if necessary
 }
 
-void Kandas::Client::Manager::changeDevice(const QString &device, const QString &serial, int state, bool hasWriteKey)
+void Kandas::Client::Manager::deviceChanged(const QString &device, const QString &serial, int state, bool hasWriteKey)
 {
     m_model->updateDevice(device, serial, (Kandas::DeviceState) state, hasWriteKey);
 }
 
-void Kandas::Client::Manager::changeSlot(int slot, const QString &device, const QString &blockDevice, int state)
+void Kandas::Client::Manager::slotChanged(int slot, const QString &device, const QString &blockDevice, int state)
 {
     m_model->updateSlot(slot, device, blockDevice, (Kandas::SlotState) state);
 }
 
-void Kandas::Client::Manager::removeDevice(const QString &device)
+void Kandas::Client::Manager::deviceRemoved(const QString &device)
 {
     m_model->removeDevice(device);
 }
 
-void Kandas::Client::Manager::removeSlot(int slot)
+void Kandas::Client::Manager::slotRemoved(int slot)
 {
     m_model->removeSlot(slot);
 }
@@ -111,6 +111,11 @@ void Kandas::Client::Manager::initComplete()
 Kandas::AddDeviceResult Kandas::Client::Manager::addDevice(const QString &device, const QStringList &readKey, const QString &writeKey)
 {
     return (Kandas::AddDeviceResult) m_interface.addDevice(device, readKey, writeKey).value();
+}
+
+void Kandas::Client::Manager::removeDevice(const QString &device)
+{
+    m_interface.removeDevice(device);
 }
 
 void Kandas::Client::Manager::connectDevice(const QString &device, bool readOnly)

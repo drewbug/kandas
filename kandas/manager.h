@@ -43,6 +43,7 @@ namespace Kandas
                 Kandas::Client::NdasSystemModel *systemModel() const;
             public Q_SLOTS:
                 Kandas::AddDeviceResult addDevice(const QString &device, const QStringList &readKey, const QString &writeKey = QString());
+                void removeDevice(const QString &device);
 
                 void connectDevice(const QString &device, bool readOnly);
                 void connectSlot(int slot, bool readOnly);
@@ -52,11 +53,11 @@ namespace Kandas
                 void initializationComplete(const QString &daemonVersion);
                 void systemStateChanged(Kandas::SystemState state);
             private Q_SLOTS:
-                void changeSystem(int systemState);
-                void changeDevice(const QString &device, const QString &serial, int state, bool hasWriteKey);
-                void changeSlot(int slot, const QString &device, const QString &blockDevice, int state);
-                void removeDevice(const QString &device);
-                void removeSlot(int slot);
+                void systemChanged(int systemState);
+                void deviceChanged(const QString &device, const QString &serial, int state, bool hasWriteKey);
+                void slotChanged(int slot, const QString &device, const QString &blockDevice, int state);
+                void deviceRemoved(const QString &device);
+                void slotRemoved(int slot);
                 void initComplete();
             private:
                 OrgKandasInterface m_interface;

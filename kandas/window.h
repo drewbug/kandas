@@ -27,6 +27,7 @@ namespace Kandas
     {
 
         class AddDialog;
+        class RemoveDialog;
         class View;
 
         class MainWindow : public KXmlGuiWindow
@@ -39,11 +40,13 @@ namespace Kandas
                 void initializationComplete(const QString &daemonVersion);
             private Q_SLOTS:
                 void showAddDialog();
+                void showRemoveDialog();
                 void setupDialogs();
             private:
                 void setupActions();
 
                 Kandas::Client::AddDialog *m_addDialog;
+                Kandas::Client::RemoveDialog *m_removeDialog;
                 Kandas::Client::View *m_view;
         };
 

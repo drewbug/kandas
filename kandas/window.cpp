@@ -18,6 +18,7 @@
 
 #include "window.h"
 #include "adddialog.h"
+#include "removedialog.h"
 #include "view.h"
 
 #include <QTimer>
@@ -30,6 +31,7 @@
 
 Kandas::Client::MainWindow::MainWindow()
     : m_addDialog(0)
+    , m_removeDialog(0)
     , m_view(new Kandas::Client::View(this))
 {
     //early GUI initialisation
@@ -49,6 +51,7 @@ Kandas::Client::MainWindow::MainWindow()
 Kandas::Client::MainWindow::~MainWindow()
 {
     delete m_addDialog;
+    delete m_removeDialog;
 }
 
 void Kandas::Client::MainWindow::setupActions()
@@ -58,13 +61,15 @@ void Kandas::Client::MainWindow::setupActions()
     connect(addDeviceAct, SIGNAL(triggered()), this, SLOT(showAddDialog()));
     KAction* removeDeviceAct = new KAction(KIcon("list-remove"), i18n("Remove device"), actionCollection());
     actionCollection()->addAction("kandas_device_remove", removeDeviceAct);
-    removeDeviceAct->setEnabled(false); //TODO: implement this action
+    connect(removeDeviceAct, SIGNAL(triggered()), this, SLOT(showRemoveDialog()));
 }
 
 void Kandas::Client::MainWindow::setupDialogs()
 {
     if (!m_addDialog)
         m_addDialog = new Kandas::Client::AddDialog(m_view->manager());
+    if (!m_removeDialog)
+        m_removeDialog = new Kandas::Client::RemoveDialog(m_view->manager());
 }
 
 void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVersion)
@@ -78,8 +83,14 @@ void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVer
 
 void Kandas::Client::MainWindow::showAddDialog()
 {
-    if (m_addDialog)
+    if (m_addDialog && !m_addDialog->isVisible())
         m_addDialog->showDialog();
+}
+
+void Kandas::Client::MainWindow::showRemoveDialog()
+{
+    if (m_removeDialog && !m_removeDialog->isVisible())
+        m_removeDialog->showDialog();
 }
 
 #include "window.moc"

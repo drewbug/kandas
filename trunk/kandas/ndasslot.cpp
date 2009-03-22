@@ -68,7 +68,7 @@ QVariant Kandas::Client::NdasSlot::data(int role) const
     switch (role)
     {
         case Qt::DisplayRole:
-            return i18n("Slot %1", m_number);
+            return i18n("Slot %1 of device %2", m_number, m_deviceName);
         case Qt::DecorationRole:
             switch (m_state)
             {
@@ -93,6 +93,13 @@ QVariant Kandas::Client::NdasSlot::data(int role) const
                 return QLatin1String("connect-slot");
             else if (m_state == Kandas::ConnectedSlot)
                 return QLatin1String("disconnect-slot");
+            else //transitional state or offline
+                return QString();
+        case Kandas::Client::ActionDescriptionRole:
+            if (m_state == Kandas::DisconnectedSlot)
+                return i18n("Connect this slot");
+            else if (m_state == Kandas::ConnectedSlot)
+                return i18n("Disconnect this slot");
             else //transitional state or offline
                 return QString();
         case Kandas::Client::SecondDisplayRole:

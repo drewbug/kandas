@@ -34,7 +34,8 @@ namespace Kandas
         {
             SecondDisplayRole = Qt::UserRole + 1, //second text line
             SecondDecorationRole, //icon for action button at the right
-            ActionRole //some string that identifies the action associated with the action button
+            ActionRole, //some string that identifies the action associated with the action button
+            ActionDescriptionRole //description for this action
         };
 
         class NdasModel : public QAbstractItemModel

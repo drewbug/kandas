@@ -123,6 +123,10 @@ void Kandas::Client::NdasModel::updateDevice(const QString &deviceName, const QS
             device->update(serial, state, hasWriteKey);
             const QModelIndex index = createIndex(d, 0, (void*) device);
             emit dataChanged(index, index);
+            //if device is not available, set slots to unavailable state
+            if (state != Kandas::DeviceOnline)
+                foreach (Kandas::Client::NdasSlot* slot, device->slotList())
+                    updateSlot(slot->number(), slot->deviceName(), slot->blockDeviceName(), Kandas::SlotOffline);
             return;
         }
     }
@@ -148,6 +152,9 @@ void Kandas::Client::NdasModel::updateSlot(int slotNumber, const QString &device
                 Kandas::Client::NdasSlot* slot = device->slotList()[s];
                 if (slot->number() == slotNumber)
                 {
+                    //slot cannot be online if device is offline
+                    if (device->state() != Kandas::DeviceOnline)
+                        state = Kandas::SlotOffline;
                     //update data
                     slot->update(deviceName, blockDeviceName, state);
                     const QModelIndex index = createIndex(s, 0, (void*) slot);
@@ -194,6 +201,9 @@ void Kandas::Client::NdasModel::updateSlot(int slotNumber, const QString &device
             Kandas::Client::NdasDevice* device = m_devices[d];
             if (device->name() == deviceName)
             {
+                //slot cannot be online if device is offline
+                if (device->state() != Kandas::DeviceOnline)
+                    slot->update(deviceName, blockDeviceName, Kandas::SlotOffline);
                 //insert slot here
                 QModelIndex parent = createIndex(d, 0, (void*) device);
                 int d = device->slotList().count();
@@ -217,6 +227,9 @@ void Kandas::Client::NdasModel::updateSlot(int slotNumber, const QString &device
             Kandas::Client::NdasDevice* device = m_devices[d];
             if (device->name() == deviceName)
             {
+                //slot cannot be online if device is offline
+                if (device->state() != Kandas::DeviceOnline)
+                    slot->update(deviceName, blockDeviceName, Kandas::SlotOffline);
                 //insert slot here
                 QModelIndex parent = createIndex(d, 0, (void*) device);
                 int d = device->slotList().count();

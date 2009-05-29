@@ -41,7 +41,7 @@ bool Kandas::Console::InfoWorker::execute()
         if (m_listEnv)
             std::cout << std::endl; //some space between both lists
         if (devicesList().isEmpty())
-            Kandas::Console::printMessage(i18n("No devices registered"));
+            Kandas::Console::printMessage(i18n("No drives registered."));
         else
             listDevices();
     }

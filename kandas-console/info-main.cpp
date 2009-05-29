@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     //read command line options
     bool listEnv = args->isSet("environment");
-    bool listDevices = args->isSet("devices");
+    bool listDevices = args->isSet("drives");
     bool listSlots = args->isSet("slots");
     args->clear();
 

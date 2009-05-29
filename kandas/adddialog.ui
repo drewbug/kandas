@@ -9,14 +9,11 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle" >
-   <string>Form</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout" >
    <item row="0" column="0" >
     <widget class="QLabel" name="nameLabel" >
      <property name="text" >
-      <string>Choose a device name:</string>
+      <string>Choose a drive name:</string>
      </property>
      <property name="alignment" >
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

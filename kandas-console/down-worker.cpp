@@ -73,7 +73,7 @@ bool Kandas::Console::DownWorker::disconnectSlot(int slotNumber)
     Kandas::Console::Slot* slot = slotList.slot(slotNumber);
     if (!slot)
     {
-        Kandas::Console::printError(i18n("Connection point \"%1\" is not available.", slotNumber));
+        Kandas::Console::printError(i18n("Connection point %1 is not available.", slotNumber));
         return true; //do nothing, exit immediately
     }
     //check whether update is necessary

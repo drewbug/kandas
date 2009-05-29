@@ -38,7 +38,7 @@ Kandas::Client::Manager::Manager()
     }
     else if (version != QLatin1String("0.2"))
     {
-        m_systemModel->setConnectionError(i18n("Incompatible daemon detected (version \"%1\").", version));
+        m_systemModel->setConnectionError(i18n("Incompatible KaNDASd detected (version \"%1\").", version));
         QTimer::singleShot(0, this, SLOT(initComplete()));
     }
     //connect interface

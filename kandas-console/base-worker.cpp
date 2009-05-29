@@ -61,7 +61,7 @@ Kandas::Console::BaseWorkerPrivate::BaseWorkerPrivate(BaseWorker *parent)
     }
     else if (version != "0.2")
     {
-        Kandas::Console::printError(i18n("Incompatible daemon detected (version \"%1\").", version));
+        Kandas::Console::printError(i18n("Incompatible KaNDASd detected (version \"%1\").", version));
         m_clean = false;
     }
 }

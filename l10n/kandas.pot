@@ -1,0 +1,373 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: http://code.google.com/p/kandas/issues/list\n"
+"POT-Creation-Date: 2009-05-29 20:38+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: kandas/adddialog.cpp:57
+msgid "Register a drive"
+msgstr ""
+
+#: kandas/adddialog.cpp:139
+msgid ""
+"The NDAS driver is now searching for this drive. It will then appear in the "
+"drive list."
+msgstr ""
+
+#: kandas/adddialog.cpp:142
+msgid "The drive registration failed for some undetermined reason."
+msgstr ""
+
+#: kandas/adddialog.cpp:145
+msgid "The given access keys are invalid."
+msgstr ""
+
+#: kandas/adddialog.cpp:148
+msgid "The given drive name is invalid."
+msgstr ""
+
+#: kandas/adddialog.cpp:151
+msgid "A drive with this name does already exist."
+msgstr ""
+
+#: kandas/connectmenu.cpp:29
+msgid "Read access"
+msgstr ""
+
+#: kandas/connectmenu.cpp:30
+msgid "Read/write access"
+msgstr ""
+
+#: kandas-console/base-worker.cpp:59 kandas/manager.cpp:36
+msgid "KaNDASd is not running."
+msgstr ""
+
+#: kandas-console/base-worker.cpp:64 kandas/manager.cpp:41
+msgid "Incompatible KaNDASd detected (version \"%1\")."
+msgstr ""
+
+#: kandas-console/base-worker.cpp:173
+msgid "Operation timed out."
+msgstr ""
+
+#: kandas-console/base-worker.cpp:184
+msgid "Error: %1"
+msgstr ""
+
+#: kandas-console/base-worker.cpp:189
+msgid "Warning: %1"
+msgstr ""
+
+#: kandas-console/base-worker.h:35
+msgid "Command line management for NDAS-powered network drives"
+msgstr ""
+
+#: kandas-console/down-main.cpp:28
+msgid "KaNDAS-down"
+msgstr ""
+
+#: kandas-console/down-main.cpp:28 kandas-console/info-main.cpp:27
+#: kandas-console/up-main.cpp:28 kandasd/main.cpp:31 kandas/main.cpp:31
+msgid "Copyright 2008-2009 Stefan Majewsky"
+msgstr ""
+
+#: kandas-console/down-main.cpp:29 kandas-console/info-main.cpp:28
+#: kandas-console/up-main.cpp:29 kandasd/main.cpp:32 kandas/main.cpp:32
+msgid "Stefan Majewsky"
+msgstr ""
+
+#: kandas-console/down-main.cpp:29 kandas-console/info-main.cpp:28
+#: kandas-console/up-main.cpp:29 kandasd/main.cpp:32 kandas/main.cpp:32
+msgid "Maintainer"
+msgstr ""
+
+#: kandas-console/down-main.cpp:34 kandas-console/up-main.cpp:36
+msgid "Argument is a drive name"
+msgstr ""
+
+#: kandas-console/down-main.cpp:35 kandas-console/up-main.cpp:37
+msgid "Connection point (or drive if the -d switch is given)"
+msgstr ""
+
+#: kandas-console/down-main.cpp:43 kandas-console/up-main.cpp:45
+msgid "Missing argument. Use the --help switch for details."
+msgstr ""
+
+#: kandas-console/down-worker.cpp:45 kandas-console/up-worker.cpp:46
+msgid "Drive \"%1\" is not available."
+msgstr ""
+
+#: kandas-console/down-worker.cpp:61 kandas-console/down-worker.cpp:85
+msgid "Terminating connection..."
+msgstr ""
+
+#: kandas-console/down-worker.cpp:76 kandas-console/up-worker.cpp:77
+msgid "Connection point %1 is not available."
+msgstr ""
+
+#: kandas-console/down-worker.cpp:95
+msgid "Connection to point %1 terminated."
+msgstr ""
+
+#: kandas-console/info-main.cpp:27
+msgid "KaNDAS-info"
+msgstr ""
+
+#: kandas-console/info-main.cpp:33
+msgid "Show information about environment state"
+msgstr ""
+
+#: kandas-console/info-main.cpp:35
+msgid "List available drives"
+msgstr ""
+
+#: kandas-console/info-main.cpp:37
+msgid "List available slots"
+msgstr ""
+
+#: kandas-console/info-main.cpp:38
+msgid "By default, everything is printed out."
+msgstr ""
+
+#: kandas-console/info-worker.cpp:44
+msgid "No drives registered."
+msgstr ""
+
+#: kandas-console/info-worker.cpp:65
+msgctxt "System state is unknown"
+msgid "Unknown."
+msgstr ""
+
+#: kandas-console/info-worker.cpp:68
+msgctxt "System state is alright"
+msgid "Alright."
+msgstr ""
+
+#: kandas-console/info-worker.cpp:71 kandas/ndassystemmodel.cpp:86
+msgid "NDAS driver is not loaded."
+msgstr ""
+
+#: kandas-console/info-worker.cpp:74 kandas/ndassystemmodel.cpp:91
+msgid "NDAS driver is not installed."
+msgstr ""
+
+#: kandas-console/info-worker.cpp:77
+msgid "System state: %1"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:80
+msgid "Driver management: KaNDASd %1, protocol version %2"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:85
+msgid "Drive"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:86
+msgid "Serial"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:87
+msgid "Connection points"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:88 kandas-console/info-worker.cpp:157
+msgid "Current state"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:137 kandas-console/info-worker.cpp:195
+#: kandas/ndasdevice.cpp:134 kandas/ndasdevice.cpp:145 kandas/ndasslot.cpp:108
+msgid "Offline"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:140
+msgid "Online"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:143 kandas/ndasdevice.cpp:147
+msgid "Connection error"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:146 kandas/ndasdevice.cpp:149
+msgid "Login error"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:154
+msgid "Connection point"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:155
+msgid "At drive"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:156
+msgid "UNIX device"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:198 kandas/ndasdevice.cpp:136
+#: kandas/ndasslot.cpp:110
+msgid "Connected"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:201 kandas/ndasdevice.cpp:140
+#: kandas/ndasslot.cpp:112
+msgid "Disconnected"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:204 kandas/ndasdevice.cpp:138
+#: kandas/ndasslot.cpp:114
+msgid "Connecting"
+msgstr ""
+
+#: kandas-console/info-worker.cpp:207 kandas/ndasdevice.cpp:142
+#: kandas/ndasslot.cpp:116
+msgid "Disconnecting"
+msgstr ""
+
+#: kandas-console/up-main.cpp:28
+msgid "KaNDAS-up"
+msgstr ""
+
+#: kandas-console/up-main.cpp:34
+msgid "Establish read-only connection"
+msgstr ""
+
+#: kandas-console/up-worker.cpp:62 kandas-console/up-worker.cpp:86
+msgid "Establishing connection..."
+msgstr ""
+
+#: kandas-console/up-worker.cpp:96
+msgid "Connection to point %1 established."
+msgstr ""
+
+#: kandasd/main.cpp:27
+msgid "Management daemon for NDAS-powered network drives"
+msgstr ""
+
+#: kandasd/main.cpp:31
+msgid "KaNDASd"
+msgstr ""
+
+#: kandasd/main.cpp:37
+msgid "Do not block the console"
+msgstr ""
+
+#: kandasd/main.cpp:39
+msgctxt "description of -s switch for KaNDASd"
+msgid "NDAS source directory"
+msgstr ""
+
+#: kandasd/main.cpp:40
+msgid "KaNDASd has to run with root privileges."
+msgstr ""
+
+#: kandas/main.cpp:25
+msgid "KDE interface for NDAS-powered network drives"
+msgstr ""
+
+#. i18n: file: kandas/kandasui.rc:6
+#. i18n: ectx: Menu (kandas)
+#: kandas/main.cpp:30 l10n/rc.cpp:15 rc.cpp:15
+msgid "KaNDAS"
+msgstr ""
+
+#: kandas/ndasdevice.cpp:122
+msgid "Connect to this drive"
+msgstr ""
+
+#: kandas/ndasdevice.cpp:124
+msgid "Disconnect from this drive"
+msgstr ""
+
+#: kandas/ndasdevice.cpp:134
+msgid "Partially offline"
+msgstr ""
+
+#: kandas/ndasdevice.cpp:136 kandas/ndasdevice.cpp:140
+msgid "Partially connected"
+msgstr ""
+
+#: kandas/ndasslot.cpp:71
+msgid "Connection point %1"
+msgstr ""
+
+#: kandas/ndasslot.cpp:99
+msgid "Connect to this connection point"
+msgstr ""
+
+#: kandas/ndasslot.cpp:101
+msgid "Disconnect from this connection point"
+msgstr ""
+
+#: kandas/ndassystemmodel.cpp:72 kandas/ndassystemmodel.cpp:87
+#: kandas/ndassystemmodel.cpp:92
+msgid "Check your system configuration."
+msgstr ""
+
+#: kandas/ndassystemmodel.cpp:81
+msgid "Performing system check..."
+msgstr ""
+
+#: kandas/removedialog.cpp:36
+msgid "Remove a drive"
+msgstr ""
+
+#: kandas/window.cpp:61
+msgid "Register drive..."
+msgstr ""
+
+#: kandas/window.cpp:63
+msgid "Remove drive..."
+msgstr ""
+
+#. i18n: file: kandas/adddialog.ui:16
+#. i18n: ectx: property (text), widget (QLabel, nameLabel)
+#: l10n/rc.cpp:3 rc.cpp:3
+msgid "Choose a drive name:"
+msgstr ""
+
+#. i18n: file: kandas/adddialog.ui:26
+#. i18n: ectx: property (text), widget (QLabel, readKeyLabel)
+#: l10n/rc.cpp:6 rc.cpp:6
+msgid "Read access key:"
+msgstr ""
+
+#. i18n: file: kandas/adddialog.ui:77
+#. i18n: ectx: property (text), widget (QLabel, writeKeyLabel)
+#: l10n/rc.cpp:9 rc.cpp:9
+msgid "Write access key:"
+msgstr ""
+
+#. i18n: file: kandas/adddialog.ui:87
+#. i18n: ectx: property (text), widget (QLabel, writeKeyLabel2)
+#: l10n/rc.cpp:12 rc.cpp:12
+msgid "(optional)"
+msgstr ""
+
+#. i18n: file: kandas/kandasui.rc:12
+#. i18n: ectx: ToolBar (deviceToolBar)
+#: l10n/rc.cpp:18 rc.cpp:18
+msgid "Drive management"
+msgstr ""
+
+#: l10n/rc.cpp:19 rc.cpp:19
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr ""
+
+#: l10n/rc.cpp:20 rc.cpp:20
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr ""

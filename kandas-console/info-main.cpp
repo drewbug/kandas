@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 
     KCmdLineOptions options;
     options.add("e");
-    options.add("environment", ki18n("Show environment state"));
+    options.add("environment", ki18n("Show information about environment state"));
     options.add("d");
     options.add("drives", ki18n("List available drives"));
     options.add("s");

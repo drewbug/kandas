@@ -43,7 +43,7 @@ bool Kandas::Console::UpWorker::connectDevice(const QString &deviceName)
     //check whether device exists
     if (!devicesList().device(deviceName))
     {
-        Kandas::Console::printError(i18n("ERROR: Drive \"%1\" is not available."));
+        Kandas::Console::printError(i18n("Drive \"%1\" is not available."));
         return true; //do nothing, exit immediately
     }
     //get a list of all slots that need to be up'ed, and send request to KaNDASd
@@ -74,7 +74,7 @@ bool Kandas::Console::UpWorker::connectSlot(int slotNumber)
     Kandas::Console::Slot* slot = slotList.slot(slotNumber);
     if (!slot)
     {
-        Kandas::Console::printMessage(i18n("ERROR: Connection point %1 is not available.", slotNumber));
+        Kandas::Console::printMessage(i18n("Connection point %1 is not available.", slotNumber));
         return true; //do nothing, exit immediately
     }
     //check whether update is necessary

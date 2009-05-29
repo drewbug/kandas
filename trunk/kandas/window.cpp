@@ -38,13 +38,13 @@ Kandas::Client::MainWindow::MainWindow()
 {
     //early GUI initialisation
     setupActions();
-    statusBar()->hide();
     setAutoSaveSettings();
     //central widget
     setCentralWidget(m_view);
     connect(m_view, SIGNAL(initializationComplete(const QString &)), this, SLOT(initializationComplete(const QString &)));
     //late GUI initialisation
     setupGUI();
+    statusBar()->hide();
     setMinimumSize(QSize(300, 300));
     setWindowIcon(KIcon("folder-remote"));
     QTimer::singleShot(0, this, SLOT(setupDialogs()));

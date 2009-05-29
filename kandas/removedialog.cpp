@@ -38,6 +38,8 @@ Kandas::Client::RemoveDialog::RemoveDialog(Kandas::Client::Manager *manager)
     //setup view
     m_view->setModel(m_manager->model());
     m_view->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_view->setViewMode(QListView::IconMode);
+    m_view->setSpacing(6);
     connect(m_view->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(handleInput()));
 }
 

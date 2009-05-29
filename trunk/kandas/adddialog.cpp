@@ -54,7 +54,7 @@ Kandas::Client::AddDialog::AddDialog(Kandas::Client::Manager *manager)
     m_ui.setupUi(m_widget);
     setMainWidget(m_widget);
     setButtons(KDialog::Ok | KDialog::Cancel);
-    setCaption(i18n("Add a NDAS device"));
+    setCaption(i18n("Register a drive"));
     setMaximumSize(QSize(500, 250));
     connect(this, SIGNAL(okClicked()), this, SLOT(handleOkClicked()));
     //setup input validation
@@ -136,19 +136,19 @@ void Kandas::Client::AddDialog::handleOkClicked()
     switch (result)
     {
         case Kandas::DeviceAdded:
-            KMessageBox::information(0, i18n("The NDAS service has started to scan for this device. It should appear in the device list in some seconds."), QString(), "kandas_adddevice_successinfo");
+            KMessageBox::information(0, i18n("The NDAS driver is now searching for this drive. It will then appear in the drive list."), QString(), "kandas_adddevice_successinfo");
             return; //nothing to do
         case Kandas::DeviceAdditionFailed:
-            message = i18n("The device could not be added for some reason that KaNDAS could not determine.");
+            message = i18n("The drive registration failed for some undetermined reason.");
             break;
         case Kandas::InvalidDeviceKey:
             message = i18n("The given access keys are invalid.");
             break;
         case Kandas::InvalidDeviceName:
-            message = i18n("The given device name is invalid.");
+            message = i18n("The given drive name is invalid.");
             break;
         case Kandas::DeviceExistsAlready:
-            message = i18n("A device with this name does already exist.");
+            message = i18n("A drive with this name does already exist.");
             break;
     }
     KMessageBox::error(this, message);

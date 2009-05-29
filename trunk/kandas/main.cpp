@@ -22,14 +22,14 @@
 #include <KAboutData>
 #include <KCmdLineArgs>
 
-static const char description[] = I18N_NOOP("KDE adapter for NDAS devices");
+static const char description[] = I18N_NOOP("KDE interface for NDAS-powered network drives");
 static const char version[] = "trunk";
 
 int main(int argc, char ** argv)
 {
-    KAboutData about("kandas", 0, ki18nc("The application's name", "KaNDAS"), version, ki18n(description),
+    KAboutData about("kandas", 0, ki18n("KaNDAS"), version, ki18n(description),
         KAboutData::License_GPL, ki18n("Copyright 2008-2009 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
-    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Original author and current maintainer"), "majewsky@gmx.net");
+    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Maintainer"), "majewsky@gmx.net");
     KCmdLineArgs::init(argc, argv, &about);
 
     KApplication app;

@@ -119,9 +119,9 @@ QVariant Kandas::Client::NdasDevice::data(int role) const
                 return QString();
         case Kandas::Client::ActionDescriptionRole:
             if (dominantSlotState == Kandas::DisconnectedSlot)
-                return i18n("Connect this device");
+                return i18n("Connect to this drive");
             else if (dominantSlotState == Kandas::ConnectedSlot)
-                return i18n("Disconnect this device");
+                return i18n("Disconnect from this drive");
             else //transitional state or offline
                 return QString();
         case Kandas::Client::SecondDisplayRole:
@@ -137,12 +137,12 @@ QVariant Kandas::Client::NdasDevice::data(int role) const
                         case Kandas::ConnectingSlot:
                             return i18n("Connecting");
                         case Kandas::DisconnectedSlot:
-                            return partial ? i18n("Not connected") : i18n("Partially connected");
+                            return partial ? i18n("Disconnected") : i18n("Partially connected");
                         case Kandas::DisconnectingSlot:
                             return i18n("Disconnecting");
                     }
                 case Kandas::DeviceOffline:
-                    return i18n("Device offline");
+                    return i18n("Offline");
                 case Kandas::DeviceConnectionError:
                     return i18n("Connection error");
                 case Kandas::DeviceLoginError:

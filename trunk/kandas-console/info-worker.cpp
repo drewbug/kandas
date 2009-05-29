@@ -41,7 +41,7 @@ bool Kandas::Console::InfoWorker::execute()
         if (m_listEnv)
             std::cout << std::endl; //some space between both lists
         if (devicesList().isEmpty())
-            std::cout << i18n("No devices registered").toUtf8().data() << std::endl;
+            Kandas::Console::printMessage(i18n("No devices registered"));
         else
             listDevices();
     }
@@ -57,31 +57,34 @@ bool Kandas::Console::InfoWorker::execute()
 
 void Kandas::Console::InfoWorker::listEnvironment()
 {
-    std::cout << i18n("System state:").toUtf8().data() << ' ';
+    //print system state
+    QString systemStateMessage;
     switch (system())
     {
         case Kandas::SystemUnchecked:
-            std::cout << i18n("Could not be determined").toUtf8().data() << std::endl;
+            systemStateMessage = i18nc("System state is unknown", "Unknown.");
             break;
         case Kandas::SystemChecked:
-            std::cout << i18nc("System state is alright", "Alright").toUtf8().data() << std::endl;
+            systemStateMessage = i18nc("System state is alright", "Alright.");
             break;
         case Kandas::NoDriverFound:
-            std::cout << i18n("NDAS driver not installed or not running").toUtf8().data() << std::endl;
+            systemStateMessage = i18n("NDAS driver is not loaded.");
             break;
         case Kandas::NoAdminFound:
-            std::cout << i18n("NDAS administration tool not installed.").toUtf8().data() << std::endl;
+            systemStateMessage = i18n("NDAS driver is not installed.");
             break;
     }
+    Kandas::Console::printMessage(i18n("System state: %1", systemStateMessage));
     //show KaNDAS version
-    std::cout << i18n("NDAS management: KaNDASd %1, protocol version %2", interface()->daemonVersion(), interface()->interfaceVersion()).toUtf8().data() << std::endl;
+    const QString dVer = interface()->daemonVersion(), iVer = interface()->interfaceVersion();
+    Kandas::Console::printMessage(i18n("Driver management: KaNDASd %1, protocol version %2", dVer, iVer));
 }
 
 void Kandas::Console::InfoWorker::listDevices()
 {
-    static const QString deviceHeader = i18n("Device");
+    static const QString deviceHeader = i18n("Drive");
     static const QString serialHeader = i18n("Serial");
-    static const QString slotsHeader = i18n("Associated slots");
+    static const QString slotsHeader = i18n("Connection points");
     static const QString stateHeader = i18n("Current state");
     static const int columnPadding = 3;
     static const char paddingCharacterRaw = ' ';
@@ -148,8 +151,8 @@ void Kandas::Console::InfoWorker::listDevices()
 
 void Kandas::Console::InfoWorker::listSlots()
 {
-    static const QString slotHeader = i18n("Slot");
-    static const QString deviceHeader = i18n("At device");
+    static const QString slotHeader = i18n("Connection point");
+    static const QString deviceHeader = i18n("At drive");
     static const QString blockDeviceHeader = i18n("UNIX device");
     static const QString stateHeader = i18n("Current state");
     static const int columnPadding = 3;
@@ -189,7 +192,7 @@ void Kandas::Console::InfoWorker::listSlots()
         switch (slot->state)
         {
             case Kandas::SlotOffline:
-                std::cout << i18n("Unavailable").toUtf8().data() << std::endl;
+                std::cout << i18n("Offline").toUtf8().data() << std::endl;
                 break;
             case Kandas::ConnectedSlot:
                 std::cout << i18n("Connected").toUtf8().data() << std::endl;

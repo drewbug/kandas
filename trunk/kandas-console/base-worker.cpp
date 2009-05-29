@@ -56,12 +56,12 @@ Kandas::Console::BaseWorkerPrivate::BaseWorkerPrivate(BaseWorker *parent)
     QString version = m_interface->interfaceVersion().value();
     if (version == "") //no KaNDASd instance running
     {
-        std::cerr << i18n("ERROR: KaNDASd is not running.").toUtf8().data() << std::endl;
+        Kandas::Console::printError(i18n("KaNDASd is not running."));
         m_clean = false;
     }
     else if (version != "0.2")
     {
-        std::cerr << i18n("ERROR: Unknown KaNDASd version \"%1\" detected.", version).toUtf8().data() << std::endl;
+        Kandas::Console::printError(i18n("Incompatible daemon detected (version \"%1\").", version));
         m_clean = false;
     }
 }
@@ -170,8 +170,23 @@ void Kandas::Console::BaseWorker::executeJobs()
 
 void Kandas::Console::BaseWorker::autoTimeout()
 {
-    std::cerr << i18n("Operation timed out.").toUtf8().data() << std::endl;
+    Kandas::Console::printWarning(i18n("Operation timed out."));
     qApp->quit();
+}
+
+void Kandas::Console::printMessage(const QString& message, bool errorOutput)
+{
+    (errorOutput ? std::cerr : std::cout) << message.toUtf8().data() << std::endl;
+}
+
+void Kandas::Console::printError(const QString& message)
+{
+    Kandas::Console::printMessage(i18n("Error: %1", message), true);
+}
+
+void Kandas::Console::printWarning(const QString& message)
+{
+    Kandas::Console::printMessage(i18n("Warning: %1", message), true);
 }
 
 #include "base-worker.moc"

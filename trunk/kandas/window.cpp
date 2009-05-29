@@ -38,8 +38,7 @@ Kandas::Client::MainWindow::MainWindow()
 {
     //early GUI initialisation
     setupActions();
-    statusBar()->insertPermanentItem(i18n("Connecting to KaNDASd..."), 1, 1);
-    statusBar()->setItemAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+    statusBar()->hide();
     setAutoSaveSettings();
     //central widget
     setCentralWidget(m_view);
@@ -59,9 +58,9 @@ Kandas::Client::MainWindow::~MainWindow()
 
 void Kandas::Client::MainWindow::setupActions()
 {
-    m_addDialogAct = new KAction(KIcon("list-add"), i18n("Add device..."), actionCollection());
+    m_addDialogAct = new KAction(KIcon("list-add"), i18n("Register drive..."), actionCollection());
     actionCollection()->addAction("kandas_device_add", m_addDialogAct);
-    m_removeDialogAct = new KAction(KIcon("list-remove"), i18n("Remove device..."), actionCollection());
+    m_removeDialogAct = new KAction(KIcon("list-remove"), i18n("Remove drive..."), actionCollection());
     actionCollection()->addAction("kandas_device_remove", m_removeDialogAct);
 }
 
@@ -81,14 +80,9 @@ void Kandas::Client::MainWindow::setupDialogs()
 
 void Kandas::Client::MainWindow::initializationComplete(const QString &daemonVersion)
 {
-    if (daemonVersion.isEmpty())
-    {
-        statusBar()->changeItem(i18n("No connection to KaNDASd"), 1);
-        m_addDialogAct->setEnabled(false);
-        m_removeDialogAct->setEnabled(false);
-    }
-    else
-        statusBar()->changeItem(i18n("Connected to KaNDASd %1", daemonVersion), 1);
+    bool hasDaemon = !daemonVersion.isEmpty();
+    m_addDialogAct->setEnabled(hasDaemon);
+    m_removeDialogAct->setEnabled(hasDaemon);
     show();
 }
 

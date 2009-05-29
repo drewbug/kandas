@@ -22,20 +22,19 @@
 #include <KAboutData>
 #include <KApplication>
 #include <KCmdLineArgs>
-#include <KLocalizedString>
 
 int main(int argc, char **argv)
 {
-    KAboutData about("kandas-up", "kandas", ki18nc("The application's name", "KaNDAS-up"), Kandas::Console::VersionRaw, ki18n(Kandas::Console::Description), KAboutData::License_GPL, ki18n("Copyright 2008-2009 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
-    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Original author and current maintainer"), "majewsky@gmx.net");
+    KAboutData about("kandas-up", "kandas", ki18n("KaNDAS-up"), Kandas::Console::VersionRaw, ki18n(Kandas::Console::Description), KAboutData::License_GPL, ki18n("Copyright 2008-2009 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
+    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Maintainer"), "majewsky@gmx.net");
     KCmdLineArgs::init(argc, argv, &about, KCmdLineArgs::CmdLineArgNone);
 
     KCmdLineOptions options;
     options.add("r");
-    options.add("readonly", ki18n("Connect slot read-only"));
+    options.add("readonly", ki18n("Establish read-only connection"));
     options.add("d");
-    options.add("device", ki18n("Slot argument is a device name; connect all slots of this device"));
-    options.add("+slot", ki18n("The slot to connect to"));
+    options.add("drive", ki18n("Argument is a drive name"));
+    options.add("+point", ki18n("Connection point (or drive if the -d switch is given)"));
     KCmdLineArgs::addCmdLineOptions(options);
 
     KApplication app(false);
@@ -43,13 +42,13 @@ int main(int argc, char **argv)
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     if (args->count() < 1)
     {
-        std::cerr << i18n("ERROR: KaNDAS-up called without slot ID or device name. Use the --help switch for details.").toUtf8().data() << std::endl;
+        Kandas::Console::printError(i18n("Missing argument. Use the --help switch for details."));
         return 1;
     }
     //read command line options
     bool readOnly = args->isSet("readonly");
     QVariant target(args->arg(0));
-    if (!args->isSet("device"))
+    if (!args->isSet("drive"))
         target.convert(QVariant::Int);
     args->clear();
 

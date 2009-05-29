@@ -33,8 +33,7 @@ Kandas::Client::RemoveDialog::RemoveDialog(Kandas::Client::Manager *manager)
     setMainWidget(m_view);
     setButtons(KDialog::User1 | KDialog::Cancel);
     setButtonGuiItem(KDialog::User1, KStandardGuiItem::remove());
-    setButtonText(KDialog::User1, i18n("Remove device"));
-    setCaption(i18n("Remove a NDAS device"));
+    setCaption(i18n("Remove a drive"));
     connect(this, SIGNAL(user1Clicked()), this, SLOT(handleOkClicked()));
     //setup view
     m_view->setModel(m_manager->model());

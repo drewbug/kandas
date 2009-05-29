@@ -69,7 +69,7 @@ void Kandas::Client::NdasSystemModel::updateContents()
     if (!m_errorMessage.isEmpty())
     {
         m_item->setData(m_errorMessage, Qt::DisplayRole);
-        m_item->setData(i18n("Check your installation."), Kandas::Client::SecondDisplayRole);
+        m_item->setData(i18n("Check your system configuration."), Kandas::Client::SecondDisplayRole);
         m_item->setData(KIcon("dialog-error"), Qt::DecorationRole);
         return;
     }
@@ -78,18 +78,18 @@ void Kandas::Client::NdasSystemModel::updateContents()
         case Kandas::SystemChecked:
             break; //do not set any specific content, as the model is assumed to be hidden in this state
         case Kandas::SystemUnchecked:
-            m_item->setData(i18n("Waiting for system check..."), Qt::DisplayRole);
+            m_item->setData(i18n("Performing system check..."), Qt::DisplayRole);
             m_item->setData(QString(), Kandas::Client::SecondDisplayRole);
-            m_item->setData(KIcon("dialog-informatismon"), Qt::DecorationRole);
+            m_item->setData(KIcon("dialog-information"), Qt::DecorationRole);
             break;
         case Kandas::NoDriverFound:
-            m_item->setData(i18n("NDAS driver is not loaded"), Qt::DisplayRole);
-            m_item->setData(i18n("Check your installation."), Kandas::Client::SecondDisplayRole);
+            m_item->setData(i18n("NDAS driver is not loaded."), Qt::DisplayRole);
+            m_item->setData(i18n("Check your system configuration."), Kandas::Client::SecondDisplayRole);
             m_item->setData(KIcon("dialog-error"), Qt::DecorationRole);
             break;
         case Kandas::NoAdminFound:
-            m_item->setData(i18n("NDAS administration interface is not installed"), Qt::DisplayRole);
-            m_item->setData(i18n("Check your installation."), Kandas::Client::SecondDisplayRole);
+            m_item->setData(i18n("NDAS driver is not installed."), Qt::DisplayRole);
+            m_item->setData(i18n("Check your system configuration."), Kandas::Client::SecondDisplayRole);
             m_item->setData(KIcon("dialog-error"), Qt::DecorationRole);
             break;
     }

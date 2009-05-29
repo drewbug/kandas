@@ -1,0 +1,8 @@
+The translation stuff is in the l10n/ subdirectory.
+
+How to translate KaNDAS
+-----------------------
+
+Copy the file "kandas.pot" in this directory to "kandas_[lang code].po" (the underscore is important, as well as the changed file type), where "[lang code]" is the ISO code of your locale (e.g. "de" for German). Also, add your localization of "Name" and "GenericName" in kandas/kandas.desktop.
+
+For any further questions, contact me at majewsky (at) gmx (dot) net. Please also send me the translation via mail, I will then grant you access to the repository.

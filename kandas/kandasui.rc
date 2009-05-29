@@ -8,13 +8,8 @@
             <Action name="kandas_device_remove"/>
         </Menu>
     </MenuBar>
-<!--    <ToolBar name="driverToolBar">
-        <Text>Driver functions</Text>
-        <Action name="kandas_start"/>
-        <Action name="kandas_stop"/>
-    </ToolBar>-->
     <ToolBar name="deviceToolBar">
-        <Text>Device management</Text>
+        <Text>Drive management</Text>
         <Action name="kandas_device_add"/>
         <Action name="kandas_device_remove"/>
     </ToolBar>

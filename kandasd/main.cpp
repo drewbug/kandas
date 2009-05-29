@@ -24,19 +24,19 @@
 #include <KCmdLineOptions>
 #include <KProcess>
 
-static const char description[] = I18N_NOOP("KDE adapter daemon for NDAS devices");
+static const char description[] = I18N_NOOP("Management daemon for NDAS-powered network drives");
 
 int main(int argc, char ** argv)
 {
-    KAboutData about("kandasd", "kandas", ki18nc("The application's name", "KaNDASd"), Kandas::Daemon::DaemonVersionRaw, ki18n(description), KAboutData::License_GPL, ki18n("Copyright 2008-2009 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
-    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Original author and current maintainer"), "majewsky@gmx.net");
+    KAboutData about("kandasd", "kandas", ki18n("KaNDASd"), Kandas::Daemon::DaemonVersionRaw, ki18n(description), KAboutData::License_GPL, ki18n("Copyright 2008-2009 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
+    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Maintainer"), "majewsky@gmx.net");
     KCmdLineArgs::init(argc, argv, &about, KCmdLineArgs::CmdLineArgNone);
 
     KCmdLineOptions options;
     options.add("d");
-    options.add("detach", ki18n("Start detached instance of KaNDASd (for usage on console)"));
+    options.add("detach", ki18n("Do not block the console"));
     options.add("s");
-    options.add("source <directory>", ki18n("NDAS source directory (use this with KaNDASsimul)"), "/proc/ndas");
+    options.add("source <directory>", ki18nc("description of -s switch for KaNDASd", "NDAS source directory"), "/proc/ndas");
     options.add("", ki18n("KaNDASd has to run with root privileges."));
     KCmdLineArgs::addCmdLineOptions(options);
 

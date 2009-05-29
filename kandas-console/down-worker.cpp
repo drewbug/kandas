@@ -42,7 +42,7 @@ bool Kandas::Console::DownWorker::disconnectDevice(const QString &deviceName)
     //check whether device exists
     if (!devicesList().device(deviceName))
     {
-        std::cerr << i18n("ERROR: Device \"%1\" is not available.", deviceName).toUtf8().data();
+        Kandas::Console::printError(i18n("Drive \"%1\" is not available.", deviceName));
         return true; //do nothing, exit immediately
     }
     //get a list of all slots that need to be down'ed, and send request to KaNDASd
@@ -58,7 +58,7 @@ bool Kandas::Console::DownWorker::disconnectDevice(const QString &deviceName)
     //exit immediately if nothing is to do, else wait for all slots to be connected
     if (m_remainingSlots.count() != 0)
     {
-        std::cout << i18np("Waiting for 1 slot to disconnect...", "Waiting for %1 slots to disconnect...", m_remainingSlots.count()).toUtf8().data() << std::endl;
+        Kandas::Console::printMessage(i18n("Terminating connection..."));
         connect(interface(), SIGNAL(slotInfo(int, const QString &, const QString &, int)), this, SLOT(slotChanged(int, const QString &, const QString &, int)));
         return false;
     }
@@ -73,7 +73,7 @@ bool Kandas::Console::DownWorker::disconnectSlot(int slotNumber)
     Kandas::Console::Slot* slot = slotList.slot(slotNumber);
     if (!slot)
     {
-        std::cerr << i18n("ERROR: Slot %1 is not available.", slotNumber).toUtf8().data();
+        Kandas::Console::printError(i18n("Connection point \"%1\" is not available.", slotNumber));
         return true; //do nothing, exit immediately
     }
     //check whether update is necessary
@@ -82,7 +82,7 @@ bool Kandas::Console::DownWorker::disconnectSlot(int slotNumber)
     //issue update
     m_remainingSlots << slotNumber;
     interface()->disconnectSlot(slotNumber);
-    std::cout << i18n("Waiting for slot to disconnect...").toUtf8().data() << std::endl;
+    Kandas::Console::printMessage(i18n("Terminating connection..."));
     connect(interface(), SIGNAL(slotInfo(int, const QString &, const QString &, int)), this, SLOT(slotChanged(int, const QString &, const QString &, int)));
     return false;
 }
@@ -92,7 +92,7 @@ void Kandas::Console::DownWorker::slotChanged(int slot, const QString &/*device*
     if (newState == Kandas::DisconnectedSlot && m_remainingSlots.contains(slot))
     {
         m_remainingSlots.removeAll(slot);
-        std::cout << i18n("Slot %1 disconnected.", slot).toUtf8().data() << std::endl;
+        std::cout << i18n("Connection to point %1 terminated.", slot).toUtf8().data() << std::endl;
         if (m_remainingSlots.count() == 0)
             qApp->quit();
     }

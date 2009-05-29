@@ -24,17 +24,18 @@
 
 int main(int argc, char **argv)
 {
-    KAboutData about("kandas-info", "kandas", ki18nc("The application's name", "KaNDAS-info"), Kandas::Console::VersionRaw, ki18n(Kandas::Console::Description), KAboutData::License_GPL, ki18n("Copyright 2008-2009 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
-    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Original author and current maintainer"), "majewsky@gmx.net");
+    KAboutData about("kandas-info", "kandas", ki18n("KaNDAS-info"), Kandas::Console::VersionRaw, ki18n(Kandas::Console::Description), KAboutData::License_GPL, ki18n("Copyright 2008-2009 Stefan Majewsky"), KLocalizedString(), "http://code.google.com/p/kandas/", "majewsky@gmx.net");
+    about.addAuthor(ki18n("Stefan Majewsky"), ki18n("Maintainer"), "majewsky@gmx.net");
     KCmdLineArgs::init(argc, argv, &about, KCmdLineArgs::CmdLineArgNone);
 
     KCmdLineOptions options;
     options.add("e");
     options.add("environment", ki18n("Show environment state"));
     options.add("d");
-    options.add("devices", ki18n("List all available devices"));
+    options.add("drives", ki18n("List available drives"));
     options.add("s");
-    options.add("slots", ki18n("List all available slots"));
+    options.add("slots", ki18n("List available slots"));
+    options.add("", ki18n("By default, everything is printed out."));
     KCmdLineArgs::addCmdLineOptions(options);
 
     KApplication app(false);

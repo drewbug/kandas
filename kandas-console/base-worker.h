@@ -32,9 +32,13 @@ namespace Kandas
     namespace Console
     {
 
-        const char Description[] = I18N_NOOP("Command line management for NDAS devices");
+        const char Description[] = I18N_NOOP("Command line management for NDAS-powered network drives");
         const char VersionRaw[] = "trunk";
         const QString Version(VersionRaw);
+
+        void printMessage(const QString& message, bool errorOutput = false);
+        void printError(const QString& message);
+        void printWarning(const QString& message);
 
         class BaseWorkerPrivate;
 

@@ -14,8 +14,7 @@ set(kandas_SRCS
     viewdelegate.cpp
     window.cpp
 )
-find_path(KANDASD_INTERFACE_PATH NAMES org.kandas.xml PATH_SUFFIXES kandasd)
-qt4_add_dbus_interface(kandas_SRCS ${CMAKE_SOURCE_DIR}/kandasd/org.kandas.xml interface)
+qt4_add_dbus_interface(kandas_SRCS ${CMAKE_SOURCE_DIR}/kandas-daemon/org.kandas.xml interface)
 kde4_add_ui_files(kandas_SRCS adddialog.ui)
 
 kde4_add_executable(kandas ${kandas_SRCS})

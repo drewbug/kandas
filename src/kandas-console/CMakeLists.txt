@@ -1,8 +1,7 @@
 SET(kandas_base_SRCS
     base-worker.cpp
 )
-find_path(KANDASD_INTERFACE_PATH NAMES org.kandas.xml PATH_SUFFIXES kandasd)
-qt4_add_dbus_interface(kandas_base_SRCS ${CMAKE_SOURCE_DIR}/kandasd/org.kandas.xml interface)
+qt4_add_dbus_interface(kandas_base_SRCS ${CMAKE_SOURCE_DIR}/kandas-daemon/org.kandas.xml interface)
 
 set(kandas_info_SRCS
     ${kandas_base_SRCS}

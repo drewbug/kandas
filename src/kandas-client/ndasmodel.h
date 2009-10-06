@@ -20,7 +20,7 @@
 #define KANDAS_CLIENT_NDASMODEL_H
 
 #include <QAbstractItemModel>
-#include <kandasd/definitions.h>
+#include <kandas-daemon/definitions.h>
 
 namespace Kandas
 {

@@ -21,7 +21,7 @@
 
 #include <QPersistentModelIndex>
 #include <QStackedWidget>
-#include <kandasd/definitions.h>
+#include <kandas-daemon/definitions.h>
 
 namespace Kandas
 {

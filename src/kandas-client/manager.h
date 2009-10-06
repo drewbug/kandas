@@ -22,7 +22,7 @@
 #include "interface.h"
 
 #include <QObject>
-#include <kandasd/definitions.h>
+#include <kandas-daemon/definitions.h>
 
 namespace Kandas
 {

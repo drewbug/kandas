@@ -23,7 +23,7 @@
 
 #include <QList>
 #include <QString>
-#include <kandasd/definitions.h>
+#include <kandas-daemon/definitions.h>
 
 namespace Kandas
 {

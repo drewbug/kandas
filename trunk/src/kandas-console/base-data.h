@@ -19,7 +19,7 @@
 #ifndef KANDAS_CONSOLE_BASEDATA_H
 #define KANDAS_CONSOLE_BASEDATA_H
 
-#include <kandasd/definitions.h>
+#include <kandas-daemon/definitions.h>
 #include <QList>
 
 namespace Kandas

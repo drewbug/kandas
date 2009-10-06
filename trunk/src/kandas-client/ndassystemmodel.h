@@ -20,7 +20,7 @@
 #define KANDAS_CLIENT_NDASSYSTEMMODEL_H
 
 #include <QStandardItem>
-#include <kandasd/definitions.h>
+#include <kandas-daemon/definitions.h>
 
 namespace Kandas
 {

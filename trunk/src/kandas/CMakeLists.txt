@@ -1,11 +1,3 @@
-project(kandas)
-find_package(KDE4 REQUIRED)
-include (KDE4Defaults)
-include (MacroLibrary)
-
-add_definitions (${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
-include_directories (${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
-
 set(kandas_SRCS
     adddialog.cpp
     connectmenu.cpp
@@ -23,7 +15,7 @@ set(kandas_SRCS
     window.cpp
 )
 find_path(KANDASD_INTERFACE_PATH NAMES org.kandas.xml PATH_SUFFIXES kandasd)
-qt4_add_dbus_interface(kandas_SRCS ${KANDASD_INTERFACE_PATH}/org.kandas.xml interface)
+qt4_add_dbus_interface(kandas_SRCS ${CMAKE_SOURCE_DIR}/kandasd/org.kandas.xml interface)
 kde4_add_ui_files(kandas_SRCS adddialog.ui)
 
 kde4_add_executable(kandas ${kandas_SRCS})

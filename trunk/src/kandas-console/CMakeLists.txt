@@ -1,17 +1,8 @@
-project(kandas-console)
-
-find_package(KDE4 REQUIRED)
-include(KDE4Defaults)
-include(MacroLibrary)
-
-add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINTIONS})
-include_directories(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${KDE4_INCLUDES})
-
 SET(kandas_base_SRCS
     base-worker.cpp
 )
 find_path(KANDASD_INTERFACE_PATH NAMES org.kandas.xml PATH_SUFFIXES kandasd)
-qt4_add_dbus_interface(kandas_base_SRCS ${KANDASD_INTERFACE_PATH}/org.kandas.xml interface)
+qt4_add_dbus_interface(kandas_base_SRCS ${CMAKE_SOURCE_DIR}/kandasd/org.kandas.xml interface)
 
 set(kandas_info_SRCS
     ${kandas_base_SRCS}
